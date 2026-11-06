@@ -73,11 +73,11 @@ packetlab/
 
 **Step 6 — Simulator page v1 (60 min)**
 
-- [ ] Selects: topology, source, destination; “Lancer”
-- [ ] SVG drawn from the JSON (`viewBox` so it scales); active device and link in cyan; packet as a dot on the current link
-- [ ] Player: précédent · suivant · lecture/pause · rejouer, step counter, speed 0.5× / 1× / 2×
-- [ ] Keyboard: ← → steps, space play/pause, R rejouer
-- [ ] Panels: headers (MAC, IP, TTL, changed value highlighted), table consulted, log with the current line highlighted
+- [x] Selects: topology, source, destination; “Lancer”
+- [x] SVG drawn from the JSON (`viewBox` so it scales); active device and link in cyan; packet as a dot on the current link
+- [x] Player: précédent · suivant · lecture/pause · rejouer, step counter, speed 0.5× / 1× / 2×
+- [x] Keyboard: ← → steps, space play/pause, R rejouer
+- [x] Panels: headers (MAC, IP, TTL, changed value highlighted), table consulted, log with the current line highlighted
 
 **Step 7 — Deploy (10 min)**
 

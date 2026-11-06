@@ -22,9 +22,62 @@
     </nav>
   </header>
 
-  <main class="page">
+  <main class="page sim">
     <h1>Voyage d'un paquet</h1>
-    <p class="intro">Choisissez une topologie, une source et une destination, puis suivez le paquet saut par saut.</p>
+
+    <form class="sim-setup" id="setup">
+      <label>Topologie <select id="topo"></select></label>
+      <label>Source <select id="src"></select></label>
+      <label>Destination <select id="dst"></select></label>
+      <button type="submit" class="primary" id="run">Lancer</button>
+    </form>
+    <p class="intro" id="topo-desc"></p>
+    <p class="error" id="error" hidden></p>
+
+    <div class="sim-layout">
+      <section class="sim-stage" aria-label="Topologie et contrôles">
+        <svg id="topology" class="topology" role="img" aria-label="Schéma de la topologie choisie"></svg>
+        <p class="caption" id="caption" aria-live="polite"></p>
+
+        <div class="player" id="player">
+          <button type="button" data-action="prev" aria-label="Étape précédente" title="Étape précédente (←)">◀ Précédent</button>
+          <button type="button" data-action="play" class="primary" title="Lecture / pause (Espace)">▶ Lecture</button>
+          <button type="button" data-action="next" aria-label="Étape suivante" title="Étape suivante (→)">Suivant ▶</button>
+          <button type="button" data-action="replay" aria-label="Rejouer depuis le début" title="Rejouer (R)">↺ Rejouer</button>
+          <label class="speed">Vitesse
+            <select data-role="speed">
+              <option value="0.5">0,5×</option>
+              <option value="1" selected>1×</option>
+              <option value="2">2×</option>
+            </select>
+          </label>
+          <span class="counter" data-role="counter" aria-live="polite"></span>
+          <span class="sim-time" id="sim-time"></span>
+        </div>
+        <p class="keys">Clavier : ← → étape par étape · Espace lecture/pause · R rejouer</p>
+        <p class="legend">
+          <span class="dot dot-arp"></span> trame ARP
+          <span class="dot dot-data"></span> trame de données
+          <span class="dot dot-active"></span> équipement / lien actif
+        </p>
+      </section>
+
+      <aside class="sim-panels">
+        <section class="panel">
+          <h2>En-têtes</h2>
+          <div id="headers"></div>
+        </section>
+        <section class="panel">
+          <h2>Table consultée</h2>
+          <div id="tables"></div>
+        </section>
+        <section class="panel">
+          <h2>Journal</h2>
+          <ol class="log" id="log"></ol>
+        </section>
+      </aside>
+    </div>
   </main>
+  <script type="module" src="./js/ui/simulator-page.js"></script>
 </body>
 </html>
