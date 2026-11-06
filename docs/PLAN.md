@@ -56,13 +56,13 @@ packetlab/
 
 **Step 4 — Engine core (50 min) — must be done tonight**
 
-- [ ] `scheduler.js`: events sorted by simulated time, ties by insertion order
-- [ ] Event = `{ t, type, device, frame, note, tables }`: `note` is the French log sentence, `tables` a copy of the tables after the event (this makes “étape précédente” and “rejouer” trivial)
-- [ ] PC: ARP for the destination (same subnet) or the gateway (other subnet); hold the data until the reply
-- [ ] Switch: learn source MAC + port; forward to one port or flood; never change the frame
-- [ ] Router: TTL − 1 (drop at 0), longest-prefix match, ARP for the next hop, rewrite both MACs, keep both IPs
-- [ ] Tests: worked example (MACs per segment, TTL 64/63/62), IPs unchanged, same input = same events, étoile never uses a router
-- [ ] `node tests/print-log.js mixte PC-A PC-B` prints the journey; read it once and check it against § 7.1
+- [x] `scheduler.js`: events sorted by simulated time, ties by insertion order
+- [x] Event = `{ t, type, device, frame, note, tables }`: `note` is the French log sentence, `tables` a copy of the tables after the event (this makes “étape précédente” and “rejouer” trivial)
+- [x] PC: ARP for the destination (same subnet) or the gateway (other subnet); hold the data until the reply
+- [x] Switch: learn source MAC + port; forward to one port or flood; never change the frame
+- [x] Router: TTL − 1 (drop at 0), longest-prefix match, ARP for the next hop, rewrite both MACs, keep both IPs
+- [x] Tests: worked example (MACs per segment, TTL 64/63/62), IPs unchanged, same input = same events, étoile never uses a router
+- [x] `node tests/print-log.js mixte PC-A PC-B` prints the journey; read it once and check it against § 7.1
 
 **Step 5 — Bus, anneau, maillée (30 min)**
 

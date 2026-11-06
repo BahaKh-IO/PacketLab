@@ -59,9 +59,9 @@ Frozen at step 3. Any change to these formats must be agreed first (see CLAUDE.m
 ## Simulation event (produced by `simulate()`, never stored)
 
 - `t` — number, simulated time in milliseconds.
-- `type` — string: `"send"`, `"arp-request"`, `"arp-reply"`, `"arp-learn"`, `"mac-learn"`, `"forward"`, `"flood"`, `"route"`, `"receive"`, `"ignore"`, `"deliver"`, `"drop"`.
+- `type` — string: `"start"` (source decides: destination or gateway), `"arp-request"`, `"arp-reply"`, `"arp-learn"`, `"mac-learn"`, `"send"` (PC or router puts a data frame on a link), `"forward"` (one port / next station), `"flood"` (several ports / whole bus), `"route"`, `"ignore"`, `"deliver"`, `"drop"`.
 - `device` — string, id of the device that acts.
-- `link` — string or `null`, id of the link the frame is put on (or arrives from) during this event.
+- `links` — array of link ids the frame is put on by this event (several for a flood, `[]` when the frame stops here).
 - `frame` — copy of the Frame concerned, or `null`.
 - `note` — string, French sentence for the log.
 - `tables` — deep copy of every device's `arp`, `macTable` and `routes` after the event, keyed by device id.
@@ -70,4 +70,4 @@ Frozen at step 3. Any change to these formats must be agreed first (see CLAUDE.m
 - `kind` — `"arp"` or `"data"`.
 - `macSrc`, `macDst` — strings; `macDst` is `"FF:FF:FF:FF:FF:FF"` for a broadcast.
 - `arp` — ARP frames only: `{ "op": "request" | "reply", "senderIp", "senderMac", "targetIp", "targetMac" }`.
-- `ipSrc`, `ipDst`, `ttl` — data frames only.
+- `ipSrc`, `ipDst`, `ttl` — data frames only (`macDst` is `null` in the `start` event, before ARP).
