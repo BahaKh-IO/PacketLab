@@ -22,9 +22,94 @@
     </nav>
   </header>
 
-  <main class="page">
+  <main class="page lab">
     <h1>Labo fiabilité</h1>
     <p class="intro">Perdez ou retardez des morceaux d'un message, puis comparez la livraison avec et sans retransmission.</p>
+
+    <form class="lab-setup" id="setup">
+      <div class="lab-fields">
+        <label class="field-message">Message
+          <input id="message" type="text" maxlength="60" value="Rendez-vous à SUP'COM à 10h" autocomplete="off">
+        </label>
+        <label>Taille d'un morceau
+          <select id="taille">
+            <option value="3">3 caractères</option>
+            <option value="4" selected>4 caractères</option>
+            <option value="5">5 caractères</option>
+            <option value="6">6 caractères</option>
+            <option value="8">8 caractères</option>
+          </select>
+        </label>
+      </div>
+
+      <fieldset class="script">
+        <legend>Script d'incidents : cliquez sur un morceau pour le perdre ou le retarder</legend>
+        <div class="chips" id="chips"></div>
+        <p class="hint">Normal → perdu (disparaît au routeur B) → retard court 60 ms (arrive dans le désordre) → retard long 300 ms (plus long que le délai d'attente).</p>
+      </fieldset>
+
+      <fieldset class="modes">
+        <legend>Mode</legend>
+        <label><input type="radio" name="mode" value="sans" checked> Sans récupération</label>
+        <label><input type="radio" name="mode" value="avec"> Avec récupération</label>
+        <label><input type="radio" name="mode" value="comparer"> Comparer les deux</label>
+        <button type="submit" class="primary" id="run">Lancer</button>
+      </fieldset>
+    </form>
+
+    <section class="lab-stage" aria-label="Réseau et contrôles">
+      <div class="lanes" id="lanes">
+        <p class="lab-empty">Écrivez le script d'incidents, choisissez un mode, puis cliquez sur « Lancer ».</p>
+      </div>
+
+      <div class="player" id="player">
+        <button type="button" data-action="prev" aria-label="Instant précédent" title="Instant précédent (←)"><span class="icon" aria-hidden="true">◀</span><span class="label"> Précédent</span></button>
+        <button type="button" data-action="play" class="primary" title="Lecture / pause (Espace)"><span class="icon" aria-hidden="true">▶</span><span class="label"> Lecture</span></button>
+        <button type="button" data-action="next" aria-label="Instant suivant" title="Instant suivant (→)"><span class="label">Suivant </span><span class="icon" aria-hidden="true">▶</span></button>
+        <button type="button" data-action="replay" aria-label="Rejouer depuis le début" title="Rejouer (R)"><span class="icon" aria-hidden="true">↺</span><span class="label"> Rejouer</span></button>
+        <label class="speed"><span class="label">Vitesse</span>
+          <select data-role="speed" aria-label="Vitesse">
+            <option value="0.5">0,5×</option>
+            <option value="1" selected>1×</option>
+            <option value="2">2×</option>
+            <option value="4">4×</option>
+          </select>
+        </label>
+        <span class="counter" data-role="counter" aria-live="polite"></span>
+        <span class="sim-time" id="lab-time"></span>
+      </div>
+      <p class="keys">Clavier : ← → instant par instant · Espace lecture/pause · R rejouer</p>
+      <p class="legend">
+        <span class="mini mini-chunk">3</span> morceau
+        <span class="mini mini-resend">3</span> morceau renvoyé
+        <span class="mini mini-ack">A3</span> ACK
+        <span class="mini mini-loss">3</span> morceau perdu
+        · Émetteur : <span class="mini sender-envoye">n</span> envoyé
+        <span class="mini sender-expire">n</span> délai expiré
+        <span class="mini sender-confirme">n</span> confirmé
+      </p>
+    </section>
+
+    <section class="results" id="results" hidden aria-live="polite">
+      <h2>Résultats</h2>
+      <div class="table-wrap"><table class="data-table results-table" id="results-table"></table></div>
+      <p class="hint">Temps total : instant où le message est complet chez le récepteur, ou fin de la simulation s'il reste troué.</p>
+    </section>
+
+    <details class="about">
+      <summary>À propos du modèle</summary>
+      <p>Ce labo montre l'idée de l'acquittement et de la retransmission. C'est un modèle simplifié, <strong>ce n'est pas TCP</strong> :</p>
+      <ul>
+        <li>Le chemin est fixe : émetteur → routeur A → routeur B → récepteur, 20 ms par lien.</li>
+        <li>L'émetteur envoie un morceau toutes les 10 ms, sans attendre les ACK (pas de fenêtre, pas de contrôle de congestion).</li>
+        <li>Le récepteur envoie un ACK par morceau (pas d'ACK cumulatif) ; dans ce modèle, les ACK ne se perdent jamais.</li>
+        <li>Le délai d'attente est fixe : <span id="delai-attente"></span> ms par morceau (TCP le calcule à partir des temps mesurés).</li>
+        <li>Une perte ou un retard du script ne touche que le premier envoi du morceau ; le renvoi passe toujours.</li>
+        <li>Les morceaux sont numérotés 1, 2, 3… (TCP numérote les octets).</li>
+        <li>Le même script donne toujours exactement la même exécution : rien n'est tiré au hasard.</li>
+      </ul>
+    </details>
   </main>
+  <script type="module" src="./js/ui/reliability-page.js"></script>
 </body>
 </html>

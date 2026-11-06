@@ -113,12 +113,12 @@ Goal: the demo step of § 18 works: chunk 3 lost without recovery (hole), then w
 
 **Page (`fiabilite.html`)**
 
-- [ ] Message input, chunk size, click a chunk to set perdre / retarder / normal
-- [ ] Network strip with chunks moving; lost chunk crossed out; retransmission in violet
-- [ ] Receiver cells filling in arrival order
-- [ ] “Comparer”: both modes animated side by side on the same script, then the results table
-- [ ] Same controls as the simulator (step, play, speed, keyboard)
-- [ ] “À propos du modèle” panel: simplifications, not TCP
+- [x] Message input, chunk size, click a chunk to set perdre / retarder / normal
+- [x] Network strip with chunks moving; lost chunk crossed out; retransmission in violet
+- [x] Receiver cells filling in arrival order
+- [x] “Comparer”: both modes animated side by side on the same script, then the results table
+- [x] Same controls as the simulator (step, play, speed, keyboard)
+- [x] “À propos du modèle” panel: simplifications, not TCP
 
 ## Session 4 — Quizzes, fiches, courses, progress (≈ 3 h)
 

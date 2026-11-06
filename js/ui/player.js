@@ -3,9 +3,9 @@
 //   info.delay   — duration of one step at the current speed (ms), for animations
 //   info.forward — true when we just moved one step forward (not back, not a jump)
 
-const BASE_DELAY_MS = 1400; // time per step at speed 1×
+const BASE_DELAY_MS = 1400; // default time per step at speed 1×
 
-export function createPlayer(root, onChange) {
+export function createPlayer(root, onChange, { baseDelay = BASE_DELAY_MS } = {}) {
   const btn = (a) => root.querySelector(`[data-action="${a}"]`);
   const prevBtn = btn('prev');
   const nextBtn = btn('next');
@@ -20,7 +20,7 @@ export function createPlayer(root, onChange) {
   let locked = false; // a bubble or a question is open
   let timer = null;
 
-  const stepDelay = () => BASE_DELAY_MS / Number(speedSelect.value);
+  const stepDelay = () => baseDelay / Number(speedSelect.value);
 
   function render() {
     counter.textContent = count ? `Étape ${index + 1} / ${count}` : 'Étape – / –';
