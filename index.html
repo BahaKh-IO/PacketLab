@@ -22,9 +22,62 @@
     </nav>
   </header>
 
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="hero-text">
+        <h1>Voir voyager les paquets</h1>
+        <p>Choisissez une topologie, envoyez un paquet et suivez-le saut par saut : adresses MAC et IP, TTL, tables ARP, MAC et de routage. Tout est déjà configuré.</p>
+        <div class="hero-actions">
+          <a class="button primary" href="./simulateur.html?topo=mixte&amp;src=PC-A&amp;dst=PC-B">Lancer l'exemple PC-A → PC-B</a>
+          <a class="button ghost" href="./simulateur.html">Choisir une topologie</a>
+        </div>
+      </div>
+      <svg class="hero-art" viewBox="0 0 360 150" role="img" aria-label="Un paquet passe de PC-A à PC-B par un switch et deux routeurs">
+        <polyline class="hero-link" points="30,75 105,75 180,75 255,75 330,75" />
+        <rect class="hero-node" x="6" y="57" width="48" height="36" rx="6" /><text x="30" y="80">PC-A</text>
+        <rect class="hero-node" x="79" y="60" width="52" height="30" rx="4" /><text x="105" y="80">SW1</text>
+        <circle class="hero-node" cx="180" cy="75" r="22" /><text x="180" y="80">R1</text>
+        <circle class="hero-node" cx="255" cy="75" r="22" /><text x="255" y="80">R2</text>
+        <rect class="hero-node" x="306" y="57" width="48" height="36" rx="6" /><text x="330" y="80">PC-B</text>
+        <circle class="hero-packet" cx="30" cy="40" r="8" />
+        <text class="hero-caption" x="180" y="128">MAC réécrites à chaque routeur · IP inchangées · TTL 64 → 62</text>
+      </svg>
+    </div>
+  </section>
+
   <main class="page">
-    <h1>PacketLab</h1>
-    <p class="intro">Apprendre les réseaux en voyant voyager les paquets : topologies, adresses, routeurs et switchs, sans configuration.</p>
+    <section class="resume" id="resume" hidden aria-live="polite">
+      <div>
+        <p class="resume-kicker">Reprendre</p>
+        <p class="resume-text" id="resume-text"></p>
+      </div>
+      <a class="button primary" id="resume-link" href="./simulateur.html">Continuer</a>
+    </section>
+
+    <h2 class="section-title">Trois modules</h2>
+    <div class="cards">
+      <article class="card">
+        <p class="card-kicker">Module A</p>
+        <h3>Voyage d'un paquet</h3>
+        <p>Cinq topologies prêtes (étoile, bus, anneau, maillée, mixte). Le paquet avance étape par étape ; à chaque saut on voit les en-têtes et les tables, avec des questions en cours de route.</p>
+        <a class="card-link" href="./simulateur.html">Ouvrir le simulateur →</a>
+      </article>
+      <article class="card">
+        <p class="card-kicker">Module B</p>
+        <h3>Labo fiabilité</h3>
+        <p>Un message découpé en morceaux traverse le réseau. Perdez-en un, retardez-en un autre, puis comparez la livraison sans et avec acquittements et retransmissions.</p>
+        <a class="card-link" href="./fiabilite.html">Ouvrir le labo →</a>
+        <p class="card-soon">En construction</p>
+      </article>
+      <article class="card">
+        <p class="card-kicker">Module C</p>
+        <h3>Apprendre et s'évaluer</h3>
+        <p>Des fiches d'une page, des cours PDF et des quiz corrigés par thème : adressage, MAC, ARP, commutation, routage, topologies, fiabilité.</p>
+        <p class="card-links"><a href="./fiches.html">Fiches</a> · <a href="./cours.html">Cours</a> · <a href="./quiz.html">Quiz</a> · <a href="./progression.html">Progression</a></p>
+        <p class="card-soon">En construction</p>
+      </article>
+    </div>
   </main>
+  <script type="module" src="./js/ui/home.js"></script>
 </body>
 </html>

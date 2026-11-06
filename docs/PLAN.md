@@ -95,8 +95,8 @@ Goal: the simulator teaches on its own, without you explaining next to it.
 - [x] Write those questions for mixte (3) and maillée (2)
 - [x] Click a device → its tables open in the side panel; click a log line → jump to that step
 - [x] Responsive: under 768 px the drawing on top, panels as tabs below, controls sticky, buttons ≥ 44 px
-- [ ] Home page: hero, three module cards, “reprendre” from localStorage
-- [ ] URL parameters (`simulateur.html?topo=mixte&src=PC-A&dst=PC-B`) so fiches and the demo open a ready scenario
+- [x] Home page: hero, three module cards, “reprendre” from localStorage
+- [x] URL parameters (`simulateur.html?topo=mixte&src=PC-A&dst=PC-B`) so fiches and the demo open a ready scenario
 
 ## Session 3 — Labo fiabilité, full version (≈ 3 h)
 

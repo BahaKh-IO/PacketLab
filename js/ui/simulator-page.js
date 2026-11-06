@@ -7,6 +7,7 @@ import { createPlayer } from './player.js';
 import { renderHeaders, renderTables, createLog } from './panels.js';
 import { createCoach } from './coach.js';
 import { bubblesFor, markSeen, resetSeen } from './bubbles.js';
+import { save } from '../storage.js';
 
 const TOPOLOGY_IDS = ['mixte', 'etoile', 'bus', 'anneau', 'maillee'];
 
@@ -33,6 +34,7 @@ let view = null;
 let events = [];
 let questions = []; // questions of the current run
 let selectedDevice = null; // device clicked in the drawing (null: the active device)
+let runPair = null; // { src, dst } of the current run
 const answered = new Set(); // questions already asked in this run
 
 /** Draw step i (reads the event list only). */
@@ -44,6 +46,8 @@ function render(i, delay) {
   renderHeaders(headersEl, events, i);
   showTables(i);
   log.show(i);
+  // Remembered for the "Reprendre" box of the home page.
+  save('dernier-scenario', { topo: topo.id, nom: topo.nom, ...runPair, etape: i + 1, total: events.length });
 }
 
 /** Small line above the tables when they belong to a clicked device, not the active one. */
@@ -175,6 +179,9 @@ function run() {
   const src = srcSelect.value;
   const dst = dstSelect.value;
   events = simulate(topo, src, dst);
+  runPair = { src, dst };
+  // Shareable address of this scenario (no reload).
+  history.replaceState(null, '', `?${new URLSearchParams({ topo: topo.id, src, dst })}`);
   questions = (topo.questions ?? []).filter((q) => q.source === src && q.destination === dst);
   answered.clear();
   log.load(events);
@@ -207,7 +214,22 @@ async function init() {
     resetSeen();
     $('reset-bubbles').textContent = 'Bulles réactivées ✓';
   });
-  selectTopology(TOPOLOGY_IDS[0]);
+  openFromUrl();
+}
+
+/** simulateur.html?topo=mixte&src=PC-A&dst=PC-B&etape=12 opens a ready scenario. */
+function openFromUrl() {
+  const q = new URLSearchParams(location.search);
+  const id = q.get('topo');
+  if (!topologies.has(id)) {
+    selectTopology(TOPOLOGY_IDS[0]);
+    return;
+  }
+  selectTopology(id, q.get('src'), q.get('dst'));
+  if (!q.has('src') || !q.has('dst') || runBtn.disabled) return;
+  run();
+  const step = Number(q.get('etape'));
+  if (Number.isInteger(step) && step > 1) player.go(step - 1); // a jump: no question or bubble on the way
 }
 
 init();
