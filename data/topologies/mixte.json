@@ -69,5 +69,43 @@
     { "id": "L5", "a": "R2:e1", "b": "SW2:p1", "delai": 10 },
     { "id": "L6", "a": "SW2:p2", "b": "PC-B:eth0", "delai": 10 },
     { "id": "L7", "a": "SW2:p3", "b": "PC-D:eth0", "delai": 10 }
+  ],
+  "questions": [
+    {
+      "source": "PC-A", "destination": "PC-B", "apresEtape": 2,
+      "enonce": "La requête ARP de PC-A arrive à SW1, dont la table MAC est encore vide. Que va faire SW1 ?",
+      "choix": [
+        "L'envoyer seulement vers R1, la passerelle",
+        "En envoyer une copie sur tous ses autres ports",
+        "La renvoyer à PC-A",
+        "La jeter, car il ne connaît pas la destination"
+      ],
+      "bonne": 1,
+      "explication": "La MAC destination est FF:FF:FF:FF:FF:FF (diffusion) : un switch envoie une diffusion sur tous ses ports sauf celui d'arrivée, donc vers PC-C et vers R1 (étape 4). Au passage, il apprend que AA:AA:AA:00:00:0A se trouve derrière son port p1."
+    },
+    {
+      "source": "PC-A", "destination": "PC-B", "apresEtape": 12,
+      "enonce": "R1 va envoyer la trame vers R2. Quelle sera sa MAC source ?",
+      "choix": [
+        "AA:AA:AA:00:00:0A (PC-A)",
+        "11:11:11:00:00:01 (R1, interface e0)",
+        "11:11:11:00:00:02 (R1, interface e1)",
+        "22:22:22:00:00:01 (R2, interface e0)"
+      ],
+      "bonne": 2,
+      "explication": "Un routeur met comme MAC source celle de son interface de sortie. La route choisie sort par e1, donc 11:11:11:00:00:02 (étape 16). La MAC de PC-A ne sort jamais de son réseau local ; l'IP source, elle, reste 192.168.1.10."
+    },
+    {
+      "source": "PC-A", "destination": "PC-B", "apresEtape": 17,
+      "enonce": "Quelle sera la MAC destination de la trame après R2 ?",
+      "choix": [
+        "22:22:22:00:00:02 (R2, interface e1)",
+        "BB:BB:BB:00:00:0B (PC-B)",
+        "FF:FF:FF:FF:FF:FF (diffusion)",
+        "22:22:22:00:00:01 (R2, interface e0)"
+      ],
+      "bonne": 1,
+      "explication": "Le réseau 192.168.2.0/24 est directement connecté à R2 : le prochain saut est PC-B lui-même. R2 trouve sa MAC par ARP (la requête, elle, part en diffusion), puis envoie la trame à BB:BB:BB:00:00:0B (étape 26). L'IP destination est restée 192.168.2.20 depuis le début."
+    }
   ]
 }

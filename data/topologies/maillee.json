@@ -110,5 +110,31 @@
     { "id": "L9", "a": "R4:e0", "b": "SW2:p1", "delai": 10 },
     { "id": "L10", "a": "SW2:p2", "b": "PC-B:eth0", "delai": 10 },
     { "id": "L11", "a": "SW2:p3", "b": "PC-D:eth0", "delai": 10 }
+  ],
+  "questions": [
+    {
+      "source": "PC-A", "destination": "PC-B", "apresEtape": 11,
+      "enonce": "R1 connaît deux routes qui mènent à 192.168.2.20 : « 192.168.2.0/24 via 10.0.12.2 (R2) » et la route par défaut « 0.0.0.0/0 via 10.0.13.2 (R3) ». Laquelle choisit-il ?",
+      "choix": [
+        "La route par défaut, via R3",
+        "192.168.2.0/24, via R2",
+        "Les deux : une copie part sur chaque chemin",
+        "Aucune : le paquet est jeté"
+      ],
+      "bonne": 1,
+      "explication": "Quand plusieurs routes conviennent, le routeur prend la plus précise, celle qui a le plus long préfixe : /24 est plus long que /0. R1 envoie donc vers R2 (étape 12, ligne surlignée dans sa table de routage). La route par défaut ne sert que si aucune autre ne convient."
+    },
+    {
+      "source": "PC-B", "destination": "PC-A", "apresEtape": 11,
+      "enonce": "Le paquet de PC-B arrive à R4. Pour revenir vers 192.168.1.10, par quel routeur R4 va-t-il le faire passer ?",
+      "choix": [
+        "R2, par le même chemin qu'à l'aller",
+        "R3",
+        "Directement R1",
+        "R2 et R3 en même temps"
+      ],
+      "bonne": 1,
+      "explication": "La table de R4 a une seule route vers 192.168.1.0/24 : via 10.0.34.1, c'est-à-dire R3 (étape 12). Chaque routeur décide seul, avec sa propre table : l'aller (R1 → R2 → R4) et le retour (R4 → R3 → R1) ne prennent pas le même chemin. R4 n'a d'ailleurs aucun lien direct avec R1."
+    }
   ]
 }
