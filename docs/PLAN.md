@@ -89,8 +89,8 @@ packetlab/
 Goal: the simulator teaches on its own, without you explaining next to it.
 
 - [x] Finish any step from today that is not done
-- [ ] Smooth packet animation along the link (`requestAnimationFrame`), broadcast as several packets, dropped frame shown with a cross
-- [ ] Teaching bubbles, shown once each, the first time it happens: switch keeps the addresses; router rewrites the MACs and keeps the IPs; TTL decreases; ARP finds the MAC
+- [x] Smooth packet animation along the link (`requestAnimationFrame`), broadcast as several packets, dropped frame shown with a cross
+- [x] Teaching bubbles, shown once each, the first time it happens: switch keeps the addresses; router rewrites the MACs and keeps the IPs; TTL decreases; ARP finds the MAC
 - [ ] Questions during the simulation: optional `questions` array in a topology JSON (`{ apresEtape, enonce, choix, bonne, explication }`); the player pauses and asks, e.g. “Quelle sera la MAC destination après R2 ?”
 - [ ] Write those questions for mixte (3) and maillée (2)
 - [ ] Click a device → its tables open in the side panel; click a log line → jump to that step

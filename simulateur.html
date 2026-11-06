@@ -37,6 +37,7 @@
     <div class="sim-layout">
       <section class="sim-stage" aria-label="Topologie et contrôles">
         <svg id="topology" class="topology" role="img" aria-label="Schéma de la topologie choisie"></svg>
+        <div class="coach" id="coach" role="dialog" aria-live="polite" aria-label="Aide et questions" hidden></div>
         <p class="caption" id="caption" aria-live="polite"></p>
 
         <div class="player" id="player">
@@ -54,7 +55,8 @@
           <span class="counter" data-role="counter" aria-live="polite"></span>
           <span class="sim-time" id="sim-time"></span>
         </div>
-        <p class="keys">Clavier : ← → étape par étape · Espace lecture/pause · R rejouer</p>
+        <p class="keys">Clavier : ← → étape par étape · Espace lecture/pause · R rejouer
+          · <button type="button" class="link-button" id="reset-bubbles">Réafficher les bulles d'aide</button></p>
         <p class="legend">
           <span class="dot dot-arp"></span> trame ARP
           <span class="dot dot-data"></span> trame de données

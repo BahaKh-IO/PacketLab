@@ -56,7 +56,7 @@ export function createTopologyView(svg, topo) {
     const el = svgEl('polyline', { points: `${p1.x},${p1.y} ${mid.x},${mid.y} ${p2.x},${p2.y}`, class: 'link' });
     if (ring) el.setAttribute('marker-mid', 'url(#arrow)'); // direction of the ring
     layerLinks.append(el);
-    links.set(l.id, { el, p1, p2 });
+    links.set(l.id, { el, p1, p2, aId, bId });
     // Port names near each end, only for devices with several ports (switch, router).
     for (const [p, q, name, devId] of [[p1, p2, aIf, aId], [p2, p1, bIf, bId]]) {
       if (byId.get(devId).type === 'bus' || byId.get(devId).interfaces.length < 2) continue;
@@ -88,26 +88,61 @@ export function createTopologyView(svg, topo) {
   }
 
   // ---------- highlight one event ----------
+  let frameRequest = null; // current requestAnimationFrame id
+
   function clear() {
+    cancelAnimationFrame(frameRequest);
     for (const g of nodes.values()) g.classList.remove('active');
     for (const { el } of links.values()) el.classList.remove('active');
     layerPackets.replaceChildren();
   }
 
-  function show(event) {
+  /**
+   * Move every dot from its start point to its end point in `duration` ms.
+   * Each dot is { el, from, to }. With duration 0 the dots are put at the end directly.
+   */
+  function animate(dots, duration) {
+    const place = (k) => {
+      const e = k * k * (3 - 2 * k); // smooth start and stop
+      for (const d of dots) {
+        d.el.setAttribute('cx', d.from.x + (d.to.x - d.from.x) * e);
+        d.el.setAttribute('cy', d.from.y + (d.to.y - d.from.y) * e);
+      }
+    };
+    if (duration <= 0) {
+      place(1);
+      return;
+    }
+    const start = performance.now();
+    const tick = (now) => {
+      const k = Math.min(1, (now - start) / duration);
+      place(k);
+      if (k < 1) frameRequest = requestAnimationFrame(tick);
+    };
+    place(0);
+    frameRequest = requestAnimationFrame(tick);
+  }
+
+  /** Show one event; the frame travels along its link(s) during `duration` ms. */
+  function show(event, { duration = 0 } = {}) {
     clear();
     if (!event) return;
     nodes.get(event.device)?.classList.add('active');
     const kind = event.frame?.kind ?? 'data';
+    const dots = [];
     for (const id of event.links) {
       const l = links.get(id);
       if (!l) continue;
       l.el.classList.add('active');
-      // The frame is on the link: dot at the middle (smooth animation comes in session 2).
-      const x = (l.p1.x + l.p2.x) / 2;
-      const y = (l.p1.y + l.p2.y) / 2;
-      layerPackets.append(svgEl('circle', { cx: x, cy: y, r: 9, class: `packet packet-${kind}` }));
+      // The frame leaves from the end of the link at the acting device.
+      const [from, to] = l.bId === event.device ? [l.p2, l.p1] : [l.p1, l.p2];
+      const end = { x: from.x + (to.x - from.x) * 0.8, y: from.y + (to.y - from.y) * 0.8 }; // stop before the icon
+      const el = svgEl('circle', { r: 9, class: `packet packet-${kind}` });
+      layerPackets.append(el);
+      dots.push({ el, from, to: end });
     }
+    const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    animate(dots, reduced ? 0 : duration);
     const p = byId.get(event.device)?.position;
     if (p && event.links.length === 0 && event.frame) {
       if (event.type === 'drop' || event.type === 'ignore') {

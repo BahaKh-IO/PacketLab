@@ -114,6 +114,7 @@ button.primary:hover:not(:disabled) { background: #245bd0; }
 }
 
 .sim-stage {
+  position: relative;
   background: var(--navy);
   color: #dfe7f5;
   border-radius: var(--radius);
@@ -188,3 +189,29 @@ button.primary:hover:not(:disabled) { background: #245bd0; }
 .log li.current { background: #e6f9fd; box-shadow: inset 3px 0 0 var(--cyan); }
 .log-step { font-weight: 700; }
 .log-time { font-family: var(--mono); color: var(--muted); }
+
+.data-table tr.chosen td { background: #ede9fe; font-weight: 700; box-shadow: inset 0 -2px 0 var(--violet); }
+.link-button { min-height: 0; padding: 0; border: 0; background: none; color: var(--cyan); text-decoration: underline; font-size: inherit; cursor: pointer; }
+
+/* Teaching bubbles and questions (coach) */
+.coach { margin: 0.5rem 0.25rem; }
+.coach-card {
+  background: #fff;
+  color: var(--ink);
+  border-radius: var(--radius);
+  border-top: 5px solid var(--cyan);
+  padding: 0.9rem 1.1rem;
+  box-shadow: 0 10px 30px rgb(0 0 0 / 0.45);
+}
+.coach-question { border-top-color: var(--violet); }
+.coach-card h3 { margin: 0.1rem 0 0.5rem; color: var(--navy); font-size: 1.05rem; }
+.coach-card p { margin: 0.4rem 0; line-height: 1.45; }
+.coach-kicker { margin: 0; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.coach-actions { display: flex; justify-content: flex-end; margin-top: 0.6rem; }
+.coach-choices { display: grid; gap: 0.4rem; }
+.coach-choices .choice { text-align: left; font-family: var(--mono); font-size: 0.9rem; }
+.choice.right { border-color: #16a34a; background: #dcfce7; color: #14532d; opacity: 1; }
+.choice.wrong { border-color: var(--red); background: #fee2e2; color: #7f1d1d; opacity: 1; }
+.verdict { font-weight: 700; }
+.verdict.right { color: #15803d; }
+.verdict.wrong { color: #b91c1c; }

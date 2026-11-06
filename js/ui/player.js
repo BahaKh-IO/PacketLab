@@ -1,7 +1,9 @@
 // player.js — step controls: précédent, suivant, lecture/pause, rejouer, speed, keyboard.
-// It only knows a step index and a number of steps; onChange(index) does the drawing.
+// It only knows a step index and a number of steps; onChange(index, info) does the drawing.
+//   info.delay   — duration of one step at the current speed (ms), for animations
+//   info.forward — true when we just moved one step forward (not back, not a jump)
 
-const BASE_DELAY_MS = 1200; // time per step at speed 1×
+const BASE_DELAY_MS = 1400; // time per step at speed 1×
 
 export function createPlayer(root, onChange) {
   const btn = (a) => root.querySelector(`[data-action="${a}"]`);
@@ -15,39 +17,45 @@ export function createPlayer(root, onChange) {
   let count = 0;
   let index = 0;
   let playing = false;
+  let locked = false; // a bubble or a question is open
   let timer = null;
+
+  const stepDelay = () => BASE_DELAY_MS / Number(speedSelect.value);
 
   function render() {
     counter.textContent = count ? `Étape ${index + 1} / ${count}` : 'Étape – / –';
-    prevBtn.disabled = !count || index === 0;
-    nextBtn.disabled = !count || index === count - 1;
-    playBtn.disabled = !count;
-    replayBtn.disabled = !count;
+    prevBtn.disabled = locked || !count || index === 0;
+    nextBtn.disabled = locked || !count || index === count - 1;
+    playBtn.disabled = locked || !count;
+    replayBtn.disabled = locked || !count;
     playBtn.textContent = playing ? '❚❚ Pause' : '▶ Lecture';
     playBtn.setAttribute('aria-label', playing ? 'Pause' : 'Lecture');
   }
 
   function go(i) {
     if (!count) return;
-    index = Math.max(0, Math.min(count - 1, i));
+    const target = Math.max(0, Math.min(count - 1, i));
+    const forward = target === index + 1;
+    index = target;
     render();
-    onChange(index);
+    onChange(index, { delay: stepDelay(), forward });
   }
 
   function schedule() {
     clearTimeout(timer);
     timer = setTimeout(() => {
+      if (locked) return;
       if (index < count - 1) {
         go(index + 1);
-        schedule();
+        if (playing) schedule();
       } else {
         pause();
       }
-    }, BASE_DELAY_MS / Number(speedSelect.value));
+    }, stepDelay());
   }
 
   function play() {
-    if (!count) return;
+    if (!count || locked) return;
     if (index >= count - 1) go(0);
     playing = true;
     render();
@@ -70,7 +78,14 @@ export function createPlayer(root, onChange) {
     count = n;
     index = 0;
     render();
-    if (count) onChange(0);
+    if (count) onChange(0, { delay: stepDelay(), forward: false });
+  }
+
+  /** While locked, buttons and keys do nothing (a bubble or a question is open). */
+  function lock(flag) {
+    locked = flag;
+    if (flag) clearTimeout(timer);
+    render();
   }
 
   prevBtn.addEventListener('click', () => step(-1));
@@ -81,7 +96,7 @@ export function createPlayer(root, onChange) {
 
   // Keyboard: ← → steps, space play/pause, R rejouer.
   document.addEventListener('keydown', (e) => {
-    if (!count || e.ctrlKey || e.metaKey || e.altKey) return;
+    if (!count || locked || e.ctrlKey || e.metaKey || e.altKey) return;
     const tag = e.target.tagName;
     if (tag === 'SELECT' || tag === 'INPUT' || tag === 'TEXTAREA') return;
     if (e.key === 'ArrowLeft') { e.preventDefault(); step(-1); }
@@ -91,9 +106,13 @@ export function createPlayer(root, onChange) {
   });
   // A focused button would also "click" on space: block that, space is play/pause.
   document.addEventListener('keyup', (e) => {
-    if (e.key === ' ' && e.target.tagName === 'BUTTON') e.preventDefault();
+    if (e.key === ' ' && e.target.tagName === 'BUTTON' && !locked) e.preventDefault();
   });
 
   render();
-  return { load, go, play, pause };
+  return {
+    load, go, play, pause, lock,
+    get playing() { return playing; },
+    get index() { return index; },
+  };
 }

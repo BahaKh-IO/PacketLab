@@ -69,7 +69,7 @@ function table(caption, head, rows, prevRows) {
   if (rows.length === 0) tb.append(h('tr', null, Object.assign(h('td', 'muted', '(vide)'), { colSpan: head.length })));
   for (const r of rows) {
     const isNew = prevRows && !prevKeys.has(JSON.stringify(r.raw));
-    tb.append(h('tr', isNew ? 'new' : null, ...r.cells.map((c) => h('td', null, c))));
+    tb.append(h('tr', r.chosen ? 'chosen' : isNew ? 'new' : null, ...r.cells.map((c) => h('td', null, c))));
   }
   t.append(tb);
   return t;
@@ -95,7 +95,11 @@ export function renderTables(el, events, i, topo) {
   }
   if (now.routes) {
     parts.push(table(`Table de routage de ${dev.id}`, ['Réseau', 'Prochain saut', 'Interface'],
-      now.routes.map((r) => ({ raw: r, cells: [`${r.reseau}/${r.masque}`, r.prochainSaut ?? 'direct', r.interface] })), null));
+      now.routes.map((r) => ({
+        raw: r,
+        chosen: e.route && JSON.stringify(e.route) === JSON.stringify(r), // route picked at this step
+        cells: [`${r.reseau}/${r.masque}`, r.prochainSaut ?? 'direct', r.interface],
+      })), null));
   }
   el.replaceChildren(...parts);
 }
