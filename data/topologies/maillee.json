@@ -1,0 +1,114 @@
+{
+  "id": "maillee",
+  "nom": "Maillée : quatre routeurs, plusieurs chemins",
+  "type": "maillee",
+  "description": "Deux réseaux locaux reliés par quatre routeurs maillés : plusieurs chemins existent, la table de routage de chaque routeur choisit le sien (l'aller et le retour ne passent pas par les mêmes routeurs).",
+  "devices": [
+    {
+      "id": "PC-A", "type": "pc", "position": { "x": 50, "y": 110 },
+      "interfaces": [{ "nom": "eth0", "ip": "192.168.1.10", "masque": 24, "mac": "AA:AA:AA:00:00:0A" }],
+      "gateway": "192.168.1.1", "arp": []
+    },
+    {
+      "id": "PC-C", "type": "pc", "position": { "x": 50, "y": 310 },
+      "interfaces": [{ "nom": "eth0", "ip": "192.168.1.11", "masque": 24, "mac": "CC:CC:CC:00:00:0C" }],
+      "gateway": "192.168.1.1", "arp": []
+    },
+    {
+      "id": "SW1", "type": "switch", "position": { "x": 160, "y": 210 },
+      "interfaces": [{ "nom": "p1" }, { "nom": "p2" }, { "nom": "p3" }],
+      "macTable": []
+    },
+    {
+      "id": "R1", "type": "router", "position": { "x": 290, "y": 210 },
+      "interfaces": [
+        { "nom": "e0", "ip": "192.168.1.1", "masque": 24, "mac": "11:11:11:00:00:01" },
+        { "nom": "e1", "ip": "10.0.12.1", "masque": 30, "mac": "11:11:11:00:00:02" },
+        { "nom": "e2", "ip": "10.0.13.1", "masque": 30, "mac": "11:11:11:00:00:03" }
+      ],
+      "routes": [
+        { "reseau": "192.168.1.0", "masque": 24, "prochainSaut": null, "interface": "e0" },
+        { "reseau": "10.0.12.0", "masque": 30, "prochainSaut": null, "interface": "e1" },
+        { "reseau": "10.0.13.0", "masque": 30, "prochainSaut": null, "interface": "e2" },
+        { "reseau": "192.168.2.0", "masque": 24, "prochainSaut": "10.0.12.2", "interface": "e1" },
+        { "reseau": "0.0.0.0", "masque": 0, "prochainSaut": "10.0.13.2", "interface": "e2" }
+      ],
+      "arp": []
+    },
+    {
+      "id": "R2", "type": "router", "position": { "x": 440, "y": 80 },
+      "interfaces": [
+        { "nom": "e0", "ip": "10.0.12.2", "masque": 30, "mac": "22:22:22:00:00:01" },
+        { "nom": "e1", "ip": "10.0.24.1", "masque": 30, "mac": "22:22:22:00:00:02" },
+        { "nom": "e2", "ip": "10.0.23.1", "masque": 30, "mac": "22:22:22:00:00:03" }
+      ],
+      "routes": [
+        { "reseau": "10.0.12.0", "masque": 30, "prochainSaut": null, "interface": "e0" },
+        { "reseau": "10.0.24.0", "masque": 30, "prochainSaut": null, "interface": "e1" },
+        { "reseau": "10.0.23.0", "masque": 30, "prochainSaut": null, "interface": "e2" },
+        { "reseau": "192.168.1.0", "masque": 24, "prochainSaut": "10.0.12.1", "interface": "e0" },
+        { "reseau": "192.168.2.0", "masque": 24, "prochainSaut": "10.0.24.2", "interface": "e1" }
+      ],
+      "arp": []
+    },
+    {
+      "id": "R3", "type": "router", "position": { "x": 440, "y": 340 },
+      "interfaces": [
+        { "nom": "e0", "ip": "10.0.13.2", "masque": 30, "mac": "33:33:33:00:00:01" },
+        { "nom": "e1", "ip": "10.0.34.1", "masque": 30, "mac": "33:33:33:00:00:02" },
+        { "nom": "e2", "ip": "10.0.23.2", "masque": 30, "mac": "33:33:33:00:00:03" }
+      ],
+      "routes": [
+        { "reseau": "10.0.13.0", "masque": 30, "prochainSaut": null, "interface": "e0" },
+        { "reseau": "10.0.34.0", "masque": 30, "prochainSaut": null, "interface": "e1" },
+        { "reseau": "10.0.23.0", "masque": 30, "prochainSaut": null, "interface": "e2" },
+        { "reseau": "192.168.1.0", "masque": 24, "prochainSaut": "10.0.13.1", "interface": "e0" },
+        { "reseau": "192.168.2.0", "masque": 24, "prochainSaut": "10.0.34.2", "interface": "e1" }
+      ],
+      "arp": []
+    },
+    {
+      "id": "R4", "type": "router", "position": { "x": 590, "y": 210 },
+      "interfaces": [
+        { "nom": "e0", "ip": "192.168.2.1", "masque": 24, "mac": "44:44:44:00:00:01" },
+        { "nom": "e1", "ip": "10.0.24.2", "masque": 30, "mac": "44:44:44:00:00:02" },
+        { "nom": "e2", "ip": "10.0.34.2", "masque": 30, "mac": "44:44:44:00:00:03" }
+      ],
+      "routes": [
+        { "reseau": "192.168.2.0", "masque": 24, "prochainSaut": null, "interface": "e0" },
+        { "reseau": "10.0.24.0", "masque": 30, "prochainSaut": null, "interface": "e1" },
+        { "reseau": "10.0.34.0", "masque": 30, "prochainSaut": null, "interface": "e2" },
+        { "reseau": "192.168.1.0", "masque": 24, "prochainSaut": "10.0.34.1", "interface": "e2" }
+      ],
+      "arp": []
+    },
+    {
+      "id": "SW2", "type": "switch", "position": { "x": 720, "y": 210 },
+      "interfaces": [{ "nom": "p1" }, { "nom": "p2" }, { "nom": "p3" }],
+      "macTable": []
+    },
+    {
+      "id": "PC-B", "type": "pc", "position": { "x": 830, "y": 110 },
+      "interfaces": [{ "nom": "eth0", "ip": "192.168.2.20", "masque": 24, "mac": "BB:BB:BB:00:00:0B" }],
+      "gateway": "192.168.2.1", "arp": []
+    },
+    {
+      "id": "PC-D", "type": "pc", "position": { "x": 830, "y": 310 },
+      "interfaces": [{ "nom": "eth0", "ip": "192.168.2.21", "masque": 24, "mac": "DD:DD:DD:00:00:0D" }],
+      "gateway": "192.168.2.1", "arp": []
+    }
+  ],
+  "links": [
+    { "id": "L1", "a": "PC-A:eth0", "b": "SW1:p1", "delai": 10 },
+    { "id": "L2", "a": "PC-C:eth0", "b": "SW1:p2", "delai": 10 },
+    { "id": "L3", "a": "SW1:p3", "b": "R1:e0", "delai": 10 },
+    { "id": "L4", "a": "R1:e1", "b": "R2:e0", "delai": 20 },
+    { "id": "L5", "a": "R1:e2", "b": "R3:e0", "delai": 20 },
+    { "id": "L6", "a": "R2:e1", "b": "R4:e1", "delai": 20 },
+    { "id": "L7", "a": "R3:e1", "b": "R4:e2", "delai": 20 },
+    { "id": "L8", "a": "R2:e2", "b": "R3:e2", "delai": 20 },
+    { "id": "L9", "a": "R4:e0", "b": "SW2:p1", "delai": 10 },
+    { "id": "L10", "a": "SW2:p2", "b": "PC-B:eth0", "delai": 10 },
+    { "id": "L11", "a": "SW2:p3", "b": "PC-D:eth0", "delai": 10 }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "id": "bus",
+  "nom": "Bus : quatre PC sur un câble partagé",
+  "type": "bus",
+  "description": "Quatre PC du réseau 192.168.1.0/24 sur un même câble : chaque trame est vue par toutes les stations, seule la destinataire la garde.",
+  "devices": [
+    {
+      "id": "PC-A", "type": "pc", "position": { "x": 100, "y": 80 },
+      "interfaces": [{ "nom": "eth0", "ip": "192.168.1.10", "masque": 24, "mac": "AA:AA:AA:00:00:0A" }],
+      "gateway": null, "arp": []
+    },
+    {
+      "id": "PC-B", "type": "pc", "position": { "x": 250, "y": 320 },
+      "interfaces": [{ "nom": "eth0", "ip": "192.168.1.11", "masque": 24, "mac": "BB:BB:BB:00:00:0B" }],
+      "gateway": null, "arp": []
+    },
+    {
+      "id": "PC-C", "type": "pc", "position": { "x": 400, "y": 80 },
+      "interfaces": [{ "nom": "eth0", "ip": "192.168.1.12", "masque": 24, "mac": "CC:CC:CC:00:00:0C" }],
+      "gateway": null, "arp": []
+    },
+    {
+      "id": "PC-D", "type": "pc", "position": { "x": 550, "y": 320 },
+      "interfaces": [{ "nom": "eth0", "ip": "192.168.1.13", "masque": 24, "mac": "DD:DD:DD:00:00:0D" }],
+      "gateway": null, "arp": []
+    },
+    {
+      "id": "BUS", "type": "bus", "position": { "x": 325, "y": 200 },
+      "interfaces": [{ "nom": "p1" }, { "nom": "p2" }, { "nom": "p3" }, { "nom": "p4" }]
+    }
+  ],
+  "links": [
+    { "id": "L1", "a": "PC-A:eth0", "b": "BUS:p1", "delai": 5 },
+    { "id": "L2", "a": "PC-B:eth0", "b": "BUS:p2", "delai": 5 },
+    { "id": "L3", "a": "PC-C:eth0", "b": "BUS:p3", "delai": 5 },
+    { "id": "L4", "a": "PC-D:eth0", "b": "BUS:p4", "delai": 5 }
+  ]
+}

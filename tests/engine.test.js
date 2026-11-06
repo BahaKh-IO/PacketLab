@@ -165,3 +165,64 @@ test('etoile: switch learns, floods the ARP broadcast, then forwards to one port
   const ignored = events.filter((e) => e.type === 'ignore').map((e) => e.device);
   assert.deepEqual(ignored, ['PC-C', 'PC-D']);
 });
+
+// ---------- bus ----------
+
+test('bus PC-A -> PC-C: every station receives, only the destination keeps the frame', () => {
+  const events = simulate(load('bus'), 'PC-A', 'PC-C');
+  // Each frame put on the bus reaches the 3 other stations.
+  const busFloods = events.filter((e) => e.device === 'BUS');
+  assert.ok(busFloods.length >= 3); // ARP request, ARP reply, data
+  for (const e of busFloods) assert.equal(e.links.length, 3);
+  // The data frame: PC-B and PC-D see it and ignore it, PC-C keeps it.
+  const dataSeen = events.filter((e) => e.frame?.kind === 'data' && ['ignore', 'deliver'].includes(e.type));
+  assert.deepEqual(dataSeen.map((e) => [e.device, e.type]), [['PC-B', 'ignore'], ['PC-C', 'deliver'], ['PC-D', 'ignore']]);
+  assert.ok(events.some((e) => e.type === 'deliver' && e.device === 'PC-C'));
+});
+
+// ---------- anneau ----------
+
+test('anneau PC-A -> PC-C: frames go station to station in one direction', () => {
+  const events = simulate(load('anneau'), 'PC-A', 'PC-C');
+  // Data: A -> B (passes it on) -> C (keeps it).
+  const data = events.filter((e) => e.frame?.kind === 'data' && e.type !== 'start');
+  assert.deepEqual(data.map((e) => [e.device, e.type, e.links]), [
+    ['PC-A', 'send', ['L1']],
+    ['PC-B', 'forward', ['L2']],
+    ['PC-C', 'deliver', []],
+  ]);
+  // The ARP reply from PC-C goes on in the same direction: C -> D -> A (not back through B).
+  const reply = events.filter((e) => e.frame?.kind === 'arp' && e.frame.arp.op === 'reply');
+  assert.deepEqual(reply.map((e) => e.device), ['PC-C', 'PC-D', 'PC-A']);
+  // The ARP broadcast makes the full loop and is removed by its sender.
+  assert.ok(events.some((e) => e.type === 'drop' && e.device === 'PC-A' && e.frame.macDst === BROADCAST));
+});
+
+// ---------- maillée ----------
+
+test('maillee: the path follows the routing tables (R1-R2-R4 out, R4-R3-R1 back)', () => {
+  const topo = load('maillee');
+  const out = simulate(topo, 'PC-A', 'PC-B');
+  assert.deepEqual(out.filter((e) => e.type === 'route').map((e) => e.device), ['R1', 'R2', 'R4']);
+  assert.deepEqual(dataSends(out).map((e) => e.frame.ttl), [64, 63, 62, 61]);
+  assert.equal(out.at(-1).type, 'deliver');
+  assert.equal(out.at(-1).device, 'PC-B');
+  // R1 has a default route via R3, but the /24 to 192.168.2.0 is more specific.
+  assert.match(out.find((e) => e.type === 'route' && e.device === 'R1').note, /192\.168\.2\.0\/24 via 10\.0\.12\.2/);
+
+  const back = simulate(topo, 'PC-B', 'PC-A');
+  assert.deepEqual(back.filter((e) => e.type === 'route').map((e) => e.device), ['R4', 'R3', 'R1']);
+  assert.equal(back.at(-1).device, 'PC-A');
+});
+
+test('every PC pair of every topology is delivered', () => {
+  for (const id of ['etoile', 'bus', 'anneau', 'maillee', 'mixte']) {
+    const topo = load(id);
+    const pcs = topo.devices.filter((d) => d.type === 'pc').map((d) => d.id);
+    for (const s of pcs) for (const d of pcs) {
+      if (s === d) continue;
+      const events = simulate(topo, s, d);
+      assert.ok(events.some((e) => e.type === 'deliver' && e.device === d), `${id}: ${s} -> ${d}`);
+    }
+  }
+});

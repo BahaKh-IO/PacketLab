@@ -66,10 +66,10 @@ packetlab/
 
 **Step 5 — Bus, anneau, maillée (30 min)**
 
-- [ ] `bus.json` + rule: every station receives, only the destination MAC keeps the frame
-- [ ] `anneau.json` + rule: frame passed station to station in one direction until the destination
-- [ ] `maillee.json`: 4 routers, 2 LANs, several paths; static routes pick one; test that the path follows the routing tables
-- [ ] One test per topology
+- [x] `bus.json` + rule: every station receives, only the destination MAC keeps the frame
+- [x] `anneau.json` + rule: frame passed station to station in one direction until the destination
+- [x] `maillee.json`: 4 routers, 2 LANs, several paths; static routes pick one; test that the path follows the routing tables
+- [x] One test per topology
 
 **Step 6 — Simulator page v1 (60 min)**
 

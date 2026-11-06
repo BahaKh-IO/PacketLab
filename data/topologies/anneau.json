@@ -1,0 +1,34 @@
+{
+  "id": "anneau",
+  "nom": "Anneau : quatre PC en boucle",
+  "type": "anneau",
+  "description": "Quatre PC du réseau 192.168.1.0/24 reliés en boucle : la trame passe de station en station, toujours dans le même sens, jusqu'à la destination.",
+  "devices": [
+    {
+      "id": "PC-A", "type": "pc", "position": { "x": 300, "y": 60 },
+      "interfaces": [{ "nom": "eth0", "ip": "192.168.1.10", "masque": 24, "mac": "AA:AA:AA:00:00:0A" }],
+      "gateway": null, "arp": []
+    },
+    {
+      "id": "PC-B", "type": "pc", "position": { "x": 520, "y": 200 },
+      "interfaces": [{ "nom": "eth0", "ip": "192.168.1.11", "masque": 24, "mac": "BB:BB:BB:00:00:0B" }],
+      "gateway": null, "arp": []
+    },
+    {
+      "id": "PC-C", "type": "pc", "position": { "x": 300, "y": 340 },
+      "interfaces": [{ "nom": "eth0", "ip": "192.168.1.12", "masque": 24, "mac": "CC:CC:CC:00:00:0C" }],
+      "gateway": null, "arp": []
+    },
+    {
+      "id": "PC-D", "type": "pc", "position": { "x": 80, "y": 200 },
+      "interfaces": [{ "nom": "eth0", "ip": "192.168.1.13", "masque": 24, "mac": "DD:DD:DD:00:00:0D" }],
+      "gateway": null, "arp": []
+    }
+  ],
+  "links": [
+    { "id": "L1", "a": "PC-A:eth0", "b": "PC-B:eth0", "delai": 10 },
+    { "id": "L2", "a": "PC-B:eth0", "b": "PC-C:eth0", "delai": 10 },
+    { "id": "L3", "a": "PC-C:eth0", "b": "PC-D:eth0", "delai": 10 },
+    { "id": "L4", "a": "PC-D:eth0", "b": "PC-A:eth0", "delai": 10 }
+  ]
+}

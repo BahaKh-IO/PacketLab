@@ -100,8 +100,9 @@ export class Simulator {
   }
 
   /** A frame arrives on an interface: dispatch to the rule of that device type. */
-  arrive(dev, ifaceName, frame, link) {
+  arrive(dev, ifaceName, frame) {
     if (dev.type === 'switch') this.switchReceive(dev, ifaceName, frame);
+    else if (dev.type === 'bus') this.busReceive(dev, ifaceName, frame);
     else this.hostReceive(dev, this.iface(dev, ifaceName), frame);
   }
 
@@ -200,6 +201,7 @@ export class Simulator {
 
   /** A frame arrives on the interface of a PC or a router. */
   hostReceive(dev, iface, frame) {
+    if (this.topo.type === 'anneau' && this.ringPass(dev, iface, frame)) return;
     if (frame.macDst !== iface.mac && frame.macDst !== BROADCAST) {
       this.log('ignore', dev, [], frame,
         `${dev.id} : la MAC destination ${frame.macDst} n'est pas la sienne (${iface.mac}) : il ignore la trame.`);
@@ -279,6 +281,42 @@ export class Simulator {
     }
     const links = out.map((p) => this.transmit(dev, p, frame)).filter(Boolean);
     this.log(type, dev, links, frame, note);
+  }
+
+  // ---------- bus and ring ----------
+
+  /** Bus rule: the shared cable carries the frame to every other station; each one checks the MAC itself. */
+  busReceive(dev, port, frame) {
+    const others = dev.interfaces.map((i) => i.nom).filter((p) => p !== port && this.linkFrom(dev, p));
+    const links = others.map((p) => this.transmit(dev, p, frame)).filter(Boolean);
+    this.log('flood', dev, links, frame,
+      `Le bus est un support partagé : la trame (MAC destination ${frame.macDst}) parvient à toutes les autres stations ; ` +
+      `seule celle dont c'est la MAC la gardera.`);
+  }
+
+  /**
+   * Ring rule: a station passes on every frame that is not for it, in one
+   * direction (link a -> b). A broadcast goes all the way round and is removed
+   * by its sender. Returns true when the frame needs no further processing.
+   */
+  ringPass(dev, iface, frame) {
+    if (frame.macSrc === iface.mac) {
+      this.log('drop', dev, [], frame,
+        `La trame a fait le tour de l'anneau et revient à ${dev.id}, son émetteur, qui la retire de l'anneau.`);
+      return true;
+    }
+    if (frame.macDst === iface.mac) return false; // for me: normal processing, the frame stops here
+    const link = this.transmit(dev, iface.nom, frame);
+    const isArpTarget = frame.kind === 'arp' && frame.arp.op === 'request' && frame.arp.targetIp === iface.ip;
+    if (isArpTarget) {
+      this.log('forward', dev, link ? [link] : [], frame,
+        `${dev.id} reconnaît sa propre IP dans la requête ARP ; la diffusion continue quand même vers la station suivante, jusqu'à revenir à l'émetteur.`);
+      return false; // then answer the request (arpReceive)
+    }
+    this.log('forward', dev, link ? [link] : [], frame, frame.macDst === BROADCAST
+      ? `${dev.id} : la requête ARP cherche ${frame.arp?.targetIp}, ce n'est pas lui : il la passe à la station suivante.`
+      : `${dev.id} : la trame est pour ${frame.macDst}, pas pour lui (${iface.mac}) : il la passe à la station suivante.`);
+    return true;
   }
 
   // ---------- run ----------
