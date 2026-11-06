@@ -71,7 +71,7 @@ export class Simulator {
   }
 
   /** Record one event of the journal. */
-  log(type, dev, links, frame, note) {
+  log(type, dev, links, frame, note, extra = {}) {
     this.events.push({
       t: this.sched.now,
       type,
@@ -80,6 +80,7 @@ export class Simulator {
       frame: frame ? structuredClone(frame) : null,
       note,
       tables: this.snapshot(),
+      ...structuredClone(extra), // e.g. { route } on route events
     });
   }
 
@@ -241,7 +242,8 @@ export class Simulator {
     const packet = { kind: 'data', macSrc: frame.macSrc, macDst: frame.macDst, ipSrc: frame.ipSrc, ipDst: frame.ipDst, ttl };
     this.log('route', dev, [], packet,
       `${dev.id} : TTL ${frame.ttl} → ${ttl} ; route ${r.reseau}/${r.masque} ` +
-      `${r.prochainSaut ? `via ${r.prochainSaut}` : '(réseau directement connecté)'}, sortie par l'interface ${exit.nom}.`);
+      `${r.prochainSaut ? `via ${r.prochainSaut}` : '(réseau directement connecté)'}, sortie par l'interface ${exit.nom}.`,
+      { route: r });
     this.sendIp(dev, exit, packet, nextHop);
   }
 

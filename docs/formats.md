@@ -49,8 +49,10 @@ Frozen at step 3. Any change to these formats must be agreed first (see CLAUDE.m
 - `mac` — string MAC.
 - `port` — string, `nom` of the switch port where that MAC was seen.
 
-### Question (optional, session 2)
-- `apresEtape` — integer, index of the event after which the player pauses and asks.
+### Question (optional; `source`/`destination` added in session 2, agreed with Baha)
+- `source` — string, id of the source PC of the run this question belongs to (`"PC-A"`).
+- `destination` — string, id of the destination PC of that run (`"PC-B"`); the question is asked only during that exact run.
+- `apresEtape` — integer, step number as shown on screen (« Étape N », 1-based): the player pauses after showing it and asks, before step N + 1.
 - `enonce` — string, French question.
 - `choix` — array of strings.
 - `bonne` — integer, index of the right answer in `choix`.
@@ -65,6 +67,7 @@ Frozen at step 3. Any change to these formats must be agreed first (see CLAUDE.m
 - `frame` — copy of the Frame concerned, or `null`.
 - `note` — string, French sentence for the log.
 - `tables` — deep copy of every device's `arp`, `macTable` and `routes` after the event, keyed by device id.
+- `route` — `"route"` events only: copy of the Route the router chose (longest prefix), so the UI can highlight it.
 
 ### Frame
 - `kind` — `"arp"` or `"data"`.

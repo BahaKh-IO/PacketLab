@@ -208,7 +208,9 @@ test('maillee: the path follows the routing tables (R1-R2-R4 out, R4-R3-R1 back)
   assert.equal(out.at(-1).type, 'deliver');
   assert.equal(out.at(-1).device, 'PC-B');
   // R1 has a default route via R3, but the /24 to 192.168.2.0 is more specific.
-  assert.match(out.find((e) => e.type === 'route' && e.device === 'R1').note, /192\.168\.2\.0\/24 via 10\.0\.12\.2/);
+  const r1 = out.find((e) => e.type === 'route' && e.device === 'R1');
+  assert.match(r1.note, /192\.168\.2\.0\/24 via 10\.0\.12\.2/);
+  assert.deepEqual(r1.route, { reseau: '192.168.2.0', masque: 24, prochainSaut: '10.0.12.2', interface: 'e1' });
 
   const back = simulate(topo, 'PC-B', 'PC-A');
   assert.deepEqual(back.filter((e) => e.type === 'route').map((e) => e.device), ['R4', 'R3', 'R1']);
