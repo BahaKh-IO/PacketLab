@@ -26,7 +26,7 @@ Work through the steps in order and commit after each one. Step 4 is the one tha
 
 - [x] Open a terminal and type `node -v`. A version number (e.g. `v22.x`) means it is installed; “not recognized” means install the LTS from nodejs.org, then reopen the terminal
 - [x] On GitHub: new public repo `packetlab` with a README; clone it; open the folder in VS Code; install the Live Server extension
-- [ ] Settings → Pages → deploy from branch `main`, folder `/`
+- [x] Settings → Pages → deploy from branch `main`, folder `/` (plus `.nojekyll`; live at https://bahakh-io.github.io/PacketLab/)
 - [x] Copy the project description and the Objectif 1 slides into `docs/`
 
 **Step 2 — Skeleton and CLAUDE.md (15 min)**
@@ -81,8 +81,8 @@ packetlab/
 
 **Step 7 — Deploy (10 min)**
 
-- [ ] Merge to `main`, open the Pages link on your phone, play mixte PC-A → PC-B
-- [ ] If a JSON fails online only: check relative paths (`./data/...`) and exact lower-case file names
+- [x] Merge to `main`, open the Pages link on your phone, play mixte PC-A → PC-B (online load checked; phone check by Baha)
+- [x] If a JSON fails online only: check relative paths (`./data/...`) and exact lower-case file names
 
 ## Session 2 — Simulator pedagogy and polish (≈ 3 h)
 
