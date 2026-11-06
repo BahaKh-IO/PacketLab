@@ -28,7 +28,8 @@ export function createPlayer(root, onChange) {
     nextBtn.disabled = locked || !count || index === count - 1;
     playBtn.disabled = locked || !count;
     replayBtn.disabled = locked || !count;
-    playBtn.textContent = playing ? '❚❚ Pause' : '▶ Lecture';
+    playBtn.querySelector('.icon').textContent = playing ? '❚❚' : '▶';
+    playBtn.querySelector('.label').textContent = playing ? ' Pause' : ' Lecture';
     playBtn.setAttribute('aria-label', playing ? 'Pause' : 'Lecture');
   }
 

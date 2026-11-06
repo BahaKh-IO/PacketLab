@@ -83,8 +83,16 @@ function showTables(i) {
     : selectionHeader(`Tables de ${id} (choisi sur le schéma) à l'étape ${i + 1}.`, `Revenir à l'équipement actif (${active})`));
 }
 
+/** Phone layout: show one panel at a time (the tabs are hidden on wide screens). */
+function showTab(name) {
+  $('panels').dataset.tab = name;
+  for (const b of document.querySelectorAll('.tabs [role=tab]')) b.setAttribute('aria-selected', String(b.dataset.tab === name));
+}
+for (const b of document.querySelectorAll('.tabs [role=tab]')) b.addEventListener('click', () => showTab(b.dataset.tab));
+
 /** Click on a device in the drawing (null: back to the active device). */
 function pickDevice(id) {
+  if (id) showTab('tables');
   selectedDevice = id;
   view.select(id);
   showTables(player.index);

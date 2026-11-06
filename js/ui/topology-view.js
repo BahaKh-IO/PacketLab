@@ -25,6 +25,8 @@ export function createTopologyView(svg, topo, { onDeviceClick = () => {} } = {})
   const minX = Math.min(...xs) - pad;
   const minY = Math.min(...ys) - pad;
   svg.setAttribute('viewBox', `${minX} ${minY} ${Math.max(...xs) - minX + pad} ${Math.max(...ys) - minY + pad}`);
+  // On a phone the drawing keeps ~60 % of its natural width and scrolls sideways (see CSS --min-w).
+  svg.style.setProperty('--min-w', `${Math.round((Math.max(...xs) - minX + pad) * 0.6)}px`);
 
   const defs = svgEl('defs');
   const marker = svgEl('marker', { id: 'arrow', viewBox: '0 0 10 10', refX: 5, refY: 5, markerWidth: 7, markerHeight: 7, orient: 'auto' });

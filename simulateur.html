@@ -36,17 +36,19 @@
 
     <div class="sim-layout">
       <section class="sim-stage" aria-label="Topologie et contrôles">
-        <svg id="topology" class="topology" role="img" aria-label="Schéma de la topologie choisie"></svg>
+        <div class="svg-wrap">
+          <svg id="topology" class="topology" role="img" aria-label="Schéma de la topologie choisie"></svg>
+        </div>
         <div class="coach" id="coach" role="dialog" aria-live="polite" aria-label="Aide et questions" hidden></div>
         <p class="caption" id="caption" aria-live="polite"></p>
 
         <div class="player" id="player">
-          <button type="button" data-action="prev" aria-label="Étape précédente" title="Étape précédente (←)">◀ Précédent</button>
-          <button type="button" data-action="play" class="primary" title="Lecture / pause (Espace)">▶ Lecture</button>
-          <button type="button" data-action="next" aria-label="Étape suivante" title="Étape suivante (→)">Suivant ▶</button>
-          <button type="button" data-action="replay" aria-label="Rejouer depuis le début" title="Rejouer (R)">↺ Rejouer</button>
-          <label class="speed">Vitesse
-            <select data-role="speed">
+          <button type="button" data-action="prev" aria-label="Étape précédente" title="Étape précédente (←)"><span class="icon" aria-hidden="true">◀</span><span class="label"> Précédent</span></button>
+          <button type="button" data-action="play" class="primary" title="Lecture / pause (Espace)"><span class="icon" aria-hidden="true">▶</span><span class="label"> Lecture</span></button>
+          <button type="button" data-action="next" aria-label="Étape suivante" title="Étape suivante (→)"><span class="label">Suivant </span><span class="icon" aria-hidden="true">▶</span></button>
+          <button type="button" data-action="replay" aria-label="Rejouer depuis le début" title="Rejouer (R)"><span class="icon" aria-hidden="true">↺</span><span class="label"> Rejouer</span></button>
+          <label class="speed"><span class="label">Vitesse</span>
+            <select data-role="speed" aria-label="Vitesse">
               <option value="0.5">0,5×</option>
               <option value="1" selected>1×</option>
               <option value="2">2×</option>
@@ -55,25 +57,30 @@
           <span class="counter" data-role="counter" aria-live="polite"></span>
           <span class="sim-time" id="sim-time"></span>
         </div>
-        <p class="keys">Clavier : ← → étape par étape · Espace lecture/pause · R rejouer
-          · <button type="button" class="link-button" id="reset-bubbles">Réafficher les bulles d'aide</button></p>
+        <p class="keys">Clavier : ← → étape par étape · Espace lecture/pause · R rejouer</p>
         <p class="legend">
           <span class="dot dot-arp"></span> trame ARP
           <span class="dot dot-data"></span> trame de données
           <span class="dot dot-active"></span> équipement / lien actif
+          · <button type="button" class="link-button" id="reset-bubbles">Réafficher les bulles d'aide</button>
         </p>
       </section>
 
-      <aside class="sim-panels">
-        <section class="panel">
+      <aside class="sim-panels" id="panels" data-tab="headers">
+        <div class="tabs" role="tablist" aria-label="Panneaux">
+          <button type="button" role="tab" data-tab="headers" aria-selected="true">En-têtes</button>
+          <button type="button" role="tab" data-tab="tables" aria-selected="false">Tables</button>
+          <button type="button" role="tab" data-tab="log" aria-selected="false">Journal</button>
+        </div>
+        <section class="panel" data-panel="headers">
           <h2>En-têtes</h2>
           <div id="headers"></div>
         </section>
-        <section class="panel">
+        <section class="panel" data-panel="tables">
           <h2>Table consultée</h2>
           <div id="tables"></div>
         </section>
-        <section class="panel">
+        <section class="panel" data-panel="log">
           <h2>Journal</h2>
           <ol class="log" id="log"></ol>
         </section>

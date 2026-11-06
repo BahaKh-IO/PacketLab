@@ -223,3 +223,55 @@ button.primary:hover:not(:disabled) { background: #245bd0; }
 .verdict { font-weight: 700; }
 .verdict.right { color: #15803d; }
 .verdict.wrong { color: #b91c1c; }
+
+/* Tabs exist only for the phone layout */
+.tabs { display: none; }
+.svg-wrap { overflow-x: auto; }
+
+/* ---------- Phone layout (under 768 px) ---------- */
+@media (max-width: 767px) {
+  .page { padding-inline: 1rem; }
+  button, select { min-height: 44px; }
+  .sim { padding-bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px)); }
+  .sim-stage { padding: 0.5rem; }
+  .topology { min-width: var(--min-w, 0); max-height: none; }
+  .keys { display: none; }
+
+  /* Player: fixed bar at the bottom, icons only */
+  .player {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 20;
+    margin: 0;
+    padding: 0.5rem 0.75rem calc(0.5rem + env(safe-area-inset-bottom, 0px));
+    background: var(--navy);
+    border-top: 1px solid #2b4372;
+    flex-wrap: nowrap;
+    gap: 0.4rem;
+  }
+  .player .label { display: none; }
+  .player button { min-width: 44px; padding-inline: 0.6rem; font-size: 1.1rem; }
+  .player .counter { font-size: 0.85rem; white-space: nowrap; }
+  .player .sim-time { display: none; }
+
+  /* Panels as tabs */
+  .tabs {
+    display: flex;
+    gap: 0.25rem;
+    position: sticky;
+    top: env(safe-area-inset-top, 0px);
+    z-index: 10;
+    padding: 0.25rem 0;
+    background: var(--paper);
+  }
+  .tabs [role=tab] { flex: 1; }
+  .tabs [aria-selected="true"] { background: var(--blue); border-color: var(--blue); color: #fff; }
+  .sim-panels .panel { display: none; }
+  .sim-panels[data-tab="headers"] [data-panel="headers"],
+  .sim-panels[data-tab="tables"] [data-panel="tables"],
+  .sim-panels[data-tab="log"] [data-panel="log"] { display: block; }
+  .sim-panels .panel h2 { display: none; }
+  .log { max-height: 50vh; }
+}
