@@ -20,7 +20,11 @@ const caption = $('caption');
 const timeEl = $('sim-time');
 const headersEl = $('headers');
 const tablesEl = $('tables');
-const log = createLog($('log'));
+const log = createLog($('log'), (k) => { // click on a log line: jump to that step
+  if (coach.open) return;
+  player.pause();
+  player.go(k);
+});
 const coach = createCoach($('coach'));
 
 const topologies = new Map();
@@ -28,6 +32,7 @@ let topo = null;
 let view = null;
 let events = [];
 let questions = []; // questions of the current run
+let selectedDevice = null; // device clicked in the drawing (null: the active device)
 const answered = new Set(); // questions already asked in this run
 
 /** Draw step i (reads the event list only). */
@@ -37,8 +42,52 @@ function render(i, delay) {
   caption.textContent = e.note;
   timeEl.textContent = `t = ${e.t} ms`;
   renderHeaders(headersEl, events, i);
-  renderTables(tablesEl, events, i, topo);
+  showTables(i);
   log.show(i);
+}
+
+/** Small line above the tables when they belong to a clicked device, not the active one. */
+function selectionHeader(text, buttonText) {
+  const p = document.createElement('p');
+  p.className = 'selection-note';
+  p.append(text);
+  if (buttonText) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'link-button';
+    b.textContent = buttonText;
+    b.addEventListener('click', () => pickDevice(null));
+    p.append(' · ', b);
+  }
+  return p;
+}
+
+/** Side panel: tables of the clicked device, or of the device acting at step i. */
+function showTables(i) {
+  if (!events.length) {
+    // Before "Lancer": the tables as written in the topology file (ARP and MAC empty).
+    if (!selectedDevice) { tablesEl.replaceChildren(); return; }
+    const d = topo.devices.find((x) => x.id === selectedDevice);
+    const tables = {};
+    if (d.arp) tables.arp = d.arp;
+    if (d.macTable) tables.macTable = d.macTable;
+    if (d.routes) tables.routes = d.routes;
+    const start = [{ device: d.id, tables: { [d.id]: tables } }];
+    renderTables(tablesEl, start, 0, topo, d.id,
+      selectionHeader(`Tables de ${d.id} au départ, avant l'envoi.`, 'Fermer'));
+    return;
+  }
+  const active = events[i].device;
+  const id = selectedDevice ?? active;
+  renderTables(tablesEl, events, i, topo, id, id === active ? null
+    : selectionHeader(`Tables de ${id} (choisi sur le schéma) à l'étape ${i + 1}.`, `Revenir à l'équipement actif (${active})`));
+}
+
+/** Click on a device in the drawing (null: back to the active device). */
+function pickDevice(id) {
+  selectedDevice = id;
+  view.select(id);
+  showTables(player.index);
 }
 
 /** Questions and bubbles that must interrupt the run after step i. */
@@ -86,8 +135,8 @@ function resetPanels() {
   caption.textContent = 'Choisissez la source et la destination, puis cliquez sur « Lancer ».';
   timeEl.textContent = '';
   headersEl.replaceChildren();
-  tablesEl.replaceChildren();
   log.load([]);
+  showTables(0);
 }
 
 function selectTopology(id, src = 'PC-A', dst = null) {
@@ -100,7 +149,8 @@ function selectTopology(id, src = 'PC-A', dst = null) {
   srcSelect.value = pcs.some((d) => d.id === src) ? src : pcs[0].id;
   dstSelect.value = dst && pcs.some((d) => d.id === dst) ? dst
     : pcs.some((d) => d.id === 'PC-B') ? 'PC-B' : pcs[1].id;
-  view = createTopologyView(svg, topo);
+  selectedDevice = null;
+  view = createTopologyView(svg, topo, { onDeviceClick: pickDevice });
   resetPanels();
   checkPair();
 }

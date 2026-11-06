@@ -11,7 +11,7 @@ function svgEl(tag, attrs = {}, text = null) {
   return el;
 }
 
-export function createTopologyView(svg, topo) {
+export function createTopologyView(svg, topo, { onDeviceClick = () => {} } = {}) {
   svg.replaceChildren();
   const byId = new Map(topo.devices.map((d) => [d.id, d]));
   const pos = (id) => byId.get(id).position;
@@ -83,8 +83,25 @@ export function createTopologyView(svg, topo) {
       ? `${d.id} : ${d.interfaces.map((i) => `${i.nom} ${i.ip}/${i.masque}`).join(', ')}`
       : d.interfaces[0].ip ? `${d.id} : ${d.interfaces[0].ip}/${d.interfaces[0].masque}, MAC ${d.interfaces[0].mac}` : d.id);
     g.append(title);
+    // Click (or Tab + Entrée) on a device: show its tables.
+    g.setAttribute('tabindex', '0');
+    g.setAttribute('role', 'button');
+    g.setAttribute('aria-label', `Voir les tables de ${d.id}`);
+    g.addEventListener('click', () => onDeviceClick(d.id));
+    g.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        e.stopPropagation(); // space here selects, it does not play/pause
+        onDeviceClick(d.id);
+      }
+    });
     layerDevices.append(g);
     nodes.set(d.id, g);
+  }
+
+  /** Mark the device whose tables are shown in the side panel. */
+  function select(id) {
+    for (const [nid, g] of nodes) g.classList.toggle('selected', nid === id);
   }
 
   // ---------- highlight one event ----------
@@ -155,5 +172,5 @@ export function createTopologyView(svg, topo) {
     }
   }
 
-  return { show, clear };
+  return { show, clear, select };
 }

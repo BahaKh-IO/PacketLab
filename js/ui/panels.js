@@ -75,13 +75,16 @@ function table(caption, head, rows, prevRows) {
   return t;
 }
 
-/** Tables of the device acting at step i (ARP, MAC, routing). */
-export function renderTables(el, events, i, topo) {
+/**
+ * Tables (ARP, MAC, routing) at step i of the device `deviceId`
+ * (by default the device acting at that step). `header` is put on top.
+ */
+export function renderTables(el, events, i, topo, deviceId = events[i].device, header = null) {
   const e = events[i];
-  const dev = topo.devices.find((d) => d.id === e.device);
-  const now = e.tables[e.device] ?? {};
-  const before = i > 0 ? events[i - 1].tables[e.device] ?? {} : {};
-  const parts = [];
+  const dev = topo.devices.find((d) => d.id === deviceId);
+  const now = e.tables[deviceId] ?? {};
+  const before = i > 0 ? events[i - 1].tables[deviceId] ?? {} : {};
+  const parts = header ? [header] : [];
   if (dev.type === 'bus') {
     parts.push(h('p', 'muted', "Le bus n'a pas de table : c'est un simple câble partagé, il ne lit aucune adresse."));
   }
@@ -97,21 +100,30 @@ export function renderTables(el, events, i, topo) {
     parts.push(table(`Table de routage de ${dev.id}`, ['Réseau', 'Prochain saut', 'Interface'],
       now.routes.map((r) => ({
         raw: r,
-        chosen: e.route && JSON.stringify(e.route) === JSON.stringify(r), // route picked at this step
+        chosen: e.device === deviceId && e.route && JSON.stringify(e.route) === JSON.stringify(r), // route picked now
         cells: [`${r.reseau}/${r.masque}`, r.prochainSaut ?? 'direct', r.interface],
       })), null));
   }
   el.replaceChildren(...parts);
 }
 
-/** The log: one line per step, lines after the current step stay hidden. */
-export function createLog(ol) {
+/**
+ * The log: one line per step, lines after the current step stay hidden.
+ * Each line is a button: onPick(k) is called with its step index.
+ */
+export function createLog(ol, onPick) {
   let items = [];
   return {
     load(events) {
-      items = events.map((e, k) => h('li', null,
-        h('span', 'log-step', `${k + 1}.`), ' ',
-        h('span', 'log-time', `t=${e.t} ms`), ' ', e.note));
+      items = events.map((e, k) => {
+        const b = h('button', 'log-line',
+          h('span', 'log-step', `${k + 1}.`), ' ',
+          h('span', 'log-time', `t=${e.t} ms`), ' ', e.note);
+        b.type = 'button';
+        b.title = `Aller à l'étape ${k + 1}`;
+        b.addEventListener('click', () => onPick(k));
+        return h('li', null, b);
+      });
       ol.replaceChildren(...items);
     },
     show(i) {

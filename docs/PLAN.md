@@ -93,7 +93,7 @@ Goal: the simulator teaches on its own, without you explaining next to it.
 - [x] Teaching bubbles, shown once each, the first time it happens: switch keeps the addresses; router rewrites the MACs and keeps the IPs; TTL decreases; ARP finds the MAC
 - [x] Questions during the simulation: optional `questions` array in a topology JSON (`{ source, destination, apresEtape, enonce, choix, bonne, explication }`); the player pauses and asks, e.g. “Quelle sera la MAC destination après R2 ?”
 - [x] Write those questions for mixte (3) and maillée (2)
-- [ ] Click a device → its tables open in the side panel; click a log line → jump to that step
+- [x] Click a device → its tables open in the side panel; click a log line → jump to that step
 - [ ] Responsive: under 768 px the drawing on top, panels as tabs below, controls sticky, buttons ≥ 44 px
 - [ ] Home page: hero, three module cards, “reprendre” from localStorage
 - [ ] URL parameters (`simulateur.html?topo=mixte&src=PC-A&dst=PC-B`) so fiches and the demo open a ready scenario

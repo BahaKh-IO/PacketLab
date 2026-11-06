@@ -154,6 +154,12 @@ button.primary:hover:not(:disabled) { background: #245bd0; }
 .device-router .shape { fill: #1d2f5a; }
 .device-switch .shape { fill: #17325e; }
 .device.active .shape { stroke: var(--cyan); stroke-width: 4; filter: drop-shadow(0 0 6px var(--cyan)); }
+.device { cursor: pointer; }
+.device:focus { outline: none; }
+.device:focus-visible .shape { stroke: #fff; stroke-width: 3; }
+.device.selected .shape { stroke: var(--violet); stroke-width: 4; stroke-dasharray: 6 3; }
+.selection-note { margin: 0 0 0.5rem; padding: 0.4rem 0.6rem; background: #f3f0ff; border-left: 3px solid var(--violet); border-radius: 4px; font-size: 0.85rem; }
+.selection-note .link-button { color: var(--blue); }
 .device-label { fill: #fff; font-size: 13px; font-weight: 700; }
 .device-ip { fill: #b9c6de; font-size: 11px; font-family: var(--mono); }
 .packet { stroke: #fff; stroke-width: 2; }
@@ -187,6 +193,8 @@ button.primary:hover:not(:disabled) { background: #245bd0; }
 .log { position: relative; margin: 0; padding: 0; list-style: none; max-height: 18rem; overflow-y: auto; font-size: 0.85rem; }
 .log li { padding: 0.3rem 0.4rem; border-radius: 4px; line-height: 1.35; }
 .log li.current { background: #e6f9fd; box-shadow: inset 3px 0 0 var(--cyan); }
+.log-line { display: block; width: 100%; min-height: 0; padding: 0; border: 0; background: none; text-align: left; font: inherit; line-height: inherit; color: inherit; }
+.log-line:hover .log-step { color: var(--blue); text-decoration: underline; }
 .log-step { font-weight: 700; }
 .log-time { font-family: var(--mono); color: var(--muted); }
 
