@@ -104,12 +104,12 @@ Goal: the demo step of § 18 works: chunk 3 lost without recovery (hole), then w
 
 **Engine (`reliability.js`, reuses `scheduler.js`)**
 
-- [ ] Message split into numbered chunks (size 4 by default); path Émetteur → Routeur A → Routeur B → Récepteur
-- [ ] Incident script: `[{ morceau: 3, action: "perdre" }, { morceau: 5, action: "retarder", delai: 60 }]`; a delay makes chunks arrive out of order
-- [ ] Without recovery: each chunk sent once
-- [ ] With recovery: ACK per chunk, one timer per chunk, resend on timeout; duplicates dropped but re-ACKed
-- [ ] `RunResult`: complete, total time, transmissions, retransmissions, duplicates
-- [ ] Tests: no incident → 0 retransmissions; lose 3 → exactly 1; a delay longer than the timeout → 1 duplicate; same script twice → identical results
+- [x] Message split into numbered chunks (size 4 by default); path Émetteur → Routeur A → Routeur B → Récepteur
+- [x] Incident script: `[{ morceau: 3, action: "perdre" }, { morceau: 5, action: "retarder", delai: 60 }]`; a delay makes chunks arrive out of order
+- [x] Without recovery: each chunk sent once
+- [x] With recovery: ACK per chunk, one timer per chunk, resend on timeout; duplicates dropped but re-ACKed
+- [x] `RunResult`: complete, total time, transmissions, retransmissions, duplicates
+- [x] Tests: no incident → 0 retransmissions; lose 3 → exactly 1; a delay longer than the timeout → 1 duplicate; same script twice → identical results
 
 **Page (`fiabilite.html`)**
 
