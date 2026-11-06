@@ -24,15 +24,15 @@ Work through the steps in order and commit after each one. Step 4 is the one tha
 
 **Step 1 — Setup (15 min)**
 
-- [ ] Open a terminal and type `node -v`. A version number (e.g. `v22.x`) means it is installed; “not recognized” means install the LTS from nodejs.org, then reopen the terminal
-- [ ] On GitHub: new public repo `packetlab` with a README; clone it; open the folder in VS Code; install the Live Server extension
+- [x] Open a terminal and type `node -v`. A version number (e.g. `v22.x`) means it is installed; “not recognized” means install the LTS from nodejs.org, then reopen the terminal
+- [x] On GitHub: new public repo `packetlab` with a README; clone it; open the folder in VS Code; install the Live Server extension
 - [ ] Settings → Pages → deploy from branch `main`, folder `/`
-- [ ] Copy the project description and the Objectif 1 slides into `docs/`
+- [x] Copy the project description and the Objectif 1 slides into `docs/`
 
 **Step 2 — Skeleton and CLAUDE.md (15 min)**
 
-- [ ] Create `CLAUDE.md` (prompt 1 below), read it, fix anything wrong
-- [ ] Create the structure below and 7 pages with a shared header (prompt 2); push; open the Pages link
+- [x] Create `CLAUDE.md` (prompt 1 below), read it, fix anything wrong
+- [x] Create the structure below and 7 pages with a shared header (prompt 2); push; open the Pages link
 
 ```text
 packetlab/
