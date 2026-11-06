@@ -31,5 +31,5 @@ Segments: PC-A->R1 MAC AA..0A -> 11..01, TTL 64 | R1->R2 MAC 11..02 -> 22..01, T
 
 ## Conventions
 - UI text in French; code identifiers in English.
-- Tests: `node --test tests/`. Print a run: `node tests/print-log.js mixte PC-A PC-B`.
+- Tests: `node --test` (finds every `tests/*.test.js`; on Node 22 `node --test tests/` fails because a folder is not expanded). Print a run: `node tests/print-log.js mixte PC-A PC-B`.
 - The developer is learning: before writing a non-trivial file, explain the approach briefly; after, be ready to explain it line by line.

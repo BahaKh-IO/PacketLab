@@ -11,7 +11,7 @@ Ouvrir le dossier dans VS Code et lancer **Live Server** sur `index.html` (le `f
 ## Tests
 
 ```sh
-node --test tests/
+node --test
 node tests/print-log.js mixte PC-A PC-B
 ```
 

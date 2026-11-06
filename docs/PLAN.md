@@ -49,10 +49,10 @@ packetlab/
 
 **Step 3 — Topology format, étoile and mixte (20 min)**
 
-- [ ] Fix the JSON shape: devices (id, type, position, interfaces with ip/masque/mac, gateway for PCs, routes for routers, empty ARP and MAC tables) and links (`"PC-A:eth0"` ↔ `"SW1:p1"`)
-- [ ] `etoile.json`: 4 PCs + 1 switch in 192.168.1.0/24
-- [ ] `mixte.json`: the addresses of § 7.1, plus one extra PC per LAN
-- [ ] Check by hand: every IP in its link's subnet, every next hop directly connected, no duplicate MAC
+- [x] Fix the JSON shape: devices (id, type, position, interfaces with ip/masque/mac, gateway for PCs, routes for routers, empty ARP and MAC tables) and links (`"PC-A:eth0"` ↔ `"SW1:p1"`)
+- [x] `etoile.json`: 4 PCs + 1 switch in 192.168.1.0/24
+- [x] `mixte.json`: the addresses of § 7.1, plus one extra PC per LAN
+- [x] Check by hand: every IP in its link's subnet, every next hop directly connected, no duplicate MAC (automated in `tests/topologies.test.js`)
 
 **Step 4 — Engine core (50 min) — must be done tonight**
 
