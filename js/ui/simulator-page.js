@@ -8,7 +8,8 @@ import { createPlayer } from './player.js';
 import { renderHeaders, renderTables, createLog } from './panels.js';
 import { createCoach } from './coach.js';
 import { bubblesFor, markSeen, resetSeen } from './bubbles.js';
-import { save } from '../storage.js';
+import { save, load } from '../storage.js';
+import { predictions } from './predict.js';
 
 const TOPOLOGY_IDS = ['mixte', 'etoile', 'bus', 'anneau', 'maillee'];
 
@@ -40,6 +41,8 @@ let questions = []; // questions of the current run
 let selectedDevice = null; // device clicked in the drawing (null: the active device)
 let runInfo = null; // what is being played, for the URL and the "Reprendre" box
 const answered = new Set(); // questions already asked in this run
+let predicted = []; // « Prédire d'abord » questions of the current run (empty when the mode is off)
+const predictBox = $('predict');
 
 /** Draw step i (reads the event list only). */
 function render(i, delay) {
@@ -106,24 +109,36 @@ function pickDevice(id) {
   showTables(player.index);
 }
 
-/** Questions and bubbles that must interrupt the run after step i. */
+/**
+ * Cards that must interrupt the run after step i: first the bubbles about what
+ * step i just showed, then the questions about what step i + 1 will show.
+ */
 function interruptionsAfter(i) {
   const cards = [];
-  for (const q of questions) {
-    if (q.apresEtape === i + 1 && !answered.has(q)) {
-      cards.push({ kind: 'question', ...q, onAnswer: () => answered.add(q) });
-    }
-  }
   const type = topo.devices.find((d) => d.id === events[i].device)?.type;
   for (const b of bubblesFor(events[i], type)) {
     cards.push({ kind: 'bubble', ...b, onClose: () => markSeen(b.id) });
   }
+  const written = questions.filter((q) => q.apresEtape === i + 1 && !answered.has(q));
+  for (const q of written) cards.push({ kind: 'question', ...q, onAnswer: () => answered.add(q) });
+  if (!written.length) { // a written question takes the place of a prediction
+    for (const q of predicted) {
+      if (q.apresEtape === i + 1 && !answered.has(q)) {
+        // kind last: a prediction has its own `kind` field (arp-cible, switch…) that must not win.
+        cards.push({ ...q, kicker: 'Prédiction', kind: 'question', onAnswer: () => answered.add(q) });
+      }
+    }
+  }
   return cards;
 }
 
-const player = createPlayer($('player'), (i, { delay, forward }) => {
-  render(i, delay);
-  if (!forward) return; // only when moving one step forward
+/** « Prédire d'abord » on or off: questions generated from the event list of the run. */
+function updatePredictions() {
+  predicted = predictBox.checked && events.length ? predictions(events, shown) : [];
+}
+
+/** Pause and show the cards due after step i, if any. */
+function interrupt(i) {
   const cards = interruptionsAfter(i);
   if (!cards.length) return;
   const wasPlaying = player.playing;
@@ -133,6 +148,11 @@ const player = createPlayer($('player'), (i, { delay, forward }) => {
     player.lock(false);
     if (wasPlaying && player.index < events.length - 1) player.play();
   });
+}
+
+const player = createPlayer($('player'), (i, { delay, forward }) => {
+  render(i, delay);
+  if (forward) interrupt(i); // only when moving one step forward (not back, not a jump)
 });
 
 function option(value, text) {
@@ -201,7 +221,7 @@ function checkPair() {
   if (same) caption.textContent = 'La source et la destination doivent être deux machines différentes.';
 }
 
-function run() {
+function run({ askAtStart = true } = {}) {
   coach.clear();
   player.lock(false);
   if (scenario) {
@@ -219,8 +239,10 @@ function run() {
     history.replaceState(null, '', `?${new URLSearchParams({ topo: topo.id, src, dst })}`);
   }
   answered.clear();
+  updatePredictions();
   log.load(events);
   player.load(events.length);
+  if (askAtStart && events.length) interrupt(0); // step 1 is shown by « Lancer », not by a step forward
 }
 
 async function init() {
@@ -246,6 +268,11 @@ async function init() {
     e.preventDefault();
     run();
   });
+  predictBox.checked = load('mode-prediction', false); // off by default: watch first, predict later
+  predictBox.addEventListener('change', () => {
+    save('mode-prediction', predictBox.checked);
+    updatePredictions();
+  });
   $('reset-bubbles').addEventListener('click', () => {
     resetSeen();
     $('reset-bubbles').textContent = 'Bulles réactivées ✓';
@@ -268,9 +295,10 @@ function openFromUrl() {
   const scenarioId = (topologies.get(id).scenarios ?? []).some((s) => s.id === q.get('scenario')) ? q.get('scenario') : '';
   selectTopology(id, { src: q.get('src'), dst: q.get('dst'), scenarioId });
   if (!scenarioId && (!q.has('src') || !q.has('dst') || runBtn.disabled)) return;
-  run();
   const step = Number(q.get('etape'));
-  if (Number.isInteger(step) && step > 1) player.go(step - 1); // a jump: no question or bubble on the way
+  const jump = Number.isInteger(step) && step > 1;
+  run({ askAtStart: !jump });
+  if (jump) player.go(step - 1); // a jump: no question or bubble on the way
 }
 
 init();

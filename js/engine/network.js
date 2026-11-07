@@ -129,10 +129,10 @@ export class Simulator {
    * Send an IP packet out of `iface` towards `nextHop`. If the MAC of the
    * next hop is unknown, hold the packet and broadcast an ARP request.
    */
-  sendIp(dev, iface, packet, nextHop) {
+  sendIp(dev, iface, packet, nextHop, reason = '') {
     const mac = this.arpLookup(dev, nextHop);
     if (mac) {
-      this.sendData(dev, iface, packet, mac, nextHop, true);
+      this.sendData(dev, iface, packet, mac, nextHop, true, reason);
       return;
     }
     const key = `${dev.id}|${nextHop}`;
@@ -150,12 +150,12 @@ export class Simulator {
     };
     const link = this.transmit(dev, iface.nom, frame);
     this.log('arp-request', dev, link ? [link] : [], frame,
-      `${dev.id} ne connaît pas la MAC de ${nextHop} (absente de sa table ARP) : il garde le paquet ` +
+      `${reason}${dev.id} ne connaît pas la MAC de ${nextHop} (absente de sa table ARP) : il garde le paquet ` +
       `et diffuse une requête ARP « Qui a ${nextHop} ? » vers ${BROADCAST}.`);
   }
 
   /** Build the Ethernet frame around the packet and send it. */
-  sendData(dev, iface, packet, macDst, nextHop, fromTable = false) {
+  sendData(dev, iface, packet, macDst, nextHop, fromTable = false, reason = '') {
     const frame = {
       kind: 'data',
       macSrc: iface.mac,
@@ -171,7 +171,7 @@ export class Simulator {
         `Les IP ne changent pas : ${packet.ipSrc} → ${packet.ipDst}.`
       : `${dev.id} envoie la trame : MAC ${iface.mac} → ${macDst}, IP ${packet.ipSrc} → ${packet.ipDst}, TTL ${packet.ttl}.`;
     const cached = fromTable ? ` (MAC de ${nextHop} déjà dans sa table ARP : pas besoin de requête ARP.)` : '';
-    this.log('send', dev, link ? [link] : [], frame, note + cached);
+    this.log('send', dev, link ? [link] : [], frame, reason + note + cached);
   }
 
   /** ARP frame received by a PC or a router interface. */
@@ -347,10 +347,14 @@ export class Simulator {
         `${src.id} veut joindre ${d.ip}, qui n'est pas dans son réseau ${net}, mais il n'a pas de passerelle : envoi impossible.`);
       return;
     }
-    this.log('start', src, [], packet, local
-      ? `${src.id} veut envoyer un paquet à ${dst.id} (${d.ip}). ${d.ip} est dans son réseau ${net} : il cherche directement la MAC de ${d.ip}.`
-      : `${src.id} veut envoyer un paquet à ${dst.id} (${d.ip}). ${d.ip} n'est pas dans son réseau ${net} : il passe par sa passerelle ${nextHop}.`);
-    this.sendIp(src, s, packet, nextHop);
+    // Step 1 only states the question; the decision is told with the next step,
+    // so that « Prédire d'abord » can ask it without giving the answer away.
+    this.log('start', src, [], packet,
+      `${src.id} veut envoyer un paquet à ${dst.id} (${d.ip}). Il compare cette adresse avec son propre réseau, ${net}.`);
+    const reason = local
+      ? `${d.ip} est dans son réseau ${net} : ${src.id} cherche directement la MAC de ${d.ip}. `
+      : `${d.ip} n'est pas dans son réseau ${net} : ${src.id} passe par sa passerelle ${nextHop}. `;
+    this.sendIp(src, s, packet, nextHop, reason);
   }
 
   /** Packets still waiting for an ARP reply when nothing moves any more: nobody answered. */

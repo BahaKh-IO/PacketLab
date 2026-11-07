@@ -62,8 +62,8 @@ export function createCoach(box) {
       });
       choices.append(b);
     });
-    return h('div', 'coach-card coach-question',
-      h('p', 'coach-kicker', 'Question'),
+    return h('div', `coach-card coach-question${q.kicker ? ' coach-predict' : ''}`,
+      h('p', 'coach-kicker', q.kicker ?? 'Question'),
       h('h3', null, q.enonce),
       choices,
       feedback);

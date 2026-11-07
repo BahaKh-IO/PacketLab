@@ -128,7 +128,7 @@ Decided with Baha after Session 3. Module C and new concepts wait for the course
 - [x] Engine: `simulateScenario()`, `appliquerPannes()`, unplugged cable, « personne n'a répondu » when an ARP request gets no reply, note when the MAC is already in the ARP table
 - [x] 19 scenarios: étoile 4, bus 2, anneau 3, maillée 3, mixte 7 (second send, reply, wrong gateway, wrong mask, missing route, routing loop, unplugged cable…) + 5 diagnosis questions; `tests/scenarios.test.js`
 - [x] Simulator: « Exemple » menu, description, cut cable drawn in red, `?scenario=` links, « Reprendre » for scenarios
-- [ ] « Prédire d'abord » mode (opt-in): questions generated from the event list before key steps, once per kind of step per device
+- [x] « Prédire d'abord » mode (opt-in, remembered): questions generated from the event list before key steps (ARP target of a PC, switch decision, next hop and TTL at a router, router MAC from its table, bus/ring station), once per kind of step per device; `tests/predict.test.js` checks every run and scenario: right answer = next step, never already on screen
 
 ## Session 4 — Quizzes, fiches, courses, progress (≈ 3 h)
 

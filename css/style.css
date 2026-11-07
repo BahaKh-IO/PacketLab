@@ -103,6 +103,10 @@ button.primary:hover:not(:disabled) { background: #245bd0; }
 .sim-setup label { display: flex; flex-direction: column; gap: 0.2rem; flex: 1 1 10rem; max-width: 22rem; font-size: 0.85rem; color: var(--muted); }
 .sim-setup select { width: 100%; min-width: 0; color: var(--ink); }
 .sim-setup select:disabled { opacity: 0.7; }
+.sim-setup .toggle { flex: 0 1 auto; flex-direction: row; align-items: center; gap: 0.45rem; min-height: 2.5rem; padding: 0 0.75rem; border: 1px solid var(--line); border-radius: 8px; background: var(--card); color: var(--ink); font-size: 0.95rem; cursor: pointer; }
+.sim-setup .toggle input { width: 1.1rem; height: 1.1rem; accent-color: #f59e0b; }
+.sim-setup .toggle:has(input:checked) { border-color: #f59e0b; background: #fffbeb; }
+.toggle-hint { color: var(--muted); font-size: 0.8rem; }
 .sim-setup .field-scenario { flex-basis: 16rem; max-width: 26rem; }
 .scenario-desc { margin: 0 0 0.75rem; padding: 0.5rem 0.8rem; background: #eef4ff; border-left: 4px solid var(--blue); border-radius: 6px; line-height: 1.45; }
 
@@ -217,6 +221,7 @@ button.primary:hover:not(:disabled) { background: #245bd0; }
   box-shadow: 0 10px 30px rgb(0 0 0 / 0.45);
 }
 .coach-question { border-top-color: var(--violet); }
+.coach-predict { border-top-color: #f59e0b; }
 .coach-card h3 { margin: 0.1rem 0 0.5rem; color: var(--navy); font-size: 1.05rem; }
 .coach-card p { margin: 0.4rem 0; line-height: 1.45; }
 .coach-kicker { margin: 0; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
