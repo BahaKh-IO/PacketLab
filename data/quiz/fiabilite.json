@@ -1,0 +1,72 @@
+{
+  "theme": "fiabilite",
+  "questions": [
+    {
+      "id": "fia-1",
+      "enonce": "À quoi sert un acquittement (ACK) ?",
+      "choix": ["Confirmer à l'émetteur qu'un morceau est bien arrivé", "Demander l'adresse MAC du destinataire", "Numéroter les morceaux du message", "Détruire les morceaux en double"],
+      "bonne": 0,
+      "explication": "Le récepteur renvoie un ACK pour chaque morceau reçu. Sans ACK, l'émetteur n'a aucun moyen de savoir qu'un morceau s'est perdu."
+    },
+    {
+      "id": "fia-2",
+      "enonce": "Que fait l'émetteur quand le temporisateur d'un morceau expire sans qu'il ait reçu d'acquittement ?",
+      "choix": ["Il réémet ce morceau", "Il abandonne le message", "Il renvoie tout le message depuis le début", "Il attend indéfiniment"],
+      "bonne": 0,
+      "explication": "L'expiration du temporisateur signifie « pas de nouvelles » : le morceau (ou son ACK) a pu se perdre. L'émetteur le réémet et réarme le temporisateur.",
+      "simulateur": "./fiabilite.html"
+    },
+    {
+      "id": "fia-3",
+      "enonce": "Pourquoi numérote-t-on les morceaux d'un message ?",
+      "choix": ["Pour les remettre dans l'ordre et repérer les manquants et les doublons", "Pour qu'ils voyagent plus vite", "Pour les chiffrer", "Pour que les routeurs choisissent leur chemin"],
+      "bonne": 0,
+      "explication": "Les morceaux peuvent arriver dans le désordre, en double ou pas du tout. Le numéro dit au récepteur dans quelle case ranger chaque morceau, et à quel morceau correspond chaque acquittement."
+    },
+    {
+      "id": "fia-4",
+      "enonce": "Un morceau n'est pas perdu mais retardé, plus longtemps que le temporisateur. Que reçoit finalement le récepteur ?",
+      "choix": ["Deux exemplaires : il garde le premier et jette le doublon, en l'acquittant quand même", "Un seul exemplaire, l'émetteur annule le premier", "Aucun exemplaire", "Deux exemplaires, qu'il garde tous les deux"],
+      "bonne": 0,
+      "explication": "Le temporisateur a expiré : l'émetteur a réémis alors que l'original était encore en route. Le récepteur reconnaît le doublon grâce au numéro, le jette, et l'acquitte pour que l'émetteur soit rassuré.",
+      "simulateur": "./fiabilite.html"
+    },
+    {
+      "id": "fia-5",
+      "enonce": "Sans aucun mécanisme de récupération, que devient un morceau perdu ?",
+      "choix": ["Il manque définitivement : le message reste troué", "Le récepteur le reconstruit à partir des autres", "Le routeur qui l'a perdu le renvoie", "Il arrive plus tard grâce au TTL"],
+      "bonne": 0,
+      "explication": "Personne ne sait qu'il manque, sauf le récepteur, qui n'a aucun moyen de le réclamer. C'est la comparaison « sans / avec récupération » du Labo fiabilité.",
+      "simulateur": "./fiabilite.html"
+    },
+    {
+      "id": "fia-6",
+      "enonce": "Avec le protocole « envoyer et attendre », combien de morceaux peuvent être en route sans avoir été acquittés ?",
+      "choix": ["Un seul", "Deux", "Autant que l'on veut", "Le nombre fixé par chaque routeur"],
+      "bonne": 0,
+      "explication": "L'émetteur envoie un morceau puis attend son acquittement avant d'envoyer le suivant. C'est simple, mais le lien reste inutilisé pendant toute l'attente."
+    },
+    {
+      "id": "fia-7",
+      "enonce": "Quel avantage apporte une fenêtre d'anticipation par rapport à « envoyer et attendre » ?",
+      "choix": ["L'émetteur envoie plusieurs morceaux sans attendre chaque acquittement : le lien est mieux utilisé", "Les acquittements deviennent inutiles", "Plus aucun morceau ne peut se perdre", "Les morceaux n'ont plus besoin de numéros"],
+      "bonne": 0,
+      "explication": "Plusieurs morceaux sont « en vol » en même temps, dans la limite de la taille de la fenêtre. Les acquittements et les numéros restent indispensables pour savoir quoi réémettre. Le labo de PacketLab envoie tous les morceaux sans attendre, comme une fenêtre très large."
+    },
+    {
+      "id": "fia-8",
+      "enonce": "Pourquoi le temporisateur doit-il durer plus longtemps qu'un aller-retour normal (morceau + acquittement) ?",
+      "choix": ["Sinon l'émetteur réémet des morceaux qui allaient être acquittés, ce qui crée des doublons inutiles", "Plus il est court, plus la transmission est fiable", "Pour que les acquittements arrivent plus vite", "La durée du temporisateur n'a aucune importance"],
+      "bonne": 0,
+      "explication": "Dans le labo, l'aller-retour normal dure 120 ms et le temporisateur 200 ms. Un temporisateur trop court déclenche des réémissions inutiles ; trop long, il fait attendre longtemps après une vraie perte.",
+      "simulateur": "./fiabilite.html"
+    },
+    {
+      "id": "fia-9",
+      "enonce": "Que permet un code détecteur d'erreur comme le CRC ?",
+      "choix": ["Détecter qu'une trame a été altérée pendant la transmission", "Corriger toutes les erreurs de transmission", "Retrouver un morceau perdu", "Remettre les morceaux dans l'ordre"],
+      "bonne": 0,
+      "explication": "L'émetteur ajoute des bits de contrôle calculés à partir des données ; le récepteur refait le calcul. Un résultat différent révèle une erreur : la trame est jetée, et c'est la réémission qui la remplacera."
+    }
+  ]
+}

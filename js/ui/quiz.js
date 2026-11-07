@@ -1,1 +1,146 @@
-// quiz.js — to be written (see docs/PLAN.md).
+// quiz.js — quiz.html: choose a theme, one question at a time, correction after
+// each answer, final score with the questions to review. The score is saved by progress.js.
+
+import { h, link, button, shuffled } from './dom.js';
+import { loadThemes, loadQuiz, loadError } from './content.js';
+import { getProgress, recordQuiz } from '../progress.js';
+
+const $ = (id) => document.getElementById(id);
+const app = $('quiz-app');
+let themes = [];
+
+function show(...nodes) {
+  app.replaceChildren(...nodes);
+  window.scrollTo({ top: 0 });
+}
+
+// ---------- theme list ----------
+
+function themeList() {
+  const progress = getProgress().quiz;
+  const cards = themes.map((t) => {
+    const best = progress[t.id];
+    return h('article', 'card quiz-theme',
+      h('h3', null, t.titre),
+      h('p', null, t.resume),
+      h('p', 'quiz-best', best ? `Meilleur score : ${best.meilleur} / ${best.total} (${best.tentatives} essai${best.tentatives > 1 ? 's' : ''})` : 'Pas encore tenté'),
+      t.statut === 'a-valider' ? h('p', 'badge-review', 'Contenu à valider par l\'équipe') : null,
+      link(`./quiz.html?theme=${t.id}`, 'Commencer →', 'button primary'));
+  });
+  show(h('div', 'cards', cards));
+  history.replaceState(null, '', './quiz.html');
+}
+
+// ---------- one quiz ----------
+
+async function runQuiz(theme) {
+  let data;
+  try {
+    data = await loadQuiz(theme.id);
+  } catch (err) {
+    show(h('p', 'error', loadError(err)));
+    return;
+  }
+  const questions = shuffled(data.questions);
+  const missed = [];
+  let score = 0;
+  let index = 0;
+
+  function question() {
+    const q = questions[index];
+    // Choices shuffled for each student; the right one is tracked by its text.
+    const choices = shuffled(q.choix.map((text, k) => ({ text, right: k === q.bonne })));
+    const feedback = h('div', 'quiz-feedback');
+    feedback.hidden = true;
+    const buttons = choices.map((c, k) => button(`${k + 1}. ${c.text}`, 'choice', () => answer(c, k)));
+    const list = h('div', 'quiz-choices', buttons);
+
+    function answer(choice, k) {
+      if (!feedback.hidden) return;
+      buttons.forEach((b, j) => {
+        b.disabled = true;
+        if (choices[j].right) b.classList.add('right');
+      });
+      if (choice.right) score += 1;
+      else {
+        buttons[k].classList.add('wrong');
+        missed.push(q);
+      }
+      const last = index === questions.length - 1;
+      const next = button(last ? 'Voir mon score' : 'Question suivante', 'primary', () => {
+        if (last) end();
+        else { index += 1; question(); }
+      });
+      feedback.replaceChildren(...[ // (replaceChildren would print "null": filter it out)
+        h('p', choice.right ? 'verdict right' : 'verdict wrong', choice.right ? 'Bonne réponse !' : 'Pas tout à fait…'),
+        h('p', null, q.explication),
+        q.simulateur ? link(q.simulateur, 'Voir dans le simulateur →', 'quiz-sim-link') : null,
+        h('div', 'quiz-actions', next)].filter(Boolean));
+      feedback.hidden = false;
+      next.focus();
+    }
+
+    const bar = h('div', 'quiz-bar', h('span', null));
+    bar.firstChild.style.width = `${(index / questions.length) * 100}%`;
+    show(h('section', 'quiz-card',
+      h('p', 'quiz-meta', `${theme.titre} · question ${index + 1} / ${questions.length}`),
+      bar,
+      h('h2', null, q.enonce),
+      list,
+      feedback,
+      h('p', 'quiz-keys', 'Clavier : touches 1 à 4 pour répondre, Entrée pour continuer.')));
+    buttons[0].focus();
+
+    // Keys 1–4 answer; Enter on the focused "next" button continues.
+    app.onkeydown = (e) => {
+      const n = Number(e.key);
+      if (n >= 1 && n <= buttons.length && feedback.hidden) {
+        e.preventDefault();
+        answer(choices[n - 1], n - 1);
+      }
+    };
+  }
+
+  function end() {
+    app.onkeydown = null;
+    recordQuiz(theme.id, score, questions.length);
+    const ratio = score / questions.length;
+    const message = ratio === 1 ? 'Parfait, tout est juste !'
+      : ratio >= 0.75 ? 'Très bien : relisez les quelques points ci-dessous.'
+        : ratio >= 0.5 ? 'C\'est un début : la fiche et le cours de ce thème vous aideront.'
+          : 'Reprenez la fiche et le cours de ce thème, puis réessayez.';
+    show(h('section', 'quiz-card quiz-end',
+      h('p', 'quiz-meta', theme.titre),
+      h('h2', null, `Score : ${score} / ${questions.length}`),
+      h('p', null, message),
+      missed.length ? h('div', 'quiz-review',
+        h('h3', null, 'À revoir'),
+        missed.map((q) => h('div', 'review-item',
+          h('p', 'review-q', q.enonce),
+          h('p', 'review-a', `Réponse : ${q.choix[q.bonne]}`),
+          h('p', null, q.explication),
+          q.simulateur ? link(q.simulateur, 'Voir dans le simulateur →') : null))) : null,
+      h('div', 'quiz-actions',
+        button('Recommencer', 'primary', () => runQuiz(theme)),
+        link(`./cours.html?theme=${theme.id}`, 'Lire le cours', 'button'),
+        link(`./fiches.html?theme=${theme.id}`, 'Fiches et cartes', 'button'),
+        link('./quiz.html', 'Autres thèmes', 'button'))));
+  }
+
+  history.replaceState(null, '', `./quiz.html?theme=${theme.id}`);
+  question();
+}
+
+async function init() {
+  try {
+    themes = (await loadThemes()).themes;
+  } catch (err) {
+    show(h('p', 'error', loadError(err)));
+    return;
+  }
+  const wanted = themes.find((t) => t.id === new URLSearchParams(location.search).get('theme'));
+  if (wanted) runQuiz(wanted);
+  else themeList();
+}
+
+init();

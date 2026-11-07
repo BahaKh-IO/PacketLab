@@ -1,0 +1,66 @@
+{
+  "theme": "arp",
+  "questions": [
+    {
+      "id": "arp-1",
+      "enonce": "À quoi sert le protocole ARP ?",
+      "choix": ["Trouver l'adresse MAC qui correspond à une adresse IP du réseau local", "Trouver l'adresse IP qui correspond à un nom de site", "Attribuer automatiquement une adresse IP", "Choisir le meilleur chemin entre deux réseaux"],
+      "bonne": 0,
+      "explication": "Pour envoyer une trame, il faut la MAC du prochain équipement ; on ne connaît souvent que son IP. ARP fait le lien IP → MAC sur le réseau local. Les noms de sites, c'est DNS ; l'attribution d'adresses, DHCP ; le choix du chemin, le routage."
+    },
+    {
+      "id": "arp-2",
+      "enonce": "Vers quelle adresse MAC de destination une requête ARP est-elle envoyée ?",
+      "choix": ["FF:FF:FF:FF:FF:FF", "La MAC de la passerelle", "La MAC du commutateur", "00:00:00:00:00:00"],
+      "bonne": 0,
+      "explication": "L'émetteur ne connaît pas encore la MAC recherchée : il pose la question à tout le monde, en diffusion. Dans le message ARP lui-même, le champ « MAC cible » vaut 00:00:00:00:00:00, ce qui est un piège classique.",
+      "simulateur": "./simulateur.html?topo=etoile&src=PC-A&dst=PC-B"
+    },
+    {
+      "id": "arp-3",
+      "enonce": "Comment la réponse ARP est-elle envoyée ?",
+      "choix": ["Directement à la MAC du demandeur (unicast)", "En diffusion, à tout le réseau", "Au routeur, qui la relaie", "Elle n'est pas envoyée : le demandeur attend"],
+      "bonne": 0,
+      "explication": "La requête contient la MAC du demandeur : la machine qui possède l'IP demandée lui répond directement. Le commutateur, qui a appris où se trouve le demandeur, envoie cette réponse sur un seul port."
+    },
+    {
+      "id": "arp-4",
+      "enonce": "PC-A (192.168.1.10/24, passerelle 192.168.1.1) veut joindre 8.8.8.8. Pour quelle adresse IP fait-il une requête ARP ?",
+      "choix": ["192.168.1.1", "8.8.8.8", "192.168.1.255", "192.168.1.10"],
+      "bonne": 0,
+      "explication": "8.8.8.8 n'est pas dans 192.168.1.0/24 : PC-A doit remettre le paquet à sa passerelle. Il cherche donc la MAC de 192.168.1.1. La MAC d'une machine située hors du réseau local n'est jamais demandée.",
+      "simulateur": "./simulateur.html?topo=mixte&src=PC-A&dst=PC-B"
+    },
+    {
+      "id": "arp-5",
+      "enonce": "Une requête ARP peut-elle traverser un routeur ?",
+      "choix": ["Non : elle reste dans son domaine de diffusion", "Oui : le routeur la relaie vers tous ses réseaux", "Oui, tant que son TTL est supérieur à 0", "Seulement si la destination est la passerelle"],
+      "bonne": 0,
+      "explication": "Une requête ARP est une trame de diffusion : les routeurs ne transmettent pas les diffusions d'un réseau à l'autre. C'est pour cela que chaque routeur refait son propre ARP pour le tronçon suivant."
+    },
+    {
+      "id": "arp-6",
+      "enonce": "Que fait la machine qui reçoit une requête ARP portant sur sa propre adresse IP ?",
+      "choix": ["Elle note l'IP et la MAC du demandeur dans sa table ARP, puis répond", "Elle répond sans rien noter", "Elle transmet la requête à son routeur", "Elle l'ignore si sa table ARP est pleine"],
+      "bonne": 0,
+      "explication": "La requête lui apprend gratuitement la MAC du demandeur : elle la garde, ce qui lui évitera un ARP pour répondre plus tard. C'est pourquoi, dans PacketLab, PC-B répond à PC-A sans faire de requête ARP.",
+      "simulateur": "./simulateur.html?topo=etoile&scenario=reponse"
+    },
+    {
+      "id": "arp-7",
+      "enonce": "Juste après un premier envoi réussi de PC-A vers PC-B (même réseau), PC-A envoie un deuxième paquet à PC-B. Que se passe-t-il ?",
+      "choix": ["Aucune requête ARP : la MAC de PC-B est déjà dans la table ARP de PC-A", "Une nouvelle requête ARP, comme la première fois", "Le commutateur répond à la place de PC-B", "PC-A envoie la requête ARP en unicast"],
+      "bonne": 0,
+      "explication": "La table ARP sert justement de mémoire : tant que l'entrée est présente, l'émetteur construit la trame directement. Dans un vrai système, ces entrées expirent après quelques minutes.",
+      "simulateur": "./simulateur.html?topo=etoile&scenario=deuxieme-envoi"
+    },
+    {
+      "id": "arp-8",
+      "enonce": "Un routeur doit envoyer un paquet vers son prochain saut 10.0.0.2, dont il ne connaît pas la MAC. Que fait-il ?",
+      "choix": ["Il garde le paquet et envoie une requête ARP sur son interface de sortie", "Il jette le paquet", "Il envoie le paquet en diffusion", "Il demande la MAC au PC qui a envoyé le paquet"],
+      "bonne": 0,
+      "explication": "Un routeur se comporte comme un PC sur chacun de ses réseaux : il met le paquet en attente, demande la MAC du prochain saut par ARP, puis envoie la trame dès qu'il reçoit la réponse.",
+      "simulateur": "./simulateur.html?topo=mixte&src=PC-A&dst=PC-B"
+    }
+  ]
+}

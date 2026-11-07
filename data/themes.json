@@ -1,0 +1,54 @@
+{
+  "sources": "Textes originaux de PacketLab, écrits d'après le programme des cours de réseaux de SUP'COM (Réseaux locaux et IP ; Architectures et fonctions des réseaux ; Routage et commutation dans les réseaux). Aucun passage n'est recopié des supports de cours.",
+  "themes": [
+    {
+      "id": "adressage-ip",
+      "titre": "Adressage IPv4 et masques",
+      "resume": "Adresse réseau, diffusion, masque, sous-réseaux : savoir si deux machines sont dans le même réseau.",
+      "simulateur": "./simulateur.html?topo=mixte&scenario=mauvais-masque",
+      "statut": "a-valider"
+    },
+    {
+      "id": "ethernet-mac",
+      "titre": "Ethernet et adresses MAC",
+      "resume": "La trame Ethernet, l'adresse MAC, la diffusion et l'accès à un support partagé.",
+      "simulateur": "./simulateur.html?topo=etoile&src=PC-A&dst=PC-B",
+      "statut": "a-valider"
+    },
+    {
+      "id": "arp",
+      "titre": "ARP",
+      "resume": "Comment une machine trouve l'adresse MAC qui correspond à une adresse IP de son réseau local.",
+      "simulateur": "./simulateur.html?topo=etoile&scenario=reponse",
+      "statut": "a-valider"
+    },
+    {
+      "id": "commutation",
+      "titre": "Commutation",
+      "resume": "Le commutateur : table MAC, apprentissage, transmission ciblée, inondation, domaines de collision.",
+      "simulateur": "./simulateur.html?topo=etoile&scenario=deuxieme-envoi",
+      "statut": "a-valider"
+    },
+    {
+      "id": "routage",
+      "titre": "Routage IP et TTL",
+      "resume": "Le routeur : table de routage, plus long préfixe, prochain saut, réécriture des MAC, TTL.",
+      "simulateur": "./simulateur.html?topo=maillee&scenario=aller-retour",
+      "statut": "a-valider"
+    },
+    {
+      "id": "topologies",
+      "titre": "Topologies",
+      "resume": "Étoile, bus, anneau, maillée, mixte : comment les équipements sont reliés et ce que cela change.",
+      "simulateur": "./simulateur.html?topo=anneau&scenario=voisin-arriere",
+      "statut": "a-valider"
+    },
+    {
+      "id": "fiabilite",
+      "titre": "Fiabilité : acquittements et réémission",
+      "resume": "Pertes, retards, doublons : numérotation, acquittements, temporisateurs et réémission.",
+      "simulateur": "./fiabilite.html",
+      "statut": "a-valider"
+    }
+  ]
+}

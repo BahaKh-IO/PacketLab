@@ -1,0 +1,64 @@
+{
+  "theme": "commutation",
+  "questions": [
+    {
+      "id": "sw-1",
+      "enonce": "Sur quelle information un commutateur choisit-il le port de sortie d'une trame ?",
+      "choix": ["La MAC destination", "La MAC source", "L'adresse IP destination", "Le TTL"],
+      "bonne": 0,
+      "explication": "Le commutateur travaille en couche 2 : il lit la MAC destination et cherche dans sa table MAC derrière quel port elle se trouve. Il ne regarde ni les adresses IP ni le TTL."
+    },
+    {
+      "id": "sw-2",
+      "enonce": "Comment un commutateur remplit-il sa table MAC ?",
+      "choix": ["Il note la MAC source de chaque trame reçue avec son port d'arrivée", "Il note la MAC destination de chaque trame", "L'administrateur saisit toutes les entrées", "Il envoie des requêtes ARP à chaque machine"],
+      "bonne": 0,
+      "explication": "Chaque trame reçue lui apprend où se trouve son émetteur : « cette MAC est derrière ce port ». La table se remplit donc toute seule, au fil du trafic.",
+      "simulateur": "./simulateur.html?topo=etoile&src=PC-A&dst=PC-B"
+    },
+    {
+      "id": "sw-3",
+      "enonce": "Que fait un commutateur d'une trame dont la MAC destination est absente de sa table ?",
+      "choix": ["Il l'envoie sur tous ses ports sauf celui d'arrivée (inondation)", "Il la jette", "Il la renvoie à l'émetteur", "Il envoie d'abord une requête ARP"],
+      "bonne": 0,
+      "explication": "Faute de savoir où est la destination, il inonde : une copie part sur chaque autre port. La destination répondra, et sa MAC source sera apprise à ce moment-là."
+    },
+    {
+      "id": "sw-4",
+      "enonce": "Que modifie un commutateur dans une trame qu'il transmet ?",
+      "choix": ["Rien : adresses et données restent identiques", "La MAC source", "La MAC destination", "Le TTL"],
+      "bonne": 0,
+      "explication": "Un commutateur ne fait que choisir des ports : la trame ressort exactement comme elle est entrée. C'est le routeur, pas le commutateur, qui réécrit les MAC et décrémente le TTL.",
+      "simulateur": "./simulateur.html?topo=mixte&src=PC-A&dst=PC-B"
+    },
+    {
+      "id": "sw-5",
+      "enonce": "Un commutateur reçoit sur son port p2 une trame destinée à une MAC qu'il a apprise sur ce même port p2. Que fait-il ?",
+      "choix": ["Rien : il ne renvoie pas la trame (filtrage)", "Il l'envoie sur tous ses ports", "Il la renvoie sur p2", "Il envoie une requête ARP"],
+      "bonne": 0,
+      "explication": "La destination est du même côté que l'émetteur (par exemple derrière un concentrateur relié à p2) : elle a déjà reçu la trame. La renvoyer ne servirait à rien, le commutateur la filtre."
+    },
+    {
+      "id": "sw-6",
+      "enonce": "Quelle est la différence entre un concentrateur (hub) et un commutateur ?",
+      "choix": ["Le concentrateur répète tout sur tous ses ports ; le commutateur envoie vers le seul port de la destination connue", "Le concentrateur lit les adresses MAC, le commutateur non", "Le commutateur réécrit les adresses MAC, le concentrateur non", "Il n'y a aucune différence de fonctionnement"],
+      "bonne": 0,
+      "explication": "Le concentrateur travaille en couche 1 : il répète le signal partout sans lire d'adresse, et tous ses ports partagent les collisions. Le commutateur lit la MAC destination et isole chaque port."
+    },
+    {
+      "id": "sw-7",
+      "enonce": "Un commutateur a 8 ports, chacun relié à un PC. Combien de domaines de collision forme-t-il ?",
+      "choix": ["8", "1", "2", "0"],
+      "bonne": 0,
+      "explication": "Chaque port d'un commutateur est un domaine de collision séparé : 8 ports, 8 domaines. Avec un concentrateur à 8 ports, il n'y en aurait qu'un seul, partagé par tous."
+    },
+    {
+      "id": "sw-8",
+      "enonce": "Une trame de diffusion (MAC destination FF:FF:FF:FF:FF:FF) arrive à un commutateur. Que fait-il ?",
+      "choix": ["Il l'envoie sur tous ses autres ports, même si sa table est complète", "Il l'envoie seulement au routeur", "Il la jette", "Il l'envoie sur le port appris le plus récemment"],
+      "bonne": 0,
+      "explication": "Une diffusion est destinée à tout le monde : le commutateur l'inonde toujours. Un commutateur ne sépare donc pas les domaines de diffusion ; seul un routeur arrête les diffusions.",
+      "simulateur": "./simulateur.html?topo=etoile&src=PC-A&dst=PC-B"
+    }
+  ]
+}

@@ -1,0 +1,64 @@
+{
+  "theme": "ethernet-mac",
+  "questions": [
+    {
+      "id": "mac-1",
+      "enonce": "Combien de bits contient une adresse MAC Ethernet ?",
+      "choix": ["48", "32", "64", "128"],
+      "bonne": 0,
+      "explication": "Une adresse MAC fait 48 bits, soit 6 octets écrits en hexadécimal (par exemple AA:AA:AA:00:00:0A). 32 bits, c'est une adresse IPv4 ; 128 bits, une adresse IPv6."
+    },
+    {
+      "id": "mac-2",
+      "enonce": "Que représentent les 24 premiers bits d'une adresse MAC ?",
+      "choix": ["L'identifiant du constructeur (OUI)", "Le numéro du réseau", "Le numéro de port du commutateur", "L'adresse IP du routeur"],
+      "bonne": 0,
+      "explication": "Les 3 premiers octets forment l'OUI, attribué au constructeur de la carte réseau ; les 3 suivants sont choisis par le constructeur. Contrairement à une adresse IP, une MAC ne contient aucune notion de réseau."
+    },
+    {
+      "id": "mac-3",
+      "enonce": "Quelle adresse MAC de destination désigne toutes les machines du réseau local ?",
+      "choix": ["FF:FF:FF:FF:FF:FF", "00:00:00:00:00:00", "01:00:5E:00:00:01", "11:11:11:11:11:11"],
+      "bonne": 0,
+      "explication": "FF:FF:FF:FF:FF:FF (tous les bits à 1) est l'adresse de diffusion : chaque carte réseau du domaine de diffusion accepte la trame. C'est la destination d'une requête ARP.",
+      "simulateur": "./simulateur.html?topo=etoile&src=PC-A&dst=PC-B"
+    },
+    {
+      "id": "mac-4",
+      "enonce": "Quel champ de la trame Ethernet permet au récepteur de détecter une erreur de transmission ?",
+      "choix": ["Le FCS", "Le préambule", "Le champ Type", "L'adresse MAC source"],
+      "bonne": 0,
+      "explication": "Le FCS (Frame Check Sequence), en fin de trame, est un code CRC calculé par l'émetteur. Le récepteur refait le calcul : si le résultat diffère, la trame a été altérée et elle est jetée."
+    },
+    {
+      "id": "mac-5",
+      "enonce": "Quelle est la taille minimale du champ de données d'une trame Ethernet ?",
+      "choix": ["46 octets", "64 octets", "1500 octets", "18 octets"],
+      "bonne": 0,
+      "explication": "Le champ de données va de 46 à 1500 octets. Avec les 18 octets d'en-tête et de FCS, une trame fait au moins 64 octets : c'est ce minimum qui permet de détecter les collisions sur un support partagé."
+    },
+    {
+      "id": "mac-6",
+      "enonce": "Une carte réseau reçoit une trame dont la MAC destination n'est ni la sienne ni la diffusion. Que fait-elle ?",
+      "choix": ["Elle l'ignore", "Elle la renvoie à l'émetteur", "Elle la garde quand même", "Elle répond par une requête ARP"],
+      "bonne": 0,
+      "explication": "Chaque carte compare la MAC destination à sa propre adresse : si ce n'est pas pour elle (ni une diffusion), la trame est ignorée. C'est exactement ce qui se passe sur le bus, où toutes les stations voient toutes les trames.",
+      "simulateur": "./simulateur.html?topo=bus&src=PC-A&dst=PC-C"
+    },
+    {
+      "id": "mac-7",
+      "enonce": "Quelle méthode d'accès Ethernet utilise-t-il sur un support partagé (bus, concentrateur) ?",
+      "choix": ["CSMA/CD", "CSMA/CA", "Le passage de jeton", "Le multiplexage temporel fixe"],
+      "bonne": 0,
+      "explication": "CSMA/CD : la station écoute le support avant d'émettre, détecte une éventuelle collision, s'arrête et réessaie après une attente aléatoire. CSMA/CA est la variante des réseaux sans fil, qui évite les collisions au lieu de les détecter."
+    },
+    {
+      "id": "mac-8",
+      "enonce": "Un paquet va de PC-A à PC-B en traversant deux routeurs. Combien de fois le couple (MAC source, MAC destination) change-t-il ?",
+      "choix": ["2 fois", "Jamais", "3 fois", "1 fois"],
+      "bonne": 0,
+      "explication": "Il y a trois tronçons (PC-A → R1, R1 → R2, R2 → PC-B). Chaque routeur construit une nouvelle trame pour le tronçon suivant : les MAC changent donc 2 fois, alors que les adresses IP restent les mêmes de bout en bout.",
+      "simulateur": "./simulateur.html?topo=mixte&src=PC-A&dst=PC-B"
+    }
+  ]
+}

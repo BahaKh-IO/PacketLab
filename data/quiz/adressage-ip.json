@@ -1,0 +1,74 @@
+{
+  "theme": "adressage-ip",
+  "questions": [
+    {
+      "id": "ip-1",
+      "enonce": "Quelle est l'adresse du réseau auquel appartient l'hôte 192.168.10.77/26 ?",
+      "choix": ["192.168.10.64", "192.168.10.0", "192.168.10.77", "192.168.10.128"],
+      "bonne": 0,
+      "explication": "/26 donne le masque 255.255.255.192 : le dernier octet est découpé en blocs de 64 (0, 64, 128, 192). 77 tombe dans le bloc 64–127, dont l'adresse réseau est 192.168.10.64.",
+      "calcul": { "type": "reseau", "ip": "192.168.10.77", "masque": 26 }
+    },
+    {
+      "id": "ip-2",
+      "enonce": "Quelle est l'adresse de diffusion du réseau 172.16.32.0/20 ?",
+      "choix": ["172.16.47.255", "172.16.32.255", "172.16.255.255", "172.16.48.255"],
+      "bonne": 0,
+      "explication": "/20 laisse 4 bits d'hôte dans le troisième octet : les réseaux avancent de 16 en 16 (32, 48…). Le réseau 172.16.32.0/20 va donc jusqu'à 172.16.47.255, sa diffusion (tous les bits d'hôte à 1).",
+      "calcul": { "type": "diffusion", "ip": "172.16.32.0", "masque": 20 }
+    },
+    {
+      "id": "ip-3",
+      "enonce": "Combien d'adresses peut-on attribuer à des hôtes dans un réseau /27 ?",
+      "choix": ["30", "32", "27", "62"],
+      "bonne": 0,
+      "explication": "Il reste 32 − 27 = 5 bits d'hôte, soit 2⁵ = 32 adresses. On retire l'adresse du réseau et l'adresse de diffusion : 30 hôtes.",
+      "calcul": { "type": "hotes", "masque": 27 }
+    },
+    {
+      "id": "ip-4",
+      "enonce": "Quel masque décimal correspond à la notation /22 ?",
+      "choix": ["255.255.252.0", "255.255.255.252", "255.255.248.0", "255.255.254.0"],
+      "bonne": 0,
+      "explication": "22 bits à 1 : 8 + 8 + 6. Le troisième octet vaut 11111100 en binaire, soit 252. D'où 255.255.252.0. (255.255.255.252 serait un /30.)",
+      "calcul": { "type": "masque", "masque": 22 }
+    },
+    {
+      "id": "ip-5",
+      "enonce": "Un PC a l'adresse 10.1.1.130/25. Lequel de ces hôtes est dans le même réseau que lui ?",
+      "choix": ["10.1.1.200", "10.1.1.100", "10.1.2.130", "10.1.0.130"],
+      "bonne": 0,
+      "explication": "Avec /25, le dernier octet est coupé en deux : 0–127 et 128–255. 10.1.1.130 est dans le réseau 10.1.1.128/25, comme 10.1.1.200. 10.1.1.100 est dans l'autre moitié.",
+      "calcul": { "type": "meme-reseau", "ip": "10.1.1.130", "masque": 25 }
+    },
+    {
+      "id": "ip-6",
+      "enonce": "On veut découper 192.168.5.0/24 en 4 sous-réseaux de même taille. Quel masque faut-il ?",
+      "choix": ["/26 (255.255.255.192)", "/25 (255.255.255.128)", "/28 (255.255.255.240)", "/22 (255.255.252.0)"],
+      "bonne": 0,
+      "explication": "4 sous-réseaux = 2² : on emprunte 2 bits à la partie hôte. /24 + 2 = /26, soit 4 réseaux de 64 adresses (62 hôtes chacun)."
+    },
+    {
+      "id": "ip-7",
+      "enonce": "Laquelle de ces adresses ne peut pas être attribuée à un hôte ?",
+      "choix": ["192.168.1.255/24", "192.168.1.1/24", "192.168.1.254/24", "10.0.0.2/30"],
+      "bonne": 0,
+      "explication": "192.168.1.255 est l'adresse de diffusion du réseau 192.168.1.0/24 (tous les bits d'hôte à 1). Dans 10.0.0.0/30, les adresses 10.0.0.1 et 10.0.0.2 sont bien utilisables : c'est le cas du lien R1–R2 de la topologie mixte."
+    },
+    {
+      "id": "ip-8",
+      "enonce": "Lequel de ces blocs est une plage d'adresses privées ?",
+      "choix": ["10.0.0.0/8", "127.0.0.0/8", "169.254.0.0/16", "100.0.0.0/8"],
+      "bonne": 0,
+      "explication": "Les plages privées sont 10.0.0.0/8, 172.16.0.0/12 et 192.168.0.0/16 : elles ne sont pas routées sur Internet. 127.0.0.0/8 est réservé au bouclage (la machine elle-même) et 169.254.0.0/16 aux adresses de lien local attribuées automatiquement."
+    },
+    {
+      "id": "ip-9",
+      "enonce": "PC-A est configuré en 192.168.1.10/16 au lieu de /24. Il veut joindre 192.168.2.20. Que fait-il ?",
+      "choix": ["Il demande directement la MAC de 192.168.2.20 par ARP", "Il passe par sa passerelle 192.168.1.1", "Il envoie le paquet en diffusion IP", "Il refuse d'envoyer le paquet"],
+      "bonne": 0,
+      "explication": "Avec /16, son réseau devient 192.168.0.0/16, qui contient 192.168.2.20 : PC-A croit la destination locale et ne passe pas par sa passerelle. Personne ne lui répond, car la requête ARP ne traverse pas le routeur.",
+      "simulateur": "./simulateur.html?topo=mixte&scenario=mauvais-masque"
+    }
+  ]
+}

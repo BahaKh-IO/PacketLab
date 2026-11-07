@@ -1,0 +1,67 @@
+{
+  "theme": "topologies",
+  "questions": [
+    {
+      "id": "topo-1",
+      "enonce": "Dans quelle topologie tous les équipements sont-ils reliés à un équipement central ?",
+      "choix": ["En étoile", "En bus", "En anneau", "Maillée"],
+      "bonne": 0,
+      "explication": "En étoile, chaque machine a son propre câble vers le centre (aujourd'hui un commutateur). C'est la topologie des réseaux Ethernet actuels.",
+      "simulateur": "./simulateur.html?topo=etoile&src=PC-A&dst=PC-B"
+    },
+    {
+      "id": "topo-2",
+      "enonce": "Sur un bus, quelles stations reçoivent une trame envoyée par l'une d'elles ?",
+      "choix": ["Toutes les autres stations", "Seulement la destination", "Aucune, il faut un commutateur", "Seulement la station voisine"],
+      "bonne": 0,
+      "explication": "Le câble est partagé : le signal arrive à toutes les stations. Chacune lit la MAC destination ; seule la destinataire garde la trame, les autres l'ignorent.",
+      "simulateur": "./simulateur.html?topo=bus&src=PC-A&dst=PC-C"
+    },
+    {
+      "id": "topo-3",
+      "enonce": "Quel est le principal point faible d'un anneau simple, où les trames ne circulent que dans un sens ?",
+      "choix": ["Une seule coupure de câble suffit à isoler des stations", "Il produit énormément de collisions", "Il a besoin d'un routeur entre chaque station", "Les stations modifient les trames"],
+      "bonne": 0,
+      "explication": "Il n'existe qu'un seul chemin vers chaque station : si un câble est coupé, la trame ne peut pas faire le tour par l'autre côté. Les anneaux réels doublent souvent le câblage pour cette raison.",
+      "simulateur": "./simulateur.html?topo=anneau&scenario=cable-coupe"
+    },
+    {
+      "id": "topo-4",
+      "enonce": "Quel est le principal avantage d'une topologie maillée entre routeurs ?",
+      "choix": ["Plusieurs chemins existent : le réseau peut contourner une panne", "Elle utilise moins de câbles", "Les routeurs n'ont plus besoin de table de routage", "Les machines n'ont plus besoin d'adresse IP"],
+      "bonne": 0,
+      "explication": "La redondance des liens permet de passer par un autre chemin. Encore faut-il que les tables de routage l'utilisent : avec des routes statiques, il faut une route de secours (par exemple une route par défaut).",
+      "simulateur": "./simulateur.html?topo=maillee&scenario=route-supprimee"
+    },
+    {
+      "id": "topo-5",
+      "enonce": "Dans une étoile, que devient le réseau si l'équipement central tombe en panne ?",
+      "choix": ["Plus aucune machine ne peut communiquer avec une autre", "Seules les machines voisines communiquent encore", "Rien ne change", "Il se transforme automatiquement en bus"],
+      "bonne": 0,
+      "explication": "Toutes les communications passent par le centre : c'est un point unique de défaillance. En revanche, un câble coupé n'isole qu'une seule machine."
+    },
+    {
+      "id": "topo-6",
+      "enonce": "Combien de liens faut-il pour relier 5 équipements en maillage complet (chacun relié à tous les autres) ?",
+      "choix": ["10", "5", "20", "4"],
+      "bonne": 0,
+      "explication": "Chacun des 5 équipements a 4 liens, soit 5 × 4 = 20 extrémités, et chaque lien a 2 extrémités : 20 / 2 = 10. Formule générale : n(n − 1) / 2.",
+      "calcul": { "type": "maillage", "n": 5 }
+    },
+    {
+      "id": "topo-7",
+      "enonce": "Dans un anneau où les trames circulent A → B → C → D → A, par où passe une trame envoyée de B vers A ?",
+      "choix": ["Par C puis D", "Directement de B à A", "Seulement par D", "Par toutes les stations en même temps"],
+      "bonne": 0,
+      "explication": "A est voisin de B, mais dans le mauvais sens : la trame doit continuer B → C → D → A, presque tout le tour de l'anneau.",
+      "simulateur": "./simulateur.html?topo=anneau&scenario=voisin-arriere"
+    },
+    {
+      "id": "topo-8",
+      "enonce": "Quelle topologie physique a remplacé le bus dans les réseaux Ethernet actuels ?",
+      "choix": ["L'étoile, autour d'un commutateur", "L'anneau", "La maille complète", "Le bus en fibre optique"],
+      "bonne": 0,
+      "explication": "Le câble coaxial partagé a laissé la place aux paires torsadées, chaque machine reliée à un commutateur. Plus de collisions entre machines, et une panne de câble n'affecte qu'un poste."
+    }
+  ]
+}

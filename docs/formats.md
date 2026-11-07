@@ -95,3 +95,39 @@ A question belongs either to a free run (`source` + `destination`) or to a scena
 - `macSrc`, `macDst` — strings; `macDst` is `"FF:FF:FF:FF:FF:FF"` for a broadcast.
 - `arp` — ARP frames only: `{ "op": "request" | "reply", "senderIp", "senderMac", "targetIp", "targetMac" }`.
 - `ipSrc`, `ipDst`, `ttl` — data frames only (`macDst` is `null` in the `start` event, before ARP).
+
+## Learning content (Module C, session 4)
+
+All texts are original (written for PacketLab from the SUP'COM course programme, never copied). `tests/content.test.js` checks every file below and refuses duplicated texts.
+
+### Themes (`data/themes.json`)
+- `sources` — string, French sentence shown on the content pages: where the texts come from.
+- `themes` — array of Theme, the single list used by quizzes, fiches, flashcards, courses and the progression page.
+
+### Theme
+- `id` — string, also the file name of its quiz (`data/quiz/<id>.json`) and course (`cours/<id>.html`).
+- `titre` — string, French title.
+- `resume` — string, one French sentence.
+- `simulateur` — string, relative link that opens a ready run (`./simulateur.html?…` or `./fiabilite.html`).
+- `statut` — `"a-valider"` until Nour has checked the content against the course, then `"valide"`.
+
+### Quiz (`data/quiz/<theme>.json`)
+- `theme` — string, theme id.
+- `questions` — array of QuizQuestion (at least 8).
+
+### QuizQuestion
+- `id` — string, unique across all quizzes (`"arp-3"`).
+- `enonce` — string, French question.
+- `choix` — array of 4 strings; the page shows them in a random order.
+- `bonne` — integer, index of the right answer in `choix` (in the files it is always 0, which makes reviewing easy).
+- `explication` — string, French explanation shown after the answer.
+- `simulateur` — optional relative link to the run that shows the answer.
+- `calcul` — optional, lets the test recompute the answer: `{ "type": "reseau" | "diffusion" | "meme-reseau", "ip", "masque" }`, `{ "type": "hotes" | "masque", "masque" }`, `{ "type": "route", "ip", "routes": [[reseau, masque, label], …] }`, `{ "type": "maillage", "n" }`.
+
+### Progress (`localStorage` key `packetlab.progression`, written by `js/progress.js`)
+- `version` — 1.
+- `maj` — ISO date of the last change.
+- `quiz` — `{ "<theme>": { "tentatives", "meilleur", "total", "dernier", "date" } }`.
+- `simulations` — `{ "<topo>": { "libre": n, "scenarios": { "<id>": n } } }`.
+- `labo` — `{ "sans": n, "avec": n, "comparer": n }`.
+- `cartes` — `{ "<theme>": ["<card id>", …] }`, flashcards marked as known.

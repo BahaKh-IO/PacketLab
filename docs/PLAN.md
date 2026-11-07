@@ -137,9 +137,9 @@ Decided with Baha after Session 3. Module C and new concepts wait for the course
 
 Goal: Module C complete. Claude drafts all text; Nour checks it against the course before it is merged.
 
-- [ ] Ask Claude (in this project chat) for the quiz JSON: 7 themes × 8 questions (Adressage IP, Adresses MAC, ARP, Commutation, Routage, Topologies, Fiabilité), each with 4 choices, the answer and an explanation
+- [x] Ask Claude (in this project chat) for the quiz JSON: 7 themes × 8 questions (Adressage IP, Adresses MAC, ARP, Commutation, Routage, Topologies, Fiabilité), each with 4 choices, the answer and an explanation
 - [ ] Ask Claude for 8 fiches as JSON (IP et masque, MAC, ARP, Switch, Routeur, TTL, Topologies, ACK et timeout), each with a “voir dans le simulateur” link
-- [ ] `quiz.js`: theme list, one question at a time, correction after each answer, final score, “revoir dans le simulateur”
+- [x] `quiz.js`: theme list, one question at a time, correction after each answer, final score, “revoir dans le simulateur”
 - [ ] `sheets.js` + `fiches.html`: one screen per fiche
 - [ ] Courses: one PDF per main theme, written from the fiches plus Nour's material, sources cited on page 1; `cours.html` with Consulter / Télécharger
 - [ ] `storage.js` + `progression.html`: quiz attempts, best score per theme, simulations per topology, a small SVG bar chart, “Réinitialiser”

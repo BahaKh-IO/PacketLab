@@ -1,0 +1,67 @@
+{
+  "theme": "routage",
+  "questions": [
+    {
+      "id": "rt-1",
+      "enonce": "Sur quelle adresse un routeur se base-t-il pour choisir une route ?",
+      "choix": ["L'adresse IP destination", "L'adresse MAC destination", "L'adresse IP source", "L'adresse MAC source"],
+      "bonne": 0,
+      "explication": "Le routeur travaille en couche 3 : il compare l'IP destination du paquet aux réseaux de sa table de routage. Les MAC ne servent qu'à livrer la trame sur un tronçon."
+    },
+    {
+      "id": "rt-2",
+      "enonce": "Table de routage : 10.0.0.0/8 via A ; 10.1.0.0/16 via B ; 10.1.2.0/24 via C ; 0.0.0.0/0 via D. Quel prochain saut pour 10.1.2.9 ?",
+      "choix": ["C", "A", "B", "D"],
+      "bonne": 0,
+      "explication": "Les quatre routes contiennent 10.1.2.9, mais le routeur prend la plus précise, celle qui a le plus long préfixe : 10.1.2.0/24, via C.",
+      "calcul": { "type": "route", "ip": "10.1.2.9", "routes": [["10.0.0.0", 8, "A"], ["10.1.0.0", 16, "B"], ["10.1.2.0", 24, "C"], ["0.0.0.0", 0, "D"]] }
+    },
+    {
+      "id": "rt-3",
+      "enonce": "Même table (10.0.0.0/8 via A ; 10.1.0.0/16 via B ; 10.1.2.0/24 via C ; 0.0.0.0/0 via D). Quel prochain saut pour 172.16.0.1 ?",
+      "choix": ["D", "A", "B", "C"],
+      "bonne": 0,
+      "explication": "Aucune route en 10.x ne contient 172.16.0.1. Il reste la route par défaut 0.0.0.0/0, qui convient à toutes les adresses : le paquet part vers D.",
+      "calcul": { "type": "route", "ip": "172.16.0.1", "routes": [["10.0.0.0", 8, "A"], ["10.1.0.0", 16, "B"], ["10.1.2.0", 24, "C"], ["0.0.0.0", 0, "D"]] }
+    },
+    {
+      "id": "rt-4",
+      "enonce": "Que modifie un routeur dans un paquet qu'il transmet (sans NAT) ?",
+      "choix": ["Les MAC source et destination, et le TTL diminue de 1", "Les adresses IP source et destination", "Rien du tout", "Seulement la MAC destination"],
+      "bonne": 0,
+      "explication": "Nouvelle MAC source (son interface de sortie), nouvelle MAC destination (le prochain saut), TTL − 1. Les adresses IP restent celles de la source et de la destination finales.",
+      "simulateur": "./simulateur.html?topo=mixte&src=PC-A&dst=PC-B"
+    },
+    {
+      "id": "rt-5",
+      "enonce": "Un paquet arrive à un routeur avec un TTL de 1 et doit être transmis plus loin. Que se passe-t-il ?",
+      "choix": ["Le TTL passe à 0 et le routeur détruit le paquet", "Le paquet est transmis avec un TTL de 0", "Le routeur remet le TTL à 64", "Le paquet est renvoyé à la source sans changement"],
+      "bonne": 0,
+      "explication": "1 − 1 = 0 : le paquet est détruit. Un vrai routeur prévient aussi la source par un message ICMP « temps dépassé » (c'est ce qu'utilise traceroute) ; PacketLab ne simule pas ICMP.",
+      "simulateur": "./simulateur.html?topo=mixte&scenario=boucle"
+    },
+    {
+      "id": "rt-6",
+      "enonce": "À quoi sert le champ TTL (durée de vie) d'un paquet IP ?",
+      "choix": ["Éviter qu'un paquet tourne sans fin en cas de boucle de routage", "Chiffrer le contenu du paquet", "Mesurer le débit du lien", "Numéroter les paquets d'un message"],
+      "bonne": 0,
+      "explication": "Chaque routeur enlève 1 ; à 0, le paquet est détruit. Une erreur dans les tables de routage peut créer une boucle : sans TTL, les paquets y tourneraient indéfiniment et satureraient les liens."
+    },
+    {
+      "id": "rt-7",
+      "enonce": "Dans la table d'un routeur, la route 192.168.2.0/24 n'a pas de prochain saut (réseau « directement connecté »). Pour un paquet vers 192.168.2.20, que fait le routeur ?",
+      "choix": ["Il cherche la MAC de 192.168.2.20 elle-même et lui envoie la trame", "Il utilise sa route par défaut", "Il jette le paquet", "Il renvoie le paquet au routeur précédent"],
+      "bonne": 0,
+      "explication": "Le réseau est relié à l'une de ses interfaces : la destination est sur le même réseau local que lui. Le prochain saut est donc la destination elle-même, et c'est sa MAC que le routeur demande par ARP.",
+      "simulateur": "./simulateur.html?topo=mixte&src=PC-A&dst=PC-B"
+    },
+    {
+      "id": "rt-8",
+      "enonce": "Pourquoi l'aller et le retour d'un échange peuvent-ils passer par des routeurs différents ?",
+      "choix": ["Chaque routeur choisit avec sa propre table, sans connaître le chemin de l'aller", "Le paquet mémorise le chemin et l'évite au retour", "Ce sont les commutateurs qui choisissent le chemin", "Le chemin est tiré au hasard"],
+      "bonne": 0,
+      "explication": "Le routage se décide saut par saut. Rien n'oblige les tables à être symétriques : dans la topologie maillée, l'aller passe par R2 et le retour par R3.",
+      "simulateur": "./simulateur.html?topo=maillee&scenario=aller-retour"
+    }
+  ]
+}
