@@ -13,6 +13,8 @@ Ouvrir le dossier dans VS Code et lancer **Live Server** sur `index.html` (le `f
 ```sh
 node --test
 node tests/print-log.js mixte PC-A PC-B
+node tests/print-log.js mixte --scenario boucle
+node tests/print-reliability.js avec perdre:3
 ```
 
 Voir `docs/PLAN.md` pour le plan de travail et `docs/PacketLab_Description_Detaillee.md` pour la description complète.

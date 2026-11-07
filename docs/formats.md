@@ -12,6 +12,7 @@ Frozen at step 3. Any change to these formats must be agreed first (see CLAUDE.m
 - `devices` — array of Device.
 - `links` — array of Link.
 - `questions` — optional array of Question (used from session 2; ignored by the engine).
+- `scenarios` — optional array of Scenario: ready-made examples of this topology (added after session 3, agreed with Baha).
 
 ### Device
 - `id` — string, unique in the file, also the label on the drawing (`"PC-A"`, `"SW1"`, `"R1"`).
@@ -40,6 +41,7 @@ Frozen at step 3. Any change to these formats must be agreed first (see CLAUDE.m
 - `a` — string `"<deviceId>:<interfaceNom>"` (`"PC-A:eth0"`); in a ring (`type` `"anneau"`), frames travel from `a` to `b`.
 - `b` — string `"<deviceId>:<interfaceNom>"` (`"SW1:p1"`).
 - `delai` — number, propagation delay of the link in simulated milliseconds.
+- `coupe` — never in the file: set to `true` by a `cable-debranche` breakdown, on the copy used for a run.
 
 ### ArpEntry (learned, never in the file)
 - `ip` — string IPv4.
@@ -49,16 +51,35 @@ Frozen at step 3. Any change to these formats must be agreed first (see CLAUDE.m
 - `mac` — string MAC.
 - `port` — string, `nom` of the switch port where that MAC was seen.
 
-### Question (optional; `source`/`destination` added in session 2, agreed with Baha)
-- `source` — string, id of the source PC of the run this question belongs to (`"PC-A"`).
+### Question (optional; `source`/`destination` added in session 2, `scenario` after session 3, agreed with Baha)
+A question belongs either to a free run (`source` + `destination`) or to a scenario (`scenario`).
+- `source` — string, id of the source PC of the free run this question belongs to (`"PC-A"`).
 - `destination` — string, id of the destination PC of that run (`"PC-B"`); the question is asked only during that exact run.
+- `scenario` — string, `id` of the Scenario this question belongs to (instead of `source`/`destination`); asked only during that scenario.
 - `apresEtape` — integer, step number as shown on screen (« Étape N », 1-based): the player pauses after showing it and asks, before step N + 1.
 - `enonce` — string, French question.
 - `choix` — array of strings.
 - `bonne` — integer, index of the right answer in `choix`.
 - `explication` — string, French explanation shown after the answer.
 
-## Simulation event (produced by `simulate()`, never stored)
+### Scenario (optional)
+- `id` — string, unique in the file (`"deuxieme-envoi"`); also used in the URL (`?topo=mixte&scenario=boucle`).
+- `nom` — string, French title shown in the « Exemple » menu.
+- `description` — string, French sentence(s) shown under the drawing: what to look at.
+- `envois` — array of `{ "source", "destination" }` (PC ids): packets sent one after the other; each starts when the network is quiet again, and tables are kept between sends.
+- `ttl` — optional integer, TTL of the packets of this scenario (default 64), e.g. 8 to keep a routing loop short.
+- `pannes` — optional array of Panne, applied to a copy of the topology before the run.
+
+### Panne (breakdown of a scenario)
+- `type` — one of `"passerelle"`, `"masque"`, `"route"`, `"route-supprimee"`, `"cable-debranche"`.
+- `equipement` — device id (every type except `cable-debranche`).
+- `valeur` — `passerelle`: new gateway IPv4; `masque`: new prefix length.
+- `interface` — `masque`: optional interface name (default: the first one); `route`: exit interface of the route.
+- `reseau`, `masque` — `route` / `route-supprimee`: which route (added or replaced / removed).
+- `prochainSaut` — `route`: next hop IPv4, or `null` for a directly connected network.
+- `lien` — `cable-debranche`: link id; every frame put on it is lost.
+
+## Simulation event (produced by `simulate()` / `simulateScenario()`, never stored)
 
 - `t` — number, simulated time in milliseconds.
 - `type` — string: `"start"` (source decides: destination or gateway), `"arp-request"`, `"arp-reply"`, `"arp-learn"`, `"mac-learn"`, `"send"` (PC or router puts a data frame on a link), `"forward"` (one port / next station), `"flood"` (several ports / whole bus), `"route"`, `"ignore"`, `"deliver"`, `"drop"`.

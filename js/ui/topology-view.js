@@ -57,6 +57,10 @@ export function createTopologyView(svg, topo, { onDeviceClick = () => {} } = {})
     const mid = { x: (p1.x + p2.x) / 2, y: (p1.y + p2.y) / 2 };
     const el = svgEl('polyline', { points: `${p1.x},${p1.y} ${mid.x},${mid.y} ${p2.x},${p2.y}`, class: 'link' });
     if (ring) el.setAttribute('marker-mid', 'url(#arrow)'); // direction of the ring
+    if (l.coupe) {
+      el.classList.add('link-cut'); // unplugged cable (breakdown scenario)
+      el.append(svgEl('title', {}, `Câble ${l.id} débranché`));
+    }
     layerLinks.append(el);
     links.set(l.id, { el, p1, p2, aId, bId });
     // Port names near each end, only for devices with several ports (switch, router).

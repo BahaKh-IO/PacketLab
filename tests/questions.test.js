@@ -4,7 +4,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync } from 'node:fs';
-import { simulate } from '../js/engine/network.js';
+import { simulate, simulateScenario } from '../js/engine/network.js';
 
 const dir = new URL('../data/topologies/', import.meta.url);
 const load = (id) => JSON.parse(readFileSync(new URL(`${id}.json`, dir), 'utf8'));
@@ -14,9 +14,17 @@ for (const file of readdirSync(dir).filter((f) => f.endsWith('.json'))) {
   const topo = JSON.parse(readFileSync(new URL(file, dir), 'utf8'));
   for (const [k, q] of (topo.questions ?? []).entries()) {
     test(`${file} question ${k + 1}: well formed and on a real step`, () => {
-      const pcs = topo.devices.filter((d) => d.type === 'pc').map((d) => d.id);
-      assert.ok(pcs.includes(q.source) && pcs.includes(q.destination) && q.source !== q.destination);
-      const events = simulate(topo, q.source, q.destination);
+      let events;
+      if (q.scenario) {
+        // Question of a scenario: asked only during that scenario.
+        const sc = (topo.scenarios ?? []).find((s) => s.id === q.scenario);
+        assert.ok(sc, `scenario ${q.scenario} exists`);
+        events = simulateScenario(topo, sc);
+      } else {
+        const pcs = topo.devices.filter((d) => d.type === 'pc').map((d) => d.id);
+        assert.ok(pcs.includes(q.source) && pcs.includes(q.destination) && q.source !== q.destination);
+        events = simulate(topo, q.source, q.destination);
+      }
       // Asked after step apresEtape (1-based), so there must be a next step to discover.
       assert.ok(Number.isInteger(q.apresEtape) && q.apresEtape >= 1 && q.apresEtape < events.length);
       assert.ok(q.enonce.length > 10 && q.explication.length > 10);

@@ -96,6 +96,12 @@ export class Simulator {
     if (!end) return null;
     const [peerId, peerIface] = end.peer.split(':');
     const copy = structuredClone(frame);
+    if (end.link.coupe) {
+      // Breakdown scenario: unplugged cable, the frame never reaches the other end.
+      this.sched.after(end.link.delai, () => this.log('drop', this.device(peerId), [], copy,
+        `Le câble ${end.link.id} est débranché : la trame envoyée par ${dev.id} n'arrive jamais à ${peerId}.`));
+      return end.link.id;
+    }
     this.sched.after(end.link.delai, () => this.arrive(this.device(peerId), peerIface, copy, end.link));
     return end.link.id;
   }
@@ -126,7 +132,7 @@ export class Simulator {
   sendIp(dev, iface, packet, nextHop) {
     const mac = this.arpLookup(dev, nextHop);
     if (mac) {
-      this.sendData(dev, iface, packet, mac, nextHop);
+      this.sendData(dev, iface, packet, mac, nextHop, true);
       return;
     }
     const key = `${dev.id}|${nextHop}`;
@@ -149,7 +155,7 @@ export class Simulator {
   }
 
   /** Build the Ethernet frame around the packet and send it. */
-  sendData(dev, iface, packet, macDst, nextHop) {
+  sendData(dev, iface, packet, macDst, nextHop, fromTable = false) {
     const frame = {
       kind: 'data',
       macSrc: iface.mac,
@@ -164,7 +170,8 @@ export class Simulator {
         `(${nextHop === packet.ipDst ? 'la machine destination' : `prochain saut ${nextHop}`}). ` +
         `Les IP ne changent pas : ${packet.ipSrc} → ${packet.ipDst}.`
       : `${dev.id} envoie la trame : MAC ${iface.mac} → ${macDst}, IP ${packet.ipSrc} → ${packet.ipDst}, TTL ${packet.ttl}.`;
-    this.log('send', dev, link ? [link] : [], frame, note);
+    const cached = fromTable ? ` (MAC de ${nextHop} déjà dans sa table ARP : pas besoin de requête ARP.)` : '';
+    this.log('send', dev, link ? [link] : [], frame, note + cached);
   }
 
   /** ARP frame received by a PC or a router interface. */
@@ -346,14 +353,86 @@ export class Simulator {
     this.sendIp(src, s, packet, nextHop);
   }
 
+  /** Packets still waiting for an ARP reply when nothing moves any more: nobody answered. */
+  dropUnanswered() {
+    for (const [key, waiting] of this.pending) {
+      const [devId, ip] = key.split('|');
+      for (const { packet } of waiting) {
+        this.log('drop', this.device(devId), [], packet,
+          `Personne n'a répondu à la requête ARP de ${devId} pour ${ip} : le paquet en attente n'est jamais envoyé.`);
+      }
+    }
+    this.pending.clear();
+  }
+
   run(srcId, dstId) {
-    this.sched.at(0, () => this.start(srcId, dstId));
-    this.sched.run();
+    return this.runAll([{ source: srcId, destination: dstId }]);
+  }
+
+  /**
+   * Several packets, one after the other: each send starts when the network is
+   * quiet again. Tables are kept between sends (the 2nd packet finds them filled).
+   */
+  runAll(envois) {
+    envois.forEach(({ source, destination }, k) => {
+      this.sched.at(k === 0 ? 0 : this.sched.now + GAP_BETWEEN_SENDS, () => this.start(source, destination));
+      this.sched.run();
+      this.dropUnanswered();
+    });
     return this.events;
   }
 }
 
+const GAP_BETWEEN_SENDS = 50; // ms of silence between two sends of a scenario
+
 /** Run one packet from srcId to dstId; returns the ordered event list. */
 export function simulate(topology, srcId, dstId, options = {}) {
   return new Simulator(topology, options).run(srcId, dstId);
+}
+
+/**
+ * Copy of the topology with the breakdowns of a scenario applied (docs/formats.md, Panne).
+ * The original object is never changed.
+ */
+export function appliquerPannes(topology, pannes = []) {
+  const topo = structuredClone(topology);
+  const device = (id) => {
+    const d = topo.devices.find((x) => x.id === id);
+    if (!d) throw new Error(`Panne: unknown device ${id}`);
+    return d;
+  };
+  for (const p of pannes) {
+    if (p.type === 'passerelle') {
+      device(p.equipement).gateway = p.valeur;
+    } else if (p.type === 'masque') {
+      const d = device(p.equipement);
+      const i = p.interface ? d.interfaces.find((x) => x.nom === p.interface) : d.interfaces[0];
+      i.masque = p.valeur;
+    } else if (p.type === 'route' || p.type === 'route-supprimee') {
+      const d = device(p.equipement);
+      const k = d.routes.findIndex((r) => r.reseau === p.reseau && r.masque === p.masque);
+      if (p.type === 'route-supprimee') {
+        if (k < 0) throw new Error(`Panne: no route ${p.reseau}/${p.masque} on ${p.equipement}`);
+        d.routes.splice(k, 1);
+      } else {
+        const r = { reseau: p.reseau, masque: p.masque, prochainSaut: p.prochainSaut ?? null, interface: p.interface };
+        if (k < 0) d.routes.push(r);
+        else d.routes[k] = r;
+      }
+    } else if (p.type === 'cable-debranche') {
+      const l = topo.links.find((x) => x.id === p.lien);
+      if (!l) throw new Error(`Panne: unknown link ${p.lien}`);
+      l.coupe = true;
+    } else {
+      throw new Error(`Panne: unknown type ${p.type}`);
+    }
+  }
+  return topo;
+}
+
+/** Run a scenario of a topology (several sends, breakdowns, optional TTL). */
+export function simulateScenario(topology, scenario) {
+  const topo = appliquerPannes(topology, scenario.pannes ?? []);
+  const options = scenario.ttl ? { ttl: scenario.ttl } : {};
+  return new Simulator(topo, options).runAll(scenario.envois);
 }

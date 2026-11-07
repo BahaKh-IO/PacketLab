@@ -34,5 +34,19 @@
     { "id": "L2", "a": "PC-B:eth0", "b": "BUS:p2", "delai": 5 },
     { "id": "L3", "a": "PC-C:eth0", "b": "BUS:p3", "delai": 5 },
     { "id": "L4", "a": "PC-D:eth0", "b": "BUS:p4", "delai": 5 }
+  ],
+  "scenarios": [
+    {
+      "id": "reponse",
+      "nom": "Aller-retour : PC-C répond à PC-A",
+      "description": "PC-A envoie à PC-C, puis PC-C répond sans ARP (il a appris la MAC de PC-A). Toutes les trames, aller comme retour, passent devant toutes les stations.",
+      "envois": [{ "source": "PC-A", "destination": "PC-C" }, { "source": "PC-C", "destination": "PC-A" }]
+    },
+    {
+      "id": "deux-conversations",
+      "nom": "Deux conversations sur le même câble",
+      "description": "PC-A écrit à PC-C, puis PC-B écrit à PC-D. Sur un bus, chaque station voit aussi les trames des autres : le support est partagé par tout le monde.",
+      "envois": [{ "source": "PC-A", "destination": "PC-C" }, { "source": "PC-B", "destination": "PC-D" }]
+    }
   ]
 }

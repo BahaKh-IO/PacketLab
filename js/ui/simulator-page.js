@@ -1,7 +1,8 @@
 // simulator-page.js — wires simulateur.html together.
-// Loads the topologies, calls simulate() once per "Lancer", then only reads the event list.
+// Loads the topologies, calls simulate() or simulateScenario() once per "Lancer",
+// then only reads the event list.
 
-import { simulate } from '../engine/network.js';
+import { simulate, simulateScenario, appliquerPannes } from '../engine/network.js';
 import { createTopologyView } from './topology-view.js';
 import { createPlayer } from './player.js';
 import { renderHeaders, renderTables, createLog } from './panels.js';
@@ -13,6 +14,7 @@ const TOPOLOGY_IDS = ['mixte', 'etoile', 'bus', 'anneau', 'maillee'];
 
 const $ = (id) => document.getElementById(id);
 const topoSelect = $('topo');
+const scenarioSelect = $('scenario');
 const srcSelect = $('src');
 const dstSelect = $('dst');
 const runBtn = $('run');
@@ -29,12 +31,14 @@ const log = createLog($('log'), (k) => { // click on a log line: jump to that st
 const coach = createCoach($('coach'));
 
 const topologies = new Map();
-let topo = null;
+let topo = null;       // topology as written in its file
+let scenario = null;   // chosen example (null: free choice of source and destination)
+let shown = null;      // topology as drawn: with the breakdowns of the scenario applied
 let view = null;
 let events = [];
 let questions = []; // questions of the current run
 let selectedDevice = null; // device clicked in the drawing (null: the active device)
-let runPair = null; // { src, dst } of the current run
+let runInfo = null; // what is being played, for the URL and the "Reprendre" box
 const answered = new Set(); // questions already asked in this run
 
 /** Draw step i (reads the event list only). */
@@ -47,7 +51,7 @@ function render(i, delay) {
   showTables(i);
   log.show(i);
   // Remembered for the "Reprendre" box of the home page.
-  save('dernier-scenario', { topo: topo.id, nom: topo.nom, ...runPair, etape: i + 1, total: events.length });
+  save('dernier-scenario', { topo: topo.id, nom: topo.nom, ...runInfo, etape: i + 1, total: events.length });
 }
 
 /** Small line above the tables when they belong to a clicked device, not the active one. */
@@ -69,21 +73,21 @@ function selectionHeader(text, buttonText) {
 /** Side panel: tables of the clicked device, or of the device acting at step i. */
 function showTables(i) {
   if (!events.length) {
-    // Before "Lancer": the tables as written in the topology file (ARP and MAC empty).
+    // Before "Lancer": the tables as they are at the start (ARP and MAC empty).
     if (!selectedDevice) { tablesEl.replaceChildren(); return; }
-    const d = topo.devices.find((x) => x.id === selectedDevice);
+    const d = shown.devices.find((x) => x.id === selectedDevice);
     const tables = {};
     if (d.arp) tables.arp = d.arp;
     if (d.macTable) tables.macTable = d.macTable;
     if (d.routes) tables.routes = d.routes;
     const start = [{ device: d.id, tables: { [d.id]: tables } }];
-    renderTables(tablesEl, start, 0, topo, d.id,
+    renderTables(tablesEl, start, 0, shown, d.id,
       selectionHeader(`Tables de ${d.id} au départ, avant l'envoi.`, 'Fermer'));
     return;
   }
   const active = events[i].device;
   const id = selectedDevice ?? active;
-  renderTables(tablesEl, events, i, topo, id, id === active ? null
+  renderTables(tablesEl, events, i, shown, id, id === active ? null
     : selectionHeader(`Tables de ${id} (choisi sur le schéma) à l'étape ${i + 1}.`, `Revenir à l'équipement actif (${active})`));
 }
 
@@ -144,14 +148,16 @@ function resetPanels() {
   events = [];
   player.load(0);
   view?.clear();
-  caption.textContent = 'Choisissez la source et la destination, puis cliquez sur « Lancer ».';
+  caption.textContent = scenario
+    ? 'Cliquez sur « Lancer » pour jouer cet exemple.'
+    : 'Choisissez la source et la destination, puis cliquez sur « Lancer ».';
   timeEl.textContent = '';
   headersEl.replaceChildren();
   log.load([]);
   showTables(0);
 }
 
-function selectTopology(id, src = 'PC-A', dst = null) {
+function selectTopology(id, { src = 'PC-A', dst = null, scenarioId = '' } = {}) {
   topo = topologies.get(id);
   topoSelect.value = id;
   $('topo-desc').textContent = topo.description;
@@ -161,14 +167,36 @@ function selectTopology(id, src = 'PC-A', dst = null) {
   srcSelect.value = pcs.some((d) => d.id === src) ? src : pcs[0].id;
   dstSelect.value = dst && pcs.some((d) => d.id === dst) ? dst
     : pcs.some((d) => d.id === 'PC-B') ? 'PC-B' : pcs[1].id;
+  scenarioSelect.replaceChildren(
+    option('', 'Libre : je choisis la source et la destination'),
+    ...(topo.scenarios ?? []).map((s) => option(s.id, s.nom)));
+  selectScenario(scenarioId);
+}
+
+/** Choose an example of the topology ('' = free choice). */
+function selectScenario(id) {
+  scenario = (topo.scenarios ?? []).find((s) => s.id === id) ?? null;
+  scenarioSelect.value = scenario?.id ?? '';
+  shown = scenario ? appliquerPannes(topo, scenario.pannes ?? []) : topo;
+  srcSelect.disabled = !!scenario;
+  dstSelect.disabled = !!scenario;
+  if (scenario) {
+    srcSelect.value = scenario.envois[0].source;
+    dstSelect.value = scenario.envois[0].destination;
+  }
+  const desc = $('scenario-desc');
+  desc.hidden = !scenario;
+  desc.textContent = scenario
+    ? `${scenario.description}${scenario.envois.length > 1 ? ` (${scenario.envois.map((e) => `${e.source} → ${e.destination}`).join(', puis ')})` : ''}`
+    : '';
   selectedDevice = null;
-  view = createTopologyView(svg, topo, { onDeviceClick: pickDevice });
+  view = createTopologyView(svg, shown, { onDeviceClick: pickDevice });
   resetPanels();
   checkPair();
 }
 
 function checkPair() {
-  const same = srcSelect.value === dstSelect.value;
+  const same = !scenario && srcSelect.value === dstSelect.value;
   runBtn.disabled = same;
   if (same) caption.textContent = 'La source et la destination doivent être deux machines différentes.';
 }
@@ -176,13 +204,20 @@ function checkPair() {
 function run() {
   coach.clear();
   player.lock(false);
-  const src = srcSelect.value;
-  const dst = dstSelect.value;
-  events = simulate(topo, src, dst);
-  runPair = { src, dst };
-  // Shareable address of this scenario (no reload).
-  history.replaceState(null, '', `?${new URLSearchParams({ topo: topo.id, src, dst })}`);
-  questions = (topo.questions ?? []).filter((q) => q.source === src && q.destination === dst);
+  if (scenario) {
+    events = simulateScenario(topo, scenario);
+    questions = (topo.questions ?? []).filter((q) => q.scenario === scenario.id);
+    runInfo = { scenario: scenario.id, scenarioNom: scenario.nom };
+    history.replaceState(null, '', `?${new URLSearchParams({ topo: topo.id, scenario: scenario.id })}`);
+  } else {
+    const src = srcSelect.value;
+    const dst = dstSelect.value;
+    events = simulate(topo, src, dst);
+    questions = (topo.questions ?? []).filter((q) => !q.scenario && q.source === src && q.destination === dst);
+    runInfo = { src, dst };
+    // Shareable address of this run (no reload).
+    history.replaceState(null, '', `?${new URLSearchParams({ topo: topo.id, src, dst })}`);
+  }
   answered.clear();
   log.load(events);
   player.load(events.length);
@@ -204,6 +239,7 @@ async function init() {
   }
   topoSelect.replaceChildren(...TOPOLOGY_IDS.map((id) => option(id, topologies.get(id).nom)));
   topoSelect.addEventListener('change', () => selectTopology(topoSelect.value));
+  scenarioSelect.addEventListener('change', () => selectScenario(scenarioSelect.value));
   srcSelect.addEventListener('change', () => { resetPanels(); checkPair(); });
   dstSelect.addEventListener('change', () => { resetPanels(); checkPair(); });
   $('setup').addEventListener('submit', (e) => {
@@ -217,7 +253,11 @@ async function init() {
   openFromUrl();
 }
 
-/** simulateur.html?topo=mixte&src=PC-A&dst=PC-B&etape=12 opens a ready scenario. */
+/**
+ * Ready-made runs from the address:
+ *   simulateur.html?topo=mixte&src=PC-A&dst=PC-B&etape=12
+ *   simulateur.html?topo=mixte&scenario=boucle
+ */
 function openFromUrl() {
   const q = new URLSearchParams(location.search);
   const id = q.get('topo');
@@ -225,8 +265,9 @@ function openFromUrl() {
     selectTopology(TOPOLOGY_IDS[0]);
     return;
   }
-  selectTopology(id, q.get('src'), q.get('dst'));
-  if (!q.has('src') || !q.has('dst') || runBtn.disabled) return;
+  const scenarioId = (topologies.get(id).scenarios ?? []).some((s) => s.id === q.get('scenario')) ? q.get('scenario') : '';
+  selectTopology(id, { src: q.get('src'), dst: q.get('dst'), scenarioId });
+  if (!scenarioId && (!q.has('src') || !q.has('dst') || runBtn.disabled)) return;
   run();
   const step = Number(q.get('etape'));
   if (Number.isInteger(step) && step > 1) player.go(step - 1); // a jump: no question or bubble on the way

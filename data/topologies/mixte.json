@@ -106,6 +106,102 @@
       ],
       "bonne": 1,
       "explication": "Le réseau 192.168.2.0/24 est directement connecté à R2 : le prochain saut est PC-B lui-même. R2 trouve sa MAC par ARP (la requête, elle, part en diffusion), puis envoie la trame à BB:BB:BB:00:00:0B (étape 26). L'IP destination est restée 192.168.2.20 depuis le début."
+    },
+    {
+      "scenario": "mauvaise-passerelle", "apresEtape": 6,
+      "enonce": "Personne ne répond à la requête ARP de PC-A. Pourquoi ?",
+      "choix": [
+        "La passerelle configurée sur PC-A (192.168.1.254) n'existe pas sur le réseau",
+        "Le switch SW1 bloque les diffusions",
+        "PC-B est éteint",
+        "R1 n'a pas de route vers 192.168.2.0/24"
+      ],
+      "bonne": 0,
+      "explication": "PC-A doit passer par sa passerelle, donc il demande la MAC de 192.168.1.254. Aucun équipement n'a cette adresse : R1 (192.168.1.1) et PC-C ignorent la requête. Le paquet reste bloqué chez PC-A avant même d'avoir quitté son réseau."
+    },
+    {
+      "scenario": "mauvais-masque", "apresEtape": 6,
+      "enonce": "PC-A a demandé directement la MAC de 192.168.2.20, et personne ne répond. Quelle est la cause ?",
+      "choix": [
+        "Avec un masque /16, PC-A croit que 192.168.2.20 est dans son propre réseau",
+        "La passerelle de PC-A est mauvaise",
+        "R1 ne connaît pas le réseau 192.168.2.0/24",
+        "Le câble de PC-B est débranché"
+      ],
+      "bonne": 0,
+      "explication": "Avec /16, le réseau de PC-A devient 192.168.0.0/16, qui contient 192.168.2.20. PC-A pense donc pouvoir joindre PC-B directement et ne passe pas par sa passerelle. Mais une requête ARP ne traverse pas un routeur : PC-B ne la reçoit jamais."
+    },
+    {
+      "scenario": "boucle", "apresEtape": 19,
+      "enonce": "R1 renvoie le paquet vers R2, qui va le renvoyer vers R1… Comment cela va-t-il finir ?",
+      "choix": [
+        "Le TTL arrive à 0 et un routeur détruit le paquet",
+        "Le paquet tourne pour toujours entre R1 et R2",
+        "R2 finit par trouver la bonne route",
+        "PC-B reçoit quand même le paquet"
+      ],
+      "bonne": 0,
+      "explication": "Chaque passage par un routeur enlève 1 au TTL : 8, 7, 6… Quand il atteint 0, le routeur détruit le paquet (étape 29). C'est exactement à ça que sert le TTL : sans lui, une erreur de routage ferait tourner les paquets indéfiniment."
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "deuxieme-envoi",
+      "nom": "Deuxième envoi : PC-A écrit encore à PC-B",
+      "description": "Au deuxième paquet, PC-A, R1 et R2 connaissent déjà les MAC dont ils ont besoin : aucune requête ARP, le paquet file directement.",
+      "envois": [{ "source": "PC-A", "destination": "PC-B" }, { "source": "PC-A", "destination": "PC-B" }]
+    },
+    {
+      "id": "reponse",
+      "nom": "Aller-retour : PC-B répond à PC-A",
+      "description": "PC-B répond à PC-A. Toutes les tables ARP ont été remplies à l'aller : le retour se fait sans aucune requête ARP, avec les MAC réécrites dans l'autre sens.",
+      "envois": [{ "source": "PC-A", "destination": "PC-B" }, { "source": "PC-B", "destination": "PC-A" }]
+    },
+    {
+      "id": "mauvaise-passerelle",
+      "nom": "Panne : mauvaise passerelle sur PC-A",
+      "description": "La passerelle de PC-A a été mal configurée : 192.168.1.254 au lieu de 192.168.1.1. Cherchez pourquoi le paquet ne part jamais.",
+      "envois": [{ "source": "PC-A", "destination": "PC-B" }],
+      "pannes": [
+        { "type": "passerelle", "equipement": "PC-A", "valeur": "192.168.1.254" }
+      ]
+    },
+    {
+      "id": "mauvais-masque",
+      "nom": "Panne : mauvais masque sur PC-A",
+      "description": "Le masque de PC-A a été mal configuré : /16 au lieu de /24. Regardez à qui PC-A demande une MAC.",
+      "envois": [{ "source": "PC-A", "destination": "PC-B" }],
+      "pannes": [
+        { "type": "masque", "equipement": "PC-A", "valeur": 16 }
+      ]
+    },
+    {
+      "id": "route-manquante",
+      "nom": "Panne : R1 ne connaît pas 192.168.2.0/24",
+      "description": "La route vers 192.168.2.0/24 a été supprimée de R1, qui n'a pas de route par défaut : il ne sait pas où envoyer le paquet.",
+      "envois": [{ "source": "PC-A", "destination": "PC-B" }],
+      "pannes": [
+        { "type": "route-supprimee", "equipement": "R1", "reseau": "192.168.2.0", "masque": 24 }
+      ]
+    },
+    {
+      "id": "boucle",
+      "nom": "Panne : boucle de routage entre R1 et R2",
+      "description": "R2 renvoie par erreur le réseau 192.168.2.0/24 vers R1, qui le renvoie vers R2… Le TTL de départ est réduit à 8 pour que la boucle soit courte à regarder.",
+      "envois": [{ "source": "PC-A", "destination": "PC-B" }],
+      "ttl": 8,
+      "pannes": [
+        { "type": "route", "equipement": "R2", "reseau": "192.168.2.0", "masque": 24, "prochainSaut": "10.0.0.1", "interface": "e0" }
+      ]
+    },
+    {
+      "id": "cable-sw2",
+      "nom": "Panne : câble R2–SW2 débranché",
+      "description": "Le câble entre R2 et SW2 est débranché : le paquet traverse le premier réseau et les deux routeurs, puis R2 ne peut plus joindre PC-B.",
+      "envois": [{ "source": "PC-A", "destination": "PC-B" }],
+      "pannes": [
+        { "type": "cable-debranche", "lien": "L5" }
+      ]
     }
   ]
 }

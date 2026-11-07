@@ -35,5 +35,34 @@
     { "id": "L2", "a": "PC-B:eth0", "b": "SW1:p2", "delai": 10 },
     { "id": "L3", "a": "PC-C:eth0", "b": "SW1:p3", "delai": 10 },
     { "id": "L4", "a": "PC-D:eth0", "b": "SW1:p4", "delai": 10 }
+  ],
+  "scenarios": [
+    {
+      "id": "deuxieme-envoi",
+      "nom": "Deuxième envoi : PC-A écrit encore à PC-B",
+      "description": "PC-A envoie deux paquets de suite à PC-B. Au deuxième, la table ARP de PC-A et la table MAC du switch sont déjà remplies : plus de requête ARP, plus d'inondation.",
+      "envois": [{ "source": "PC-A", "destination": "PC-B" }, { "source": "PC-A", "destination": "PC-B" }]
+    },
+    {
+      "id": "reponse",
+      "nom": "Aller-retour : PC-B répond à PC-A",
+      "description": "PC-A envoie à PC-B, puis PC-B répond. PC-B a appris la MAC de PC-A grâce à la requête ARP : il répond sans ARP, et le switch connaît déjà les deux ports.",
+      "envois": [{ "source": "PC-A", "destination": "PC-B" }, { "source": "PC-B", "destination": "PC-A" }]
+    },
+    {
+      "id": "autre-pc",
+      "nom": "Un autre PC parle : PC-C écrit à PC-B",
+      "description": "Après l'échange PC-A → PC-B, PC-C écrit à son tour à PC-B. Chaque PC a sa propre table ARP : PC-C doit faire son ARP. Mais le switch connaît déjà le port de PC-B.",
+      "envois": [{ "source": "PC-A", "destination": "PC-B" }, { "source": "PC-C", "destination": "PC-B" }]
+    },
+    {
+      "id": "cable-pc-b",
+      "nom": "Panne : câble de PC-B débranché",
+      "description": "Le câble de PC-B est débranché (pointillés rouges) : la requête ARP n'arrive jamais à PC-B et personne ne répond.",
+      "envois": [{ "source": "PC-A", "destination": "PC-B" }],
+      "pannes": [
+        { "type": "cable-debranche", "lien": "L2" }
+      ]
+    }
   ]
 }

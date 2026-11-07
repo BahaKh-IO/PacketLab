@@ -135,6 +135,44 @@
       ],
       "bonne": 1,
       "explication": "La table de R4 a une seule route vers 192.168.1.0/24 : via 10.0.34.1, c'est-à-dire R3 (étape 12). Chaque routeur décide seul, avec sa propre table : l'aller (R1 → R2 → R4) et le retour (R4 → R3 → R1) ne prennent pas le même chemin. R4 n'a d'ailleurs aucun lien direct avec R1."
+    },
+    {
+      "scenario": "route-supprimee", "apresEtape": 11,
+      "enonce": "La route 192.168.2.0/24 de R1 a été supprimée. Le paquet arrive à R1 : que va-t-il faire ?",
+      "choix": [
+        "Jeter le paquet, faute de route",
+        "Utiliser sa route par défaut, vers R3",
+        "Envoyer quand même vers R2",
+        "Renvoyer le paquet à PC-A"
+      ],
+      "bonne": 1,
+      "explication": "Il ne reste qu'une route qui convient : la route par défaut 0.0.0.0/0, via 10.0.13.2 (R3). Le paquet passe donc par R3 puis R4 et arrive quand même. La route par défaut sert justement quand aucune route plus précise ne convient."
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "aller-retour",
+      "nom": "Aller-retour : PC-B répond à PC-A",
+      "description": "L'aller passe par R1 → R2 → R4, le retour par R4 → R3 → R1 : chaque routeur suit sa propre table. Au retour, PC-B connaît déjà la MAC de sa passerelle.",
+      "envois": [{ "source": "PC-A", "destination": "PC-B" }, { "source": "PC-B", "destination": "PC-A" }]
+    },
+    {
+      "id": "route-supprimee",
+      "nom": "Panne : R1 perd sa route vers 192.168.2.0/24",
+      "description": "La route 192.168.2.0/24 de R1 est supprimée. Il lui reste la route par défaut, vers R3 : le paquet prend un autre chemin et arrive quand même.",
+      "envois": [{ "source": "PC-A", "destination": "PC-B" }],
+      "pannes": [
+        { "type": "route-supprimee", "equipement": "R1", "reseau": "192.168.2.0", "masque": 24 }
+      ]
+    },
+    {
+      "id": "lien-r1-r2-coupe",
+      "nom": "Panne : lien R1–R2 coupé",
+      "description": "Le lien R1–R2 est coupé, mais la route statique de R1 vise toujours R2 : le paquet est perdu alors qu'un autre chemin existe. Une route statique ne s'adapte pas toute seule (c'est le rôle du routage dynamique, hors programme ici).",
+      "envois": [{ "source": "PC-A", "destination": "PC-B" }],
+      "pannes": [
+        { "type": "cable-debranche", "lien": "L4" }
+      ]
     }
   ]
 }

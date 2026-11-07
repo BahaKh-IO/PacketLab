@@ -27,11 +27,13 @@
 
     <form class="sim-setup" id="setup">
       <label>Topologie <select id="topo"></select></label>
+      <label class="field-scenario">Exemple <select id="scenario"></select></label>
       <label>Source <select id="src"></select></label>
       <label>Destination <select id="dst"></select></label>
       <button type="submit" class="primary" id="run">Lancer</button>
     </form>
     <p class="intro" id="topo-desc"></p>
+    <p class="scenario-desc" id="scenario-desc" hidden></p>
     <p class="error" id="error" hidden></p>
 
     <div class="sim-layout">

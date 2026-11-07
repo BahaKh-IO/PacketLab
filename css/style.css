@@ -102,6 +102,9 @@ button.primary:hover:not(:disabled) { background: #245bd0; }
 }
 .sim-setup label { display: flex; flex-direction: column; gap: 0.2rem; flex: 1 1 10rem; max-width: 22rem; font-size: 0.85rem; color: var(--muted); }
 .sim-setup select { width: 100%; min-width: 0; color: var(--ink); }
+.sim-setup select:disabled { opacity: 0.7; }
+.sim-setup .field-scenario { flex-basis: 16rem; max-width: 26rem; }
+.scenario-desc { margin: 0 0 0.75rem; padding: 0.5rem 0.8rem; background: #eef4ff; border-left: 4px solid var(--blue); border-radius: 6px; line-height: 1.45; }
 
 .sim-layout {
   display: grid;
@@ -147,6 +150,8 @@ button.primary:hover:not(:disabled) { background: #245bd0; }
 /* SVG drawing */
 .link { fill: none; stroke: #4a5f86; stroke-width: 3; }
 .link.active { stroke: var(--cyan); stroke-width: 5; }
+.link.link-cut { stroke: var(--red); stroke-dasharray: 8 6; }
+.link.link-cut.active { stroke: #fca5a5; }
 .bus-bar { stroke: #6b7fa6; stroke-width: 10; stroke-linecap: round; }
 .arrow-head { fill: #8fa3c7; }
 .iface-label { fill: #8fa3c7; font-size: 11px; font-family: var(--mono); }

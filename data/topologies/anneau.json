@@ -30,5 +30,42 @@
     { "id": "L2", "a": "PC-B:eth0", "b": "PC-C:eth0", "delai": 10 },
     { "id": "L3", "a": "PC-C:eth0", "b": "PC-D:eth0", "delai": 10 },
     { "id": "L4", "a": "PC-D:eth0", "b": "PC-A:eth0", "delai": 10 }
+  ],
+  "questions": [
+    {
+      "scenario": "cable-coupe", "apresEtape": 3,
+      "enonce": "PC-B passe la requête ARP vers PC-C, mais le câble L2 est débranché. Que va-t-il se passer ?",
+      "choix": [
+        "La requête est perdue : dans cet anneau, il n'y a pas d'autre chemin vers PC-C",
+        "La requête fait demi-tour et passe par PC-D",
+        "PC-B répond à la place de PC-C",
+        "PC-A renvoie aussitôt la requête dans l'autre sens"
+      ],
+      "bonne": 0,
+      "explication": "Les trames ne circulent que dans un sens (A → B → C → D → A). Si le câble B → C est coupé, rien ne peut atteindre PC-C : la requête est perdue et PC-A n'obtient jamais de réponse. C'est le point faible d'un anneau simple."
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "reponse",
+      "nom": "Aller-retour : PC-C répond à PC-A",
+      "description": "À l'aller, la trame passe par PC-B ; au retour, elle ne revient pas par PC-B mais continue dans le même sens, par PC-D.",
+      "envois": [{ "source": "PC-A", "destination": "PC-C" }, { "source": "PC-C", "destination": "PC-A" }]
+    },
+    {
+      "id": "voisin-arriere",
+      "nom": "Le voisin de derrière : PC-B écrit à PC-A",
+      "description": "PC-A est juste à côté de PC-B, mais dans le mauvais sens : la trame doit faire presque tout le tour de l'anneau (PC-C, PC-D, puis PC-A).",
+      "envois": [{ "source": "PC-B", "destination": "PC-A" }]
+    },
+    {
+      "id": "cable-coupe",
+      "nom": "Panne : câble coupé entre PC-B et PC-C",
+      "description": "Un anneau à sens unique n'a pas de chemin de secours : un seul câble coupé suffit à isoler une partie des stations.",
+      "envois": [{ "source": "PC-A", "destination": "PC-C" }],
+      "pannes": [
+        { "type": "cable-debranche", "lien": "L2" }
+      ]
+    }
   ]
 }
