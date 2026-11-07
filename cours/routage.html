@@ -1,0 +1,63 @@
+<h2>1. Relier des réseaux</h2>
+<p>Un commutateur relie des machines d'un même réseau. Pour passer d'un réseau à un autre, il faut un <strong>routeur</strong>. Il travaille dans la couche 3 (réseau) : il lit l'<strong>adresse IP destination</strong> du paquet et choisit par où l'envoyer. Chacune de ses interfaces appartient à un réseau différent et possède sa propre adresse IP et sa propre MAC.</p>
+
+<h2>2. La table de routage</h2>
+<p>Chaque ligne de la table de routage associe un réseau à une sortie :</p>
+<table>
+  <thead><tr><th>Réseau</th><th>Prochain saut</th><th>Interface</th></tr></thead>
+  <tbody>
+    <tr><td>192.168.1.0/24</td><td>directement connecté</td><td>e0</td></tr>
+    <tr><td>10.0.0.0/30</td><td>directement connecté</td><td>e1</td></tr>
+    <tr><td>192.168.2.0/24</td><td>10.0.0.2</td><td>e1</td></tr>
+  </tbody>
+</table>
+<ul>
+  <li><strong>Directement connecté</strong> : le réseau est relié à une interface du routeur ; la destination est sur le même réseau que lui, il lui livre le paquet lui-même.</li>
+  <li><strong>Prochain saut</strong> : l'adresse IP du routeur suivant, à qui confier le paquet.</li>
+</ul>
+<p>Ces routes peuvent être écrites à la main (<strong>routage statique</strong>, celui de PacketLab) ou apprises automatiquement par un protocole de routage dynamique (comme OSPF), qui sait s'adapter aux pannes.</p>
+
+<h2>3. Choisir une route : le plus long préfixe</h2>
+<p>Pour une destination, le routeur cherche toutes les routes dont le réseau contient l'adresse. S'il y en a plusieurs, il prend la plus précise, celle qui a le <strong>masque le plus long</strong>.</p>
+<div class="exemple">
+  <p class="exemple-titre">Exemple</p>
+  <p>Routes : 10.0.0.0/8 via A ; 10.1.0.0/16 via B ; 10.1.2.0/24 via C ; 0.0.0.0/0 via D.</p>
+  <ul>
+    <li>10.1.2.9 : les quatre conviennent, la /24 gagne → C.</li>
+    <li>10.1.7.1 : /8, /16 et /0 conviennent, la /16 gagne → B.</li>
+    <li>172.16.0.1 : seule la route par défaut convient → D.</li>
+  </ul>
+</div>
+<p>La <strong>route par défaut</strong> 0.0.0.0/0 convient à toutes les adresses : elle ne sert que si rien de plus précis n'existe. Sans elle, un paquet sans route est détruit.</p>
+
+<h2>4. Ce que fait le routeur au paquet</h2>
+<ol>
+  <li>Il reçoit la trame (elle lui est adressée : MAC destination = la sienne) et en sort le paquet IP.</li>
+  <li>Il enlève 1 au <strong>TTL</strong>. S'il tombe à 0, le paquet est détruit.</li>
+  <li>Il choisit la route et en déduit le prochain saut.</li>
+  <li>Il cherche la MAC du prochain saut (table ARP, ou requête ARP).</li>
+  <li>Il construit une <strong>nouvelle trame</strong> : MAC source = son interface de sortie, MAC destination = le prochain saut.</li>
+</ol>
+<p>Les adresses <strong>IP source et destination ne changent pas</strong> (sans NAT) : elles désignent toujours les deux extrémités de l'échange.</p>
+
+<h2>5. Le TTL</h2>
+<p>Le TTL (Time To Live, durée de vie) est un compteur de sauts placé dans l'en-tête IP par l'émetteur, souvent à 64. Chaque routeur l'abaisse de 1. Il protège le réseau contre les <strong>boucles de routage</strong> : si deux routeurs se renvoient un paquet à cause d'une erreur de configuration, le TTL finit par atteindre 0 et le paquet disparaît au lieu de tourner indéfiniment. Un vrai routeur prévient alors la source par un message ICMP « temps dépassé » ; c'est ce mécanisme qu'utilise la commande traceroute.</p>
+
+<h2>6. Le routage se décide saut par saut</h2>
+<p>Le paquet ne contient pas son itinéraire : chaque routeur décide seul, avec sa propre table. Rien n'oblige le retour à suivre le même chemin que l'aller.</p>
+
+<div class="callout">
+  <p class="callout-titre">Dans PacketLab</p>
+  <p>Dans la maillée, l'aller passe par R2 et le retour par R3. Supprimez une route : R1 utilise sa route par défaut. Créez une boucle : le TTL descend jusqu'à 0.</p>
+  <p><a href="./simulateur.html?topo=maillee&amp;scenario=aller-retour">Aller-retour</a> · <a href="./simulateur.html?topo=maillee&amp;scenario=route-supprimee">Route supprimée</a> · <a href="./simulateur.html?topo=mixte&amp;scenario=boucle">Boucle de routage</a></p>
+</div>
+
+<div class="retenir">
+  <p class="retenir-titre">À retenir</p>
+  <ul>
+    <li>Le routeur décide avec l'IP destination et sa table de routage.</li>
+    <li>Plusieurs routes conviennent : le plus long préfixe gagne ; 0.0.0.0/0 est la route par défaut.</li>
+    <li>À chaque routeur : TTL − 1, nouvelles MAC ; les IP restent.</li>
+    <li>Le chemin se décide saut par saut.</li>
+  </ul>
+</div>

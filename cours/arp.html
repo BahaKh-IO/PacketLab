@@ -1,0 +1,51 @@
+<h2>1. Le problème</h2>
+<p>Une machine veut envoyer un paquet. Elle connaît l'adresse IP de la destination, mais pour construire la trame Ethernet, il lui faut une <strong>adresse MAC</strong>. Le protocole <strong>ARP</strong> (Address Resolution Protocol) sert à faire ce lien : il trouve la MAC qui correspond à une adresse IP <strong>du réseau local</strong>.</p>
+
+<h2>2. Quelle IP chercher ?</h2>
+<p>La machine décide d'abord à qui elle va remettre la trame, grâce à son masque :</p>
+<ul>
+  <li>la destination est dans son réseau : elle cherche la MAC de la <strong>destination</strong> ;</li>
+  <li>la destination est ailleurs : elle cherche la MAC de sa <strong>passerelle par défaut</strong>.</li>
+</ul>
+<p>On ne demande jamais par ARP la MAC d'une machine située dans un autre réseau : elle ne répondrait pas, car la requête ne lui parviendrait pas.</p>
+
+<h2>3. L'échange ARP</h2>
+<ol>
+  <li><strong>Requête</strong> : « Qui a 192.168.1.1 ? Répondez à 192.168.1.10, AA:AA:AA:00:00:0A. » Elle est envoyée en <strong>diffusion</strong> (MAC destination FF:FF:FF:FF:FF:FF), car l'émetteur ne sait pas encore à qui l'adresser. Dans le message ARP, le champ « MAC cible » est vide (00:00:00:00:00:00).</li>
+  <li>Toutes les machines du réseau reçoivent la requête. Celles dont ce n'est pas l'adresse IP l'ignorent.</li>
+  <li><strong>Réponse</strong> : la machine concernée répond « 192.168.1.1, c'est moi : 11:11:11:00:00:01 ». La réponse part en <strong>unicast</strong>, directement vers le demandeur, dont la MAC figurait dans la requête.</li>
+  <li>Le demandeur range le couple IP → MAC dans sa <strong>table ARP</strong>, puis envoie enfin la trame qu'il gardait en attente.</li>
+</ol>
+<p>Au passage, la machine qui répond a appris la MAC du demandeur : elle la note aussi. Si elle doit lui écrire ensuite, elle n'aura pas besoin de faire d'ARP.</p>
+
+<h2>4. La table ARP</h2>
+<p>La table ARP (ou cache ARP) garde les correspondances déjà apprises. Tant qu'une entrée existe, la machine construit la trame tout de suite, sans redemander. Dans les vrais systèmes, les entrées expirent après quelques minutes pour suivre les changements du réseau ; dans PacketLab, elles commencent vides et restent pendant toute la simulation.</p>
+<table>
+  <thead><tr><th>IP</th><th>MAC</th></tr></thead>
+  <tbody>
+    <tr><td>192.168.1.1</td><td>11:11:11:00:00:01</td></tr>
+  </tbody>
+</table>
+
+<h2>5. ARP et les routeurs</h2>
+<p>Une requête ARP est une diffusion : elle ne sort pas de son <strong>domaine de diffusion</strong>, car les routeurs ne relaient pas les diffusions. Conséquence : sur un chemin à plusieurs routeurs, chaque équipement refait son propre ARP pour le tronçon suivant. Un routeur se comporte comme un PC sur chacun de ses réseaux : il met le paquet de côté, demande la MAC du prochain saut, puis transmet.</p>
+<div class="exemple">
+  <p class="exemple-titre">Exemple : trois ARP pour un seul paquet</p>
+  <p>PC-A → PC-B dans la topologie mixte : PC-A demande la MAC de 192.168.1.1 (R1), R1 demande celle de 10.0.0.2 (R2), R2 demande celle de 192.168.2.20 (PC-B). Si l'on renvoie un deuxième paquet juste après, plus aucun ARP n'est nécessaire.</p>
+</div>
+
+<div class="callout">
+  <p class="callout-titre">Dans PacketLab</p>
+  <p>Comparez le premier et le deuxième envoi, puis la réponse de PC-B : il connaît déjà la MAC de PC-A grâce à la requête.</p>
+  <p><a href="./simulateur.html?topo=etoile&amp;scenario=deuxieme-envoi">Deuxième envoi</a> · <a href="./simulateur.html?topo=etoile&amp;scenario=reponse">Aller-retour</a> · <a href="./simulateur.html?topo=mixte&amp;scenario=mauvaise-passerelle">Personne ne répond</a></p>
+</div>
+
+<div class="retenir">
+  <p class="retenir-titre">À retenir</p>
+  <ul>
+    <li>ARP trouve la MAC d'une IP du réseau local.</li>
+    <li>Destination locale : ARP pour elle ; sinon : ARP pour la passerelle.</li>
+    <li>Requête en diffusion, réponse en unicast, résultat gardé dans la table ARP.</li>
+    <li>ARP ne traverse pas les routeurs : chaque tronçon a son propre ARP.</li>
+  </ul>
+</div>

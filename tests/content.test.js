@@ -115,3 +115,17 @@ test('flashcards: at least 6 per theme, unique, and never a copy of a quiz quest
   const quizTexts = new Set(quizzes.flatMap((q) => q.questions).map((q) => norm(q.enonce)));
   for (const c of cartes) assert.ok(!quizTexts.has(norm(c.recto)), `${c.id}: not a quiz question`);
 });
+
+test('courses: one original course per theme, structured, with working links', () => {
+  for (const id of themeIds) {
+    const path = new URL(`cours/${id}.html`, root);
+    assert.ok(existsSync(path), `cours/${id}.html exists`);
+    const html = readFileSync(path, 'utf8');
+    assert.ok((html.match(/<h2>/g) ?? []).length >= 4, `${id}: at least 4 sections`);
+    assert.ok(html.includes('class="retenir"') && html.includes('class="callout"'), `${id}: "À retenir" and "Dans PacketLab" boxes`);
+    assert.ok(!/<script|on[a-z]+=/i.test(html), `${id}: no script in a course fragment`);
+    const links = [...html.matchAll(/href="([^"]+)"/g)].map((m) => m[1].replace(/&amp;/g, '&'));
+    assert.ok(links.length >= 1, `${id}: links to the simulator`);
+    for (const l of links) checkLink(l, `cours ${id}`);
+  }
+});

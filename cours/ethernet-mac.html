@@ -1,0 +1,74 @@
+<h2>1. Le rôle d'Ethernet</h2>
+<p>Ethernet est la technologie qui fait passer les données d'une machine à une autre <strong>sur un même réseau local</strong>. Il travaille dans la couche 2 (liaison de données) : il emballe le paquet IP dans une <strong>trame</strong>, avec les adresses nécessaires pour la livrer sur le câble, puis la couche physique transmet les bits.</p>
+<p>Il faut bien distinguer les deux enveloppes : la <strong>trame</strong> (Ethernet, adresses MAC) ne sert que sur un tronçon ; le <strong>paquet</strong> (IP, adresses IP) voyage de bout en bout.</p>
+
+<h2>2. L'adresse MAC</h2>
+<p>Chaque carte réseau possède une adresse MAC de <strong>48 bits</strong>, écrite en six octets hexadécimaux : <code>AA:AA:AA:00:00:0A</code>.</p>
+<ul>
+  <li>Les trois premiers octets forment l'<strong>OUI</strong>, l'identifiant du constructeur ;</li>
+  <li>les trois derniers sont attribués par le constructeur à chaque carte.</li>
+</ul>
+<p>Une MAC ne contient aucune information de réseau : elle dit <em>qui</em> est la carte, pas <em>où</em> elle se trouve. C'est pour cela qu'on a besoin des adresses IP pour aller d'un réseau à un autre.</p>
+<p>L'adresse <code>FF:FF:FF:FF:FF:FF</code> est l'adresse de <strong>diffusion</strong> : une trame qui la porte en destination est acceptée par toutes les cartes du réseau local.</p>
+
+<h2>3. La trame Ethernet</h2>
+<table>
+  <thead><tr><th>Champ</th><th>Taille</th><th>Rôle</th></tr></thead>
+  <tbody>
+    <tr><td>Préambule</td><td>8 octets</td><td>Synchroniser le récepteur avant la trame.</td></tr>
+    <tr><td>MAC destination</td><td>6 octets</td><td>Carte qui doit garder la trame.</td></tr>
+    <tr><td>MAC source</td><td>6 octets</td><td>Carte qui a envoyé la trame.</td></tr>
+    <tr><td>Type</td><td>2 octets</td><td>Ce que transportent les données (par exemple IPv4 ou ARP).</td></tr>
+    <tr><td>Données</td><td>46 à 1500 octets</td><td>Le paquet IP (complété si trop court).</td></tr>
+    <tr><td>FCS</td><td>4 octets</td><td>Code CRC pour détecter une erreur de transmission.</td></tr>
+  </tbody>
+</table>
+<p>Le récepteur recalcule le FCS : si le résultat ne correspond pas, la trame a été abîmée en route et elle est jetée. Ethernet détecte les erreurs, mais ne les répare pas.</p>
+
+<h2>4. Qui garde la trame ?</h2>
+<p>Quand une carte reçoit une trame, elle compare la MAC destination à la sienne :</p>
+<ul>
+  <li>c'est sa MAC, ou la diffusion : elle garde la trame et passe le contenu à la couche du dessus ;</li>
+  <li>sinon : elle l'ignore.</li>
+</ul>
+<p>Sur un support partagé (un bus, un concentrateur), toutes les cartes voient passer toutes les trames, et ce tri est la seule chose qui fait que chacune ne garde que les siennes.</p>
+
+<h2>5. Partager le support : CSMA/CD</h2>
+<p>Si deux stations émettent en même temps sur un support partagé, les signaux se mélangent : c'est une <strong>collision</strong>, et les deux trames sont perdues. Ethernet classique applique la méthode <strong>CSMA/CD</strong> :</p>
+<ol>
+  <li>écouter le support et attendre qu'il soit libre ;</li>
+  <li>émettre ;</li>
+  <li>surveiller pendant l'émission : si une collision est détectée, arrêter ;</li>
+  <li>attendre un temps aléatoire, puis réessayer.</li>
+</ol>
+<p>Pour qu'une collision soit détectée pendant l'émission, la trame doit durer assez longtemps : c'est l'origine de la taille minimale de 64 octets. Avec des commutateurs en duplex intégral, les collisions disparaissent.</p>
+
+<h2>6. Les MAC changent, les IP restent</h2>
+<div class="exemple">
+  <p class="exemple-titre">Exemple : PC-A vers PC-B à travers deux routeurs</p>
+  <table>
+    <thead><tr><th>Tronçon</th><th>MAC source → destination</th><th>IP source → destination</th></tr></thead>
+    <tbody>
+      <tr><td>PC-A → R1</td><td>AA:…:0A → 11:…:01</td><td>192.168.1.10 → 192.168.2.20</td></tr>
+      <tr><td>R1 → R2</td><td>11:…:02 → 22:…:01</td><td>192.168.1.10 → 192.168.2.20</td></tr>
+      <tr><td>R2 → PC-B</td><td>22:…:02 → BB:…:0B</td><td>192.168.1.10 → 192.168.2.20</td></tr>
+    </tbody>
+  </table>
+  <p>Trois tronçons, trois trames différentes, un seul paquet IP.</p>
+</div>
+
+<div class="callout">
+  <p class="callout-titre">Dans PacketLab</p>
+  <p>Suivez ce tableau pas à pas dans la topologie mixte, puis regardez le bus : chaque station reçoit la trame et seule la destinataire la garde.</p>
+  <p><a href="./simulateur.html?topo=mixte&amp;src=PC-A&amp;dst=PC-B">Mixte PC-A → PC-B</a> · <a href="./simulateur.html?topo=bus&amp;src=PC-A&amp;dst=PC-C">Bus PC-A → PC-C</a></p>
+</div>
+
+<div class="retenir">
+  <p class="retenir-titre">À retenir</p>
+  <ul>
+    <li>MAC : 48 bits, identifie une carte, ne sert que sur un tronçon.</li>
+    <li>Trame : MAC destination, MAC source, type, données (46 à 1500 octets), FCS.</li>
+    <li>Une carte garde les trames pour sa MAC ou pour FF:FF:FF:FF:FF:FF, et ignore les autres.</li>
+    <li>CSMA/CD : écouter, émettre, détecter, réessayer.</li>
+  </ul>
+</div>

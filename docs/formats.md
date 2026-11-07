@@ -152,3 +152,6 @@ All texts are original (written for PacketLab from the SUP'COM course programme,
 - `theme` — string, theme id.
 - `recto` — string, front: a term or a short question (never the text of a quiz question).
 - `verso` — string, back: the answer.
+
+### Courses (`cours/<theme>.html`)
+An HTML fragment (no `<html>`, no script), inserted into `cours.html?theme=<id>`: at least 4 `<h2>` sections, plus the boxes `<div class="exemple">`, `<div class="callout">` (« Dans PacketLab », links to runs) and `<div class="retenir">` (« À retenir »). Every `href` must open a real run (checked by the tests).

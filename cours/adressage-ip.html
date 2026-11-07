@@ -1,0 +1,71 @@
+<h2>1. Une adresse en deux parties</h2>
+<p>Une adresse IPv4 est un nombre de <strong>32 bits</strong>. Pour la lire plus facilement, on l'écrit en quatre octets séparés par des points, chacun entre 0 et 255 : <code>192.168.1.10</code>.</p>
+<p>Ces 32 bits ont deux rôles. Les premiers désignent le <strong>réseau</strong> (comme le nom d'une rue), les derniers désignent l'<strong>hôte</strong> dans ce réseau (comme le numéro de la maison). Toutes les machines d'un même réseau partagent la même partie réseau.</p>
+
+<h2>2. Le masque dit où est la frontière</h2>
+<p>Le <strong>masque de sous-réseau</strong> indique combien de bits appartiennent à la partie réseau : ses bits à 1 couvrent le réseau, ses bits à 0 couvrent l'hôte. On l'écrit soit en décimal, soit en notation CIDR (le nombre de bits à 1).</p>
+<table>
+  <thead><tr><th>CIDR</th><th>Masque décimal</th><th>Bits d'hôte</th><th>Hôtes utilisables</th></tr></thead>
+  <tbody>
+    <tr><td>/8</td><td>255.0.0.0</td><td>24</td><td>16 777 214</td></tr>
+    <tr><td>/16</td><td>255.255.0.0</td><td>16</td><td>65 534</td></tr>
+    <tr><td>/24</td><td>255.255.255.0</td><td>8</td><td>254</td></tr>
+    <tr><td>/26</td><td>255.255.255.192</td><td>6</td><td>62</td></tr>
+    <tr><td>/30</td><td>255.255.255.252</td><td>2</td><td>2</td></tr>
+  </tbody>
+</table>
+<p>Le nombre d'hôtes d'un réseau /n vaut <strong>2<sup>32 − n</sup> − 2</strong>. On retire deux adresses réservées :</p>
+<ul>
+  <li>l'<strong>adresse du réseau</strong> : tous les bits d'hôte à 0. Elle nomme le réseau lui-même ;</li>
+  <li>l'<strong>adresse de diffusion</strong> : tous les bits d'hôte à 1. Un paquet envoyé à cette adresse est reçu par toutes les machines du réseau.</li>
+</ul>
+
+<h2>3. Trouver le réseau d'une adresse</h2>
+<p>Pour obtenir l'adresse du réseau, on fait un <strong>ET binaire</strong> entre l'adresse et le masque : chaque bit d'hôte est remis à 0.</p>
+<div class="exemple">
+  <p class="exemple-titre">Exemple : 192.168.10.77/26</p>
+  <p>Le masque /26 vaut 255.255.255.192. Seul le dernier octet est partagé : 77 s'écrit <code>01001101</code>, le masque <code>11000000</code>. Le ET donne <code>01000000</code>, soit 64.</p>
+  <p>Réseau : <strong>192.168.10.64</strong>. Diffusion : 64 + 63 = <strong>192.168.10.127</strong>. Hôtes possibles : de .65 à .126.</p>
+</div>
+<p>Astuce sans binaire : dans l'octet où le masque n'est ni 255 ni 0, la taille d'un bloc vaut 256 moins cette valeur (ici 256 − 192 = 64). Les réseaux commencent aux multiples de 64 : 0, 64, 128, 192. On cherche le bloc qui contient 77.</p>
+
+<h2>4. Même réseau ou pas ?</h2>
+<p>Deux machines sont dans le même réseau si elles ont la même adresse de réseau, avec le même masque. Ce test décide de tout : une machine qui veut envoyer un paquet le fait en premier.</p>
+<ul>
+  <li><strong>Même réseau</strong> : la machine envoie directement à la destination (elle cherche sa MAC par ARP).</li>
+  <li><strong>Autre réseau</strong> : elle confie le paquet à sa <strong>passerelle par défaut</strong>, l'adresse du routeur de son réseau.</li>
+</ul>
+<p>Attention aux apparences : 10.1.1.100/25 et 10.1.1.130/25 se ressemblent, mais le masque /25 coupe le dernier octet en deux (0–127 et 128–255). Elles ne sont pas dans le même réseau.</p>
+
+<h2>5. Découper un réseau en sous-réseaux</h2>
+<p>Pour créer des sous-réseaux, on « emprunte » des bits à la partie hôte. Emprunter <em>k</em> bits donne 2<sup>k</sup> sous-réseaux, chacun ayant <em>k</em> bits d'hôte en moins.</p>
+<div class="exemple">
+  <p class="exemple-titre">Exemple : 4 sous-réseaux dans 192.168.5.0/24</p>
+  <p>4 = 2², on emprunte 2 bits : le masque devient /26. Les quatre sous-réseaux sont 192.168.5.0, .64, .128 et .192, avec 62 hôtes chacun.</p>
+</div>
+
+<h2>6. Adresses particulières</h2>
+<table>
+  <thead><tr><th>Plage</th><th>Usage</th></tr></thead>
+  <tbody>
+    <tr><td>10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16</td><td>Adresses privées : utilisables dans un réseau local, non routées sur Internet.</td></tr>
+    <tr><td>127.0.0.0/8</td><td>Bouclage : la machine s'adresse à elle-même.</td></tr>
+    <tr><td>169.254.0.0/16</td><td>Lien local : adresse que la machine se donne quand elle n'en a pas reçu.</td></tr>
+  </tbody>
+</table>
+
+<div class="callout">
+  <p class="callout-titre">Dans PacketLab</p>
+  <p>Dans la topologie mixte, PC-A (192.168.1.10/24) et PC-B (192.168.2.20/24) ne sont pas dans le même réseau : PC-A passe par sa passerelle. Changez son masque en /16 et il croit PC-B local : regardez ce qui se passe.</p>
+  <p><a href="./simulateur.html?topo=mixte&amp;src=PC-A&amp;dst=PC-B">Voir le cas normal</a> · <a href="./simulateur.html?topo=mixte&amp;scenario=mauvais-masque">Voir la panne de masque</a> · <a href="./simulateur.html?topo=mixte&amp;scenario=mauvaise-passerelle">Voir la panne de passerelle</a></p>
+</div>
+
+<div class="retenir">
+  <p class="retenir-titre">À retenir</p>
+  <ul>
+    <li>Le masque sépare partie réseau et partie hôte ; /n = n bits à 1.</li>
+    <li>Réseau = bits d'hôte à 0 ; diffusion = bits d'hôte à 1 ; hôtes = 2<sup>32 − n</sup> − 2.</li>
+    <li>Même réseau : envoi direct. Autre réseau : envoi à la passerelle par défaut.</li>
+    <li>Emprunter k bits donne 2<sup>k</sup> sous-réseaux.</li>
+  </ul>
+</div>

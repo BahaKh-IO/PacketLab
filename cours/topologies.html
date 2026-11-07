@@ -1,0 +1,52 @@
+<h2>1. Qu'est-ce qu'une topologie ?</h2>
+<p>La <strong>topologie</strong> d'un réseau décrit la façon dont les équipements sont reliés. On distingue :</p>
+<ul>
+  <li>la <strong>topologie physique</strong> : comment les câbles sont réellement posés ;</li>
+  <li>la <strong>topologie logique</strong> : comment les données circulent. Un concentrateur câblé en étoile fonctionne logiquement comme un bus, puisqu'il répète tout à tout le monde.</li>
+</ul>
+<p>Le choix d'une topologie joue sur le coût (nombre de câbles), la robustesse (ce qui se passe en cas de panne) et les performances.</p>
+
+<h2>2. Les topologies de base</h2>
+<table>
+  <thead><tr><th>Topologie</th><th>Principe</th><th>Point fort</th><th>Point faible</th></tr></thead>
+  <tbody>
+    <tr><td>Étoile</td><td>Chaque machine reliée à un centre (commutateur)</td><td>Un câble coupé n'isole qu'une machine ; facile à étendre</td><td>Le centre est un point unique de défaillance</td></tr>
+    <tr><td>Bus</td><td>Toutes les machines sur un câble partagé</td><td>Peu de câble</td><td>Collisions ; une coupure du câble arrête tout le segment</td></tr>
+    <tr><td>Anneau</td><td>Chaque machine reliée à deux voisines, la trame tourne dans un sens</td><td>Accès ordonné au support</td><td>Une coupure peut isoler des stations</td></tr>
+    <tr><td>Maillée</td><td>Plusieurs liens entre les nœuds</td><td>Plusieurs chemins : on contourne une panne</td><td>Beaucoup de liens, configuration plus riche</td></tr>
+  </tbody>
+</table>
+
+<h2>3. Comment circule une trame</h2>
+<ul>
+  <li><strong>Étoile avec commutateur</strong> : la trame va de la source au commutateur, qui la transmet vers le seul port de la destination (ou inonde si elle est inconnue).</li>
+  <li><strong>Bus</strong> : le signal atteint toutes les stations ; chacune compare la MAC destination à la sienne, seule la destinataire garde la trame.</li>
+  <li><strong>Anneau</strong> : chaque station passe la trame à sa voisine, toujours dans le même sens, jusqu'à la destination. Une diffusion fait le tour complet et revient à l'émetteur, qui la retire.</li>
+</ul>
+<div class="exemple">
+  <p class="exemple-titre">Exemple : le voisin de derrière</p>
+  <p>Dans l'anneau A → B → C → D → A, une trame de B vers A ne prend pas le « raccourci » : elle passe par C, puis D, avant d'arriver à A.</p>
+</div>
+
+<h2>4. Le maillage</h2>
+<p>Dans un <strong>maillage complet</strong>, chaque nœud est relié à tous les autres. Pour n nœuds, il faut <strong>n(n − 1)/2</strong> liens : 10 liens pour 5 nœuds, 45 pour 10. C'est pourquoi on maille surtout les routeurs du cœur de réseau, et souvent partiellement. Plusieurs chemins existent, mais avec un routage statique, il faut prévoir les routes de secours : un lien coupé n'est pas contourné tout seul.</p>
+
+<h2>5. Les topologies mixtes</h2>
+<p>Les réseaux réels combinent ces formes : des réseaux locaux en <strong>étoile</strong> autour de commutateurs, reliés entre eux par des <strong>routeurs</strong>, parfois maillés. C'est la topologie « mixte » de PacketLab : deux étoiles reliées par deux routeurs.</p>
+<p>Le bus a pratiquement disparu des réseaux Ethernet : il a été remplacé par l'étoile autour d'un commutateur, plus robuste et sans collisions entre machines.</p>
+
+<div class="callout">
+  <p class="callout-titre">Dans PacketLab</p>
+  <p>Envoyez le même paquet sur les cinq topologies et comparez le chemin, les équipements traversés et ce que voit chaque station.</p>
+  <p><a href="./simulateur.html?topo=etoile&amp;src=PC-A&amp;dst=PC-B">Étoile</a> · <a href="./simulateur.html?topo=bus&amp;src=PC-A&amp;dst=PC-C">Bus</a> · <a href="./simulateur.html?topo=anneau&amp;scenario=voisin-arriere">Anneau</a> · <a href="./simulateur.html?topo=maillee&amp;scenario=lien-r1-r2-coupe">Maillée, lien coupé</a> · <a href="./simulateur.html?topo=mixte&amp;src=PC-A&amp;dst=PC-B">Mixte</a></p>
+</div>
+
+<div class="retenir">
+  <p class="retenir-titre">À retenir</p>
+  <ul>
+    <li>Physique = câblage ; logique = circulation des données.</li>
+    <li>Étoile : centre unique ; bus : support partagé ; anneau : sens unique ; maillée : chemins multiples.</li>
+    <li>Maillage complet : n(n − 1)/2 liens.</li>
+    <li>Les réseaux réels sont mixtes : des étoiles reliées par des routeurs.</li>
+  </ul>
+</div>

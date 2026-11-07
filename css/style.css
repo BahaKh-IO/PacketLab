@@ -536,3 +536,32 @@ a.button.primary { background: var(--blue); border-color: var(--blue); color: #f
 .flashcard-done { cursor: default; }
 .deck-actions { display: flex; gap: 0.75rem; max-width: 36rem; margin-top: 0.75rem; }
 .deck-actions button { flex: 1; min-height: 2.9rem; }
+.course { max-width: 52rem; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 1.25rem 1.75rem 1.5rem; }
+.course-tools { display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem; }
+.course-title { margin: 0.2rem 0 0.5rem; color: var(--navy); font-size: 1.6rem; }
+.course-sources { font-size: 0.8rem; color: var(--muted); font-style: italic; margin: 0 0 1rem; }
+.course-body { line-height: 1.6; }
+.course-body h2 { color: var(--navy); font-size: 1.2rem; margin: 1.6rem 0 0.5rem; padding-bottom: 0.25rem; border-bottom: 2px solid var(--line); }
+.course-body p { margin: 0.5rem 0; }
+.course-body ul, .course-body ol { padding-left: 1.3rem; }
+.course-body li { margin: 0.3rem 0; }
+.course-body code { font-family: var(--mono); background: #eef2f8; padding: 0.05rem 0.3rem; border-radius: 4px; font-size: 0.92em; }
+.course-body table { width: 100%; border-collapse: collapse; margin: 0.75rem 0; font-size: 0.92rem; display: block; overflow-x: auto; }
+.course-body th, .course-body td { text-align: left; padding: 0.4rem 0.6rem; border: 1px solid var(--line); vertical-align: top; }
+.course-body th { background: #eef2f8; color: var(--navy); }
+.course-body .exemple { margin: 1rem 0; padding: 0.4rem 1rem; background: #eef4ff; border-left: 4px solid var(--blue); border-radius: 6px; }
+.course-body .callout { margin: 1.25rem 0; padding: 0.4rem 1rem; background: #ecfeff; border-left: 4px solid var(--cyan); border-radius: 6px; }
+.course-body .retenir { margin: 1.25rem 0 0.5rem; padding: 0.4rem 1rem; background: #f5f3ff; border-left: 4px solid var(--violet); border-radius: 6px; }
+.exemple-titre, .callout-titre, .retenir-titre { font-weight: 700; color: var(--navy); }
+.course-body a { color: var(--blue); font-weight: 600; }
+
+/* Print: only the course (« Imprimer / PDF » in the browser gives a clean PDF). */
+@media print {
+  .site-header, .no-print, .page > h1, .page > .intro, .badge-review { display: none !important; }
+  body, :root { background: #fff; }
+  .page { padding: 0; max-width: none; }
+  .course { border: 0; padding: 0; max-width: none; }
+  .course-body table { display: table; }
+  .course-body .exemple, .course-body .callout, .course-body .retenir { break-inside: avoid; }
+  .course-body h2 { break-after: avoid; }
+}

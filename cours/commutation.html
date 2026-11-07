@@ -1,0 +1,59 @@
+<h2>1. Du concentrateur au commutateur</h2>
+<p>Pour relier plusieurs machines en étoile, on peut utiliser un <strong>concentrateur</strong> (hub) ou un <strong>commutateur</strong> (switch). Ils se ressemblent physiquement, mais pas du tout dans leur fonctionnement.</p>
+<table>
+  <thead><tr><th></th><th>Concentrateur (hub)</th><th>Commutateur (switch)</th></tr></thead>
+  <tbody>
+    <tr><td>Couche</td><td>1 (physique)</td><td>2 (liaison de données)</td></tr>
+    <tr><td>Lit les adresses ?</td><td>Non</td><td>Oui, les adresses MAC</td></tr>
+    <tr><td>Envoie la trame</td><td>Sur tous les ports</td><td>Sur le seul port de la destination, si elle est connue</td></tr>
+    <tr><td>Domaines de collision</td><td>Un seul, partagé</td><td>Un par port</td></tr>
+  </tbody>
+</table>
+
+<h2>2. La table MAC</h2>
+<p>Le commutateur tient une <strong>table MAC</strong> (on dit aussi table de commutation) : pour chaque adresse MAC connue, le port derrière lequel elle se trouve. Il la remplit tout seul, par <strong>apprentissage</strong> : à chaque trame reçue, il lit la MAC <em>source</em> et note « cette MAC est derrière le port d'arrivée ».</p>
+<p>Au démarrage, la table est vide. Elle se remplit au fil du trafic, sans aucune configuration.</p>
+
+<h2>3. Que faire de la trame ?</h2>
+<p>Pour chaque trame, le commutateur lit la MAC <em>destination</em> et applique une seule de ces règles :</p>
+<table>
+  <thead><tr><th>Situation</th><th>Décision</th></tr></thead>
+  <tbody>
+    <tr><td>MAC destination connue, sur un autre port</td><td><strong>Transmission</strong> sur ce seul port</td></tr>
+    <tr><td>MAC destination inconnue</td><td><strong>Inondation</strong> : tous les ports sauf celui d'arrivée</td></tr>
+    <tr><td>Diffusion (FF:FF:FF:FF:FF:FF)</td><td>Inondation, toujours</td></tr>
+    <tr><td>MAC destination derrière le port d'arrivée</td><td><strong>Filtrage</strong> : rien n'est renvoyé</td></tr>
+  </tbody>
+</table>
+<p>Dans tous les cas, la trame n'est <strong>pas modifiée</strong> : mêmes MAC, mêmes IP, même TTL. Le commutateur choisit des ports, il ne réécrit rien.</p>
+
+<div class="exemple">
+  <p class="exemple-titre">Exemple : étoile, PC-A écrit à PC-B</p>
+  <ol>
+    <li>La requête ARP de PC-A arrive sur p1 : le commutateur apprend « AA…0A sur p1 », puis inonde la diffusion vers p2, p3, p4.</li>
+    <li>La réponse de PC-B arrive sur p2 : il apprend « BB…0B sur p2 » ; la destination AA…0A est connue, la réponse ne sort que par p1.</li>
+    <li>La trame de données pour BB…0B ne sort que par p2. PC-C et PC-D ne la voient jamais.</li>
+  </ol>
+</div>
+
+<h2>4. Domaines de collision et de diffusion</h2>
+<ul>
+  <li>Un <strong>domaine de collision</strong> est un ensemble de machines dont les émissions simultanées se percutent. Chaque port de commutateur en forme un : avec un PC par port, plus de collisions entre machines.</li>
+  <li>Un <strong>domaine de diffusion</strong> est l'ensemble des machines atteintes par une diffusion. Le commutateur inonde les diffusions, donc il ne le découpe pas : tout ce qui est derrière lui forme un seul domaine de diffusion. Seul un <strong>routeur</strong> (ou des VLAN) le limite.</li>
+</ul>
+
+<div class="callout">
+  <p class="callout-titre">Dans PacketLab</p>
+  <p>Regardez la table MAC de SW1 se remplir, puis lancez le deuxième envoi : plus aucune inondation. Cliquez sur SW1 pour voir sa table à n'importe quelle étape.</p>
+  <p><a href="./simulateur.html?topo=etoile&amp;src=PC-A&amp;dst=PC-B">Premier envoi</a> · <a href="./simulateur.html?topo=etoile&amp;scenario=deuxieme-envoi">Deuxième envoi</a> · <a href="./simulateur.html?topo=etoile&amp;scenario=autre-pc">Un autre PC parle</a></p>
+</div>
+
+<div class="retenir">
+  <p class="retenir-titre">À retenir</p>
+  <ul>
+    <li>Le commutateur apprend avec la MAC source et décide avec la MAC destination.</li>
+    <li>Connue : un port ; inconnue ou diffusion : inondation ; même port : filtrage.</li>
+    <li>Il ne modifie jamais la trame.</li>
+    <li>Un domaine de collision par port, un seul domaine de diffusion.</li>
+  </ul>
+</div>

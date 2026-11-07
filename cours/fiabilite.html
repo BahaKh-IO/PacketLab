@@ -1,0 +1,58 @@
+<h2>1. Ce qui peut mal tourner</h2>
+<p>Un réseau ne garantit pas que tout ce qui est envoyé arrive intact, dans l'ordre et une seule fois. Plusieurs types d'erreurs existent :</p>
+<table>
+  <thead><tr><th>Erreur</th><th>Cause possible</th><th>Conséquence</th></tr></thead>
+  <tbody>
+    <tr><td>Erreur de transmission</td><td>Bruit, interférences sur le support</td><td>Des bits sont modifiés</td></tr>
+    <tr><td>Perte</td><td>File d'attente pleine dans un routeur, trame abîmée puis jetée</td><td>Un morceau n'arrive jamais</td></tr>
+    <tr><td>Retard, désordre</td><td>Chemins ou attentes différents</td><td>Les morceaux arrivent dans le désordre</td></tr>
+    <tr><td>Doublon</td><td>Un morceau envoyé deux fois</td><td>Le même morceau arrive deux fois</td></tr>
+  </tbody>
+</table>
+
+<h2>2. Détecter les erreurs de transmission</h2>
+<p>L'émetteur ajoute aux données quelques <strong>bits de contrôle</strong> calculés à partir d'elles. Le récepteur refait le calcul : si le résultat diffère, il sait que la trame a été abîmée et il la jette. Le <strong>CRC</strong> (contrôle de redondance cyclique, ou code polynomial) est le code le plus utilisé : c'est lui qui remplit le FCS des trames Ethernet. Il <em>détecte</em> les erreurs, il ne les corrige pas : une trame jetée devient une perte, que l'on traite comme ci-dessous.</p>
+
+<h2>3. Récupérer les pertes : numéros, acquittements, temporisateurs</h2>
+<ol>
+  <li>Le message est découpé en morceaux <strong>numérotés</strong>.</li>
+  <li>Le récepteur range chaque morceau à sa place et renvoie un <strong>acquittement</strong> (ACK) qui porte son numéro.</li>
+  <li>L'émetteur arme un <strong>temporisateur</strong> pour chaque morceau envoyé. L'ACK l'annule.</li>
+  <li>Si le temporisateur expire sans ACK, l'émetteur <strong>réémet</strong> le morceau et réarme le temporisateur.</li>
+  <li>Si un morceau arrive en double, le récepteur le reconnaît à son numéro, le <strong>jette</strong>, mais l'acquitte quand même : son premier ACK s'est peut-être perdu.</li>
+</ol>
+<div class="exemple">
+  <p class="exemple-titre">Exemple : le morceau 3 est perdu</p>
+  <p>Dans le Labo fiabilité, un aller-retour normal (morceau puis ACK) dure 120 ms et le temporisateur 200 ms. Le morceau 3, envoyé à 20 ms, est perdu au routeur B. À 220 ms, son temporisateur expire : il est réémis et arrive à 280 ms. Le message est complet. Sans récupération, la case 3 reste vide pour toujours.</p>
+</div>
+
+<h2>4. Bien régler le temporisateur</h2>
+<ul>
+  <li><strong>Trop court</strong> : il expire alors que l'ACK était en route. L'émetteur réémet pour rien et crée des doublons.</li>
+  <li><strong>Trop long</strong> : après une vraie perte, l'émetteur attend longtemps avant de réagir.</li>
+</ul>
+<p>Il doit donc dépasser un peu l'aller-retour normal. Les protocoles réels mesurent cet aller-retour en permanence pour ajuster leur temporisateur.</p>
+
+<h2>5. Envoyer et attendre, ou anticiper</h2>
+<ul>
+  <li><strong>Envoyer et attendre</strong> (Send and Wait) : un seul morceau en route ; on attend son ACK avant d'envoyer le suivant. Très simple, mais le lien reste inutilisé pendant chaque attente.</li>
+  <li><strong>Fenêtre d'anticipation</strong> (Sliding Window) : jusqu'à W morceaux peuvent être envoyés sans attendre leurs ACK. Le lien est bien mieux utilisé ; les numéros et les ACK restent indispensables pour savoir quoi réémettre.</li>
+</ul>
+<p>Le labo de PacketLab envoie tous les morceaux sans attendre, comme une très grande fenêtre. C'est un modèle simplifié : ce n'est pas TCP, qui numérote les octets et utilise des acquittements cumulatifs.</p>
+
+<div class="callout">
+  <p class="callout-titre">Dans PacketLab</p>
+  <p>Perdez le morceau 3 et comparez les deux modes. Puis retardez un morceau de 60 ms (désordre) ou de 300 ms (plus long que le temporisateur : un doublon).</p>
+  <p><a href="./fiabilite.html">Ouvrir le Labo fiabilité</a></p>
+</div>
+
+<div class="retenir">
+  <p class="retenir-titre">À retenir</p>
+  <ul>
+    <li>Le CRC détecte les erreurs ; une trame abîmée est jetée.</li>
+    <li>Numéros + acquittements + temporisateurs = récupération des pertes.</li>
+    <li>Un doublon est jeté mais acquitté.</li>
+    <li>Le temporisateur doit dépasser l'aller-retour normal.</li>
+    <li>Envoyer et attendre : 1 morceau à la fois ; fenêtre d'anticipation : W morceaux.</li>
+  </ul>
+</div>
