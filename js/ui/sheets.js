@@ -8,6 +8,9 @@ import { h, link, button } from './dom.js';
 import { loadThemes, loadFiches, loadCartes, loadError } from './content.js';
 import { createFlashcards } from './flashcards.js';
 import { getProgress } from '../progress.js';
+import { startSync } from '../account.js';
+
+startSync(); // logged-in students: progress kept in sync with their account
 
 const $ = (id) => document.getElementById(id);
 const app = $('sheets-app');

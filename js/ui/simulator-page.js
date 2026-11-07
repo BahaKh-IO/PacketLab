@@ -11,6 +11,9 @@ import { bubblesFor, markSeen, resetSeen } from './bubbles.js';
 import { save, load } from '../storage.js';
 import { predictions } from './predict.js';
 import { recordSimulation } from '../progress.js';
+import { startSync } from '../account.js';
+
+startSync(); // logged-in students: progress kept in sync with their account
 
 const TOPOLOGY_IDS = ['mixte', 'etoile', 'bus', 'anneau', 'maillee'];
 

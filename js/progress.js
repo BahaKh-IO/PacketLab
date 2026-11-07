@@ -14,6 +14,12 @@
 import { load, save, remove } from './storage.js';
 
 const KEY = 'progression';
+const listeners = new Set();
+
+/** Called after every change (account.js uses it to send the progress to the server). */
+export function onProgressChange(listener) {
+  listeners.add(listener);
+}
 
 function empty() {
   return { version: 1, maj: null, quiz: {}, simulations: {}, labo: {}, cartes: {} };
@@ -31,6 +37,7 @@ function update(change) {
   change(p);
   p.maj = new Date().toISOString();
   save(KEY, p);
+  for (const listener of listeners) listener(p);
   return p;
 }
 
@@ -72,6 +79,53 @@ export function setCardKnown(theme, cardId, known) {
     else set.delete(cardId);
     p.cartes[theme] = [...set];
   });
+}
+
+/** Replace the saved progress (after a merge with the server); does not notify listeners. */
+export function replaceProgress(p) {
+  save(KEY, p);
+}
+
+const later = (a, b) => ((a ?? '') >= (b ?? '') ? a : b);
+const maxMap = (a = {}, b = {}) => {
+  const out = { ...a };
+  for (const [k, v] of Object.entries(b)) out[k] = Math.max(out[k] ?? 0, v);
+  return out;
+};
+
+/**
+ * Merge two progress objects (this browser and the account): keep the best of both.
+ * Counters take the maximum, flashcards the union, "last score" comes from the most
+ * recent attempt. Same result whatever the order, and merging twice changes nothing.
+ */
+export function mergeProgress(a, b) {
+  const x = a ?? empty();
+  const y = b ?? empty();
+  const out = empty();
+  out.maj = later(x.maj, y.maj);
+  for (const theme of new Set([...Object.keys(x.quiz), ...Object.keys(y.quiz)])) {
+    const qa = x.quiz[theme];
+    const qb = y.quiz[theme];
+    if (!qa || !qb) { out.quiz[theme] = { ...(qa ?? qb) }; continue; }
+    const recent = (qa.date ?? '') >= (qb.date ?? '') ? qa : qb;
+    out.quiz[theme] = {
+      tentatives: Math.max(qa.tentatives, qb.tentatives),
+      meilleur: Math.max(qa.meilleur, qb.meilleur),
+      total: recent.total,
+      dernier: recent.dernier,
+      date: recent.date,
+    };
+  }
+  for (const topo of new Set([...Object.keys(x.simulations), ...Object.keys(y.simulations)])) {
+    const sa = x.simulations[topo] ?? { libre: 0, scenarios: {} };
+    const sb = y.simulations[topo] ?? { libre: 0, scenarios: {} };
+    out.simulations[topo] = { libre: Math.max(sa.libre, sb.libre), scenarios: maxMap(sa.scenarios, sb.scenarios) };
+  }
+  out.labo = maxMap(x.labo, y.labo);
+  for (const theme of new Set([...Object.keys(x.cartes), ...Object.keys(y.cartes)])) {
+    out.cartes[theme] = [...new Set([...(x.cartes[theme] ?? []), ...(y.cartes[theme] ?? [])])].sort();
+  }
+  return out;
 }
 
 /** Erase everything (progression page, after confirmation). */

@@ -1,3 +1,6 @@
 # Course material from SUP'COM (not ours to publish): kept locally only.
 /ressources-cours/
 /data/Données PacketLap/
+
+# Local development database of the backend (server/dev-server.js).
+/server/dev.db

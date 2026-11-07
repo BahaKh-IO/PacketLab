@@ -1,0 +1,14 @@
+# Cloudflare Workers configuration of the PacketLab backend (see docs/backend.md).
+name = "packetlab-api"
+main = "server/worker.js"
+compatibility_date = "2025-09-01"
+
+[vars]
+# Only this site may call the API from a browser (CORS).
+ALLOWED_ORIGINS = "https://bahakh-io.github.io"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "packetlab"
+# Replace with the id printed by:  npx wrangler d1 create packetlab
+database_id = "A-REMPLIR"

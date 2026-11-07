@@ -5,6 +5,9 @@
 import { h, link, button } from './dom.js';
 import { loadThemes, loadCartes, loadError } from './content.js';
 import { getProgress, resetProgress } from '../progress.js';
+import { startSync, accountsEnabled, currentSession, pushReset } from '../account.js';
+
+startSync(); // logged-in students: progress kept in sync with their account
 
 const NS = 'http://www.w3.org/2000/svg';
 const TOPOLOGIES = [['etoile', 'Étoile'], ['bus', 'Bus'], ['anneau', 'Anneau'], ['maillee', 'Maillée'], ['mixte', 'Mixte']];
@@ -101,7 +104,11 @@ async function render() {
   const ask = button('Réinitialiser ma progression', null, () => {
     reset.replaceChildren(
       h('p', null, 'Effacer toute la progression enregistrée dans ce navigateur ? Cette action est définitive.'),
-      button('Oui, tout effacer', 'danger', () => { resetProgress(); render(); }),
+      button('Oui, tout effacer', 'danger', async () => {
+        const empty = resetProgress();
+        await pushReset(empty).catch(() => {}); // logged in: erase the account's copy too
+        render();
+      }),
       button('Annuler', null, () => reset.replaceChildren(ask)));
   });
   reset.append(ask);
@@ -133,7 +140,10 @@ async function render() {
     h('section', 'panel progress-section',
       h('h2', null, 'Labo fiabilité'),
       h('p', null, `Sans récupération : ${p.labo.sans ?? 0} · Avec récupération : ${p.labo.avec ?? 0} · Comparaisons : ${p.labo.comparer ?? 0}`)),
-    h('p', 'muted', p.maj ? `Dernière activité : ${new Date(p.maj).toLocaleString('fr-FR')}. Cette progression est enregistrée dans ce navigateur uniquement.` : 'Aucune activité enregistrée pour l\'instant dans ce navigateur.'),
+    h('p', 'muted', p.maj ? `Dernière activité : ${new Date(p.maj).toLocaleString('fr-FR')}. ` : 'Aucune activité enregistrée pour l\'instant. ',
+      currentSession() ? `Synchronisée avec le compte de ${currentSession().utilisateur.nom}.`
+        : accountsEnabled() ? link('./connexion.html', 'Créez un compte pour la retrouver sur tous vos appareils.')
+          : 'Enregistrée dans ce navigateur uniquement.'),
     reset);
 }
 

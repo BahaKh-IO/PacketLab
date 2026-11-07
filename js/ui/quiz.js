@@ -4,6 +4,9 @@
 import { h, link, button, shuffled } from './dom.js';
 import { loadThemes, loadQuiz, loadError } from './content.js';
 import { getProgress, recordQuiz } from '../progress.js';
+import { startSync } from '../account.js';
+
+startSync(); // logged-in students: progress kept in sync with their account
 
 const $ = (id) => document.getElementById(id);
 const app = $('quiz-app');

@@ -6,6 +6,9 @@ import { simulateReliability, decouper, DEFAULTS } from '../engine/reliability.j
 import { createLane, renderResults, visible } from './reliability-view.js';
 import { createPlayer } from './player.js';
 import { recordLab } from '../progress.js';
+import { startSync } from '../account.js';
+
+startSync(); // logged-in students: progress kept in sync with their account
 
 const LABELS = { sans: 'Sans récupération', avec: 'Avec récupération (ACK + délai d\'attente)' };
 // Click on a chunk: normal -> perdu -> retard court -> retard long -> normal.

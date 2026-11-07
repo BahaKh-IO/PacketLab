@@ -10,6 +10,8 @@ Read first: `docs/PLAN.md` (build plan, decisions, today's steps) and `docs/Pack
 - Hosted on GitHub Pages: all paths relative (`./data/...`), file names lower-case.
 - Local dev with VS Code Live Server (fetch of JSON fails from file://).
 - Ask before adding any library or changing a JSON format.
+- Backend (teacher's request): `server/` = `api.js` (web-standard Request/Response, Web Crypto) run on Cloudflare Workers + D1 (`worker.js`, `wrangler.toml`) and locally with node:sqlite (`dev-server.js`). Zero npm dependency. The site must keep working without it (guest mode). See `docs/backend.md`.
+- Course material from Nour lives in `ressources-cours/` (ignored by Git, never published); our quizzes, fiches, cards and courses are original texts.
 
 ## Architecture rules
 - `js/engine/` never touches the DOM. `simulate(topology, src, dst)` returns the full, ordered event list.

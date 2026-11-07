@@ -145,6 +145,13 @@ Goal: Module C complete. Claude drafts all text; Nour checks it against the cour
 - [x] `storage.js` + `progression.html`: quiz attempts, best score per theme, simulations per topology, a small SVG bar chart, “Réinitialiser”
 - [ ] Nour's check: every answer and every explanation against the course; fix before merge
 
+## Backend — student accounts (teacher's request, Nov 7, 2026)
+
+- [x] Choice with Baha: email + password, students only, Cloudflare Workers + D1 (no personal PC as host)
+- [x] `server/api.js` (inscription, connexion, déconnexion, moi, progression GET/PUT, suppression du compte), PBKDF2 passwords, hashed session tokens, login blocking, CORS — `tests/backend.test.js`
+- [x] Local dev server on node:sqlite; `mergeProgress` + automatic sync of the « labs réalisés »; « Mon compte » page; guest mode unchanged
+- [ ] Baha: create the Cloudflare account and deploy (`docs/backend.md`, steps 1–7), then set `DEPLOYED` in `js/config.js`
+
 ## Session 5 — Documentation, testing, demo (≈ 3 h)
 
 Goal: graded documentation done, no network error on screen, demo rehearsed on the live link.
