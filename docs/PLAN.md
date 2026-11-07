@@ -132,6 +132,9 @@ Decided with Baha after Session 3. Module C and new concepts wait for the course
 
 ## Session 4 — Quizzes, fiches, courses, progress (≈ 3 h)
 
+> **Nov 7, 2026 — inputs received.** Nour's course pack is organised in `ressources-cours/` (local only, ignored by Git: not ours to publish): 3 SUP'COM courses (Réseaux locaux et IP, Architectures et fonctions des réseaux, Routage et commutation) by `cours/ td/ exercices/ ds/ examens/`, a CCNA review quiz, and `a-verifier/` (near-duplicates to decide, a student's graded copy never to publish). See `ressources-cours/INDEX.md`.
+> **Teacher:** « Vous pouvez ajouter un backend simple qui gère les comptes des étudiants (authentification des comptes, les labs réalisés…) » — lifts the § 7.4 exclusion of accounts; backend design still to be chosen with Baha.
+
 Goal: Module C complete. Claude drafts all text; Nour checks it against the course before it is merged.
 
 - [ ] Ask Claude (in this project chat) for the quiz JSON: 7 themes × 8 questions (Adressage IP, Adresses MAC, ARP, Commutation, Routage, Topologies, Fiabilité), each with 4 choices, the answer and an explanation
