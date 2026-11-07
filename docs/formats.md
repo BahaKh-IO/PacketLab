@@ -131,3 +131,24 @@ All texts are original (written for PacketLab from the SUP'COM course programme,
 - `simulations` — `{ "<topo>": { "libre": n, "scenarios": { "<id>": n } } }`.
 - `labo` — `{ "sans": n, "avec": n, "comparer": n }`.
 - `cartes` — `{ "<theme>": ["<card id>", …] }`, flashcards marked as known.
+
+### Fiches (`data/fiches/fiches.json`)
+- `fiches` — array of Fiche (8, at least one per theme).
+
+### Fiche
+- `id` — string, unique; used in `fiches.html?fiche=<id>`.
+- `theme` — string, theme id.
+- `titre` — string.
+- `essentiel` — array of 3 to 5 short French sentences (no sentence repeated between sheets).
+- `exemple` — string, a worked example, taken from PacketLab's topologies when possible.
+- `piege` — string, a frequent mistake and why it is wrong.
+- `simulateur` — string, relative link to the run or lab that shows it.
+
+### Flashcards (`data/fiches/cartes.json`)
+- `cartes` — array of Carte (at least 6 per theme).
+
+### Carte
+- `id` — string, unique (`"arp-c3"`); stored in the progress when the card is known.
+- `theme` — string, theme id.
+- `recto` — string, front: a term or a short question (never the text of a quiz question).
+- `verso` — string, back: the answer.

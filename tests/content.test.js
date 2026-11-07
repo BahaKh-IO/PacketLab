@@ -89,3 +89,29 @@ test('computed answers: every question with a "calcul" has the right answer', ()
     }
   }
 });
+
+const { fiches } = json('data/fiches/fiches.json');
+const { cartes } = json('data/fiches/cartes.json');
+
+test('fiches: 8 unique sheets on known themes, complete, with a valid link', () => {
+  assert.equal(fiches.length, 8);
+  assert.equal(new Set(fiches.map((f) => f.id)).size, 8);
+  for (const f of fiches) {
+    assert.ok(themeIds.includes(f.theme), `${f.id}: theme`);
+    assert.ok(f.essentiel.length >= 3 && f.exemple.length > 40 && f.piege.length > 40, `${f.id}: content`);
+    checkLink(f.simulateur, `fiche ${f.id}`);
+  }
+  const lines = fiches.flatMap((f) => f.essentiel).map(norm);
+  assert.equal(new Set(lines).size, lines.length, 'no line repeated between sheets');
+  for (const id of themeIds) assert.ok(fiches.some((f) => f.theme === id), `a sheet for ${id}`);
+});
+
+test('flashcards: at least 6 per theme, unique, and never a copy of a quiz question', () => {
+  assert.equal(new Set(cartes.map((c) => c.id)).size, cartes.length, 'unique ids');
+  for (const id of themeIds) assert.ok(cartes.filter((c) => c.theme === id).length >= 6, `cards for ${id}`);
+  for (const c of cartes) assert.ok(themeIds.includes(c.theme) && c.recto && c.verso.length > 10, c.id);
+  const fronts = cartes.map((c) => norm(c.recto));
+  assert.equal(new Set(fronts).size, fronts.length, 'unique card fronts');
+  const quizTexts = new Set(quizzes.flatMap((q) => q.questions).map((q) => norm(q.enonce)));
+  for (const c of cartes) assert.ok(!quizTexts.has(norm(c.recto)), `${c.id}: not a quiz question`);
+});

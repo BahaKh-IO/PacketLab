@@ -1,0 +1,124 @@
+{
+  "fiches": [
+    {
+      "id": "ip-masque",
+      "theme": "adressage-ip",
+      "titre": "Adresse IPv4 et masque",
+      "essentiel": [
+        "Une adresse IPv4 compte 32 bits, écrits en 4 nombres de 0 à 255.",
+        "Le masque sépare la partie réseau (bits à 1) de la partie hôte (bits à 0). /24 = 255.255.255.0.",
+        "Adresse réseau : bits d'hôte tous à 0. Adresse de diffusion : bits d'hôte tous à 1. Aucune des deux ne peut être donnée à une machine.",
+        "Nombre d'hôtes d'un réseau /n : 2^(32 − n) − 2.",
+        "Si la destination est hors de son réseau, une machine envoie le paquet à sa passerelle par défaut."
+      ],
+      "exemple": "192.168.1.70/26 : le masque 255.255.255.192 découpe le dernier octet en blocs de 64. 70 est dans le bloc 64–127 : réseau 192.168.1.64, diffusion 192.168.1.127, hôtes de .65 à .126 (62 hôtes).",
+      "piege": "Comparer les adresses « à l'œil » sur les premiers octets. 10.1.1.100/25 et 10.1.1.130/25 se ressemblent, mais ne sont pas dans le même réseau : le masque coupe au milieu du dernier octet.",
+      "simulateur": "./simulateur.html?topo=mixte&scenario=mauvais-masque"
+    },
+    {
+      "id": "mac",
+      "theme": "ethernet-mac",
+      "titre": "Adresse MAC et trame Ethernet",
+      "essentiel": [
+        "L'adresse MAC (48 bits) identifie une carte réseau ; elle s'écrit en 6 octets hexadécimaux.",
+        "La trame Ethernet transporte : MAC destination, MAC source, type, données (46 à 1500 octets) et un FCS pour détecter les erreurs.",
+        "FF:FF:FF:FF:FF:FF est l'adresse de diffusion : toutes les cartes du réseau local acceptent la trame.",
+        "Une MAC ne sert que sur un tronçon : chaque routeur construit une nouvelle trame.",
+        "Sur un support partagé, Ethernet évite le chaos avec CSMA/CD : écouter, émettre, détecter la collision, réessayer plus tard."
+      ],
+      "exemple": "PC-A → R1 → R2 → PC-B : trois tronçons, donc trois trames différentes (AA…0A → 11…01, puis 11…02 → 22…01, puis 22…02 → BB…0B), mais un seul paquet IP de 192.168.1.10 vers 192.168.2.20.",
+      "piege": "Croire que la MAC destination est celle de la machine finale. Hors du réseau local, c'est la MAC du prochain équipement (souvent la passerelle).",
+      "simulateur": "./simulateur.html?topo=mixte&src=PC-A&dst=PC-B"
+    },
+    {
+      "id": "arp",
+      "theme": "arp",
+      "titre": "ARP : de l'IP à la MAC",
+      "essentiel": [
+        "ARP répond à la question : « quelle MAC correspond à cette IP de mon réseau local ? »",
+        "On cherche la MAC de la destination si elle est dans le réseau, sinon celle de la passerelle.",
+        "La requête part en diffusion ; la réponse revient en unicast, envoyée par le propriétaire de l'IP.",
+        "Le résultat est gardé dans la table ARP : les envois suivants n'ont plus besoin de demander.",
+        "Une requête ARP ne passe jamais un routeur : chaque routeur refait son ARP sur le tronçon suivant."
+      ],
+      "exemple": "PC-A (192.168.1.10) veut écrire à 192.168.2.20, hors de son réseau : il demande « Qui a 192.168.1.1 ? ». R1 répond avec 11:11:11:00:00:01 et note au passage la MAC de PC-A.",
+      "piege": "Penser que l'émetteur envoie le paquet sans attendre. Il le garde de côté tant que la réponse ARP n'est pas arrivée.",
+      "simulateur": "./simulateur.html?topo=etoile&scenario=reponse"
+    },
+    {
+      "id": "commutateur",
+      "theme": "commutation",
+      "titre": "Le commutateur (switch)",
+      "essentiel": [
+        "Le commutateur travaille en couche 2 : il lit la MAC destination pour choisir le port de sortie.",
+        "Il apprend tout seul : chaque trame reçue lui indique derrière quel port se trouve sa MAC source.",
+        "Destination connue : un seul port. Destination inconnue ou diffusion : tous les autres ports (inondation).",
+        "Il ne modifie jamais la trame : ni les MAC, ni les IP, ni le TTL.",
+        "Chaque port est un domaine de collision ; mais tout le commutateur reste un seul domaine de diffusion."
+      ],
+      "exemple": "Premier envoi PC-A → PC-B : la requête ARP est inondée vers PC-B, PC-C et PC-D. Au deuxième envoi, la table MAC connaît PC-A (p1) et PC-B (p2) : la trame ne sort plus que par p2.",
+      "piege": "Confondre commutateur et concentrateur. Le concentrateur répète tout partout sans lire les adresses ; le commutateur trie.",
+      "simulateur": "./simulateur.html?topo=etoile&scenario=deuxieme-envoi"
+    },
+    {
+      "id": "routeur",
+      "theme": "routage",
+      "titre": "Le routeur et sa table de routage",
+      "essentiel": [
+        "Le routeur relie des réseaux différents et choisit le chemin selon l'IP destination (couche 3).",
+        "Chaque ligne de sa table : réseau/masque → prochain saut et interface de sortie.",
+        "Plusieurs routes conviennent ? La plus précise (le plus long préfixe) gagne ; 0.0.0.0/0 sert de route par défaut.",
+        "Pour transmettre, il réécrit les deux MAC : source = son interface de sortie, destination = le prochain saut.",
+        "Les adresses IP source et destination ne changent pas (sans NAT)."
+      ],
+      "exemple": "Dans la topologie maillée, R1 a la route 192.168.2.0/24 via 10.0.12.2 et une route par défaut via 10.0.13.2. Pour 192.168.2.20, il prend la /24 : 24 bits en commun valent mieux que 0.",
+      "piege": "Croire que le paquet « connaît » son chemin. Chaque routeur décide seul, saut par saut : l'aller et le retour peuvent être différents.",
+      "simulateur": "./simulateur.html?topo=maillee&scenario=route-supprimee"
+    },
+    {
+      "id": "ttl",
+      "theme": "routage",
+      "titre": "Le TTL (durée de vie)",
+      "essentiel": [
+        "Le TTL est un compteur dans l'en-tête IP, fixé par l'émetteur (souvent 64).",
+        "Chaque routeur traversé lui enlève 1 ; un commutateur n'y touche pas.",
+        "S'il atteint 0, le routeur détruit le paquet.",
+        "Il protège le réseau contre les boucles de routage : un paquet ne peut pas tourner indéfiniment.",
+        "Le TTL reçu permet de compter les routeurs traversés : 64 au départ, 62 à l'arrivée = 2 routeurs."
+      ],
+      "exemple": "Boucle entre R1 et R2 avec un TTL de départ de 8 : R1 → 7, R2 → 6, R1 → 5… jusqu'à 0, où le paquet est détruit au lieu de faire des allers-retours sans fin.",
+      "piege": "Croire que le TTL se mesure en secondes. Malgré son nom (Time To Live), il compte des sauts entre routeurs.",
+      "simulateur": "./simulateur.html?topo=mixte&scenario=boucle"
+    },
+    {
+      "id": "topologies",
+      "theme": "topologies",
+      "titre": "Les topologies",
+      "essentiel": [
+        "Étoile : chaque machine reliée à un centre (commutateur). Simple et robuste, mais le centre est un point unique de défaillance.",
+        "Bus : un câble partagé ; toutes les stations voient toutes les trames, la destinataire garde la sienne.",
+        "Anneau : la trame passe de station en station, dans un seul sens.",
+        "Maillée : plusieurs chemins entre les équipements ; maillage complet de n nœuds = n(n − 1)/2 liens.",
+        "Mixte : un assemblage, par exemple des réseaux en étoile reliés par des routeurs."
+      ],
+      "exemple": "Dans l'anneau A → B → C → D → A, une trame de B vers A fait presque tout le tour : B → C → D → A.",
+      "piege": "Confondre topologie physique (le câblage) et logique (le chemin réel des données). Un concentrateur câblé en étoile se comporte logiquement comme un bus.",
+      "simulateur": "./simulateur.html?topo=anneau&scenario=voisin-arriere"
+    },
+    {
+      "id": "acquittements",
+      "theme": "fiabilite",
+      "titre": "Acquittements, temporisateurs, réémission",
+      "essentiel": [
+        "Un message est découpé en morceaux numérotés ; le numéro permet de ranger, de repérer les manques et les doublons.",
+        "Le récepteur acquitte chaque morceau reçu (ACK).",
+        "L'émetteur arme un temporisateur par morceau ; s'il expire sans ACK, il réémet le morceau.",
+        "Un doublon est jeté mais acquitté quand même, pour rassurer l'émetteur.",
+        "Le temporisateur doit dépasser l'aller-retour normal, sinon il provoque des réémissions inutiles."
+      ],
+      "exemple": "Le morceau 3 est perdu. Sans récupération, la case 3 reste vide. Avec récupération, son temporisateur expire 200 ms après l'envoi, le morceau repart, et le message est complet à 280 ms.",
+      "piege": "Croire que le récepteur peut réclamer un morceau. Dans ce schéma, c'est le silence (pas d'ACK) qui déclenche la réémission, côté émetteur.",
+      "simulateur": "./fiabilite.html"
+    }
+  ]
+}
