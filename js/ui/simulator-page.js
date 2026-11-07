@@ -10,6 +10,7 @@ import { createCoach } from './coach.js';
 import { bubblesFor, markSeen, resetSeen } from './bubbles.js';
 import { save, load } from '../storage.js';
 import { predictions } from './predict.js';
+import { recordSimulation } from '../progress.js';
 
 const TOPOLOGY_IDS = ['mixte', 'etoile', 'bus', 'anneau', 'maillee'];
 
@@ -238,6 +239,7 @@ function run({ askAtStart = true } = {}) {
     // Shareable address of this run (no reload).
     history.replaceState(null, '', `?${new URLSearchParams({ topo: topo.id, src, dst })}`);
   }
+  recordSimulation(topo.id, scenario?.id ?? null); // for the progression page
   answered.clear();
   updatePredictions();
   log.load(events);

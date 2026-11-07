@@ -142,7 +142,7 @@ Goal: Module C complete. Claude drafts all text; Nour checks it against the cour
 - [x] `quiz.js`: theme list, one question at a time, correction after each answer, final score, “revoir dans le simulateur”
 - [x] `sheets.js` + `fiches.html`: one screen per fiche, plus 56 flashcards (8 per theme, `flashcards.js`, known cards saved)
 - [x] Courses: one original course per theme as HTML (Baha chose HTML + « Imprimer / PDF » instead of PDF files), sources cited at the top; `cours.html` lists and shows them (`cours/<theme>.html`)
-- [ ] `storage.js` + `progression.html`: quiz attempts, best score per theme, simulations per topology, a small SVG bar chart, “Réinitialiser”
+- [x] `storage.js` + `progression.html`: quiz attempts, best score per theme, simulations per topology, a small SVG bar chart, “Réinitialiser”
 - [ ] Nour's check: every answer and every explanation against the course; fix before merge
 
 ## Session 5 — Documentation, testing, demo (≈ 3 h)

@@ -5,6 +5,7 @@
 import { simulateReliability, decouper, DEFAULTS } from '../engine/reliability.js';
 import { createLane, renderResults, visible } from './reliability-view.js';
 import { createPlayer } from './player.js';
+import { recordLab } from '../progress.js';
 
 const LABELS = { sans: 'Sans récupération', avec: 'Avec récupération (ACK + délai d\'attente)' };
 // Click on a chunk: normal -> perdu -> retard court -> retard long -> normal.
@@ -83,6 +84,7 @@ const player = createPlayer($('player'), (i, { delay, forward }) => {
 }, { baseDelay: 900 });
 
 function run() {
+  recordLab(mode()); // for the progression page
   const modes = mode() === 'comparer' ? ['sans', 'avec'] : [mode()];
   const params = { message: messageInput.value, taille: Number(tailleSelect.value), incidents: incidents() };
   runs = modes.map((m) => simulateReliability({ ...params, mode: m }));

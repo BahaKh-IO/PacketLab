@@ -565,3 +565,25 @@ a.button.primary { background: var(--blue); border-color: var(--blue); color: #f
   .course-body .exemple, .course-body .callout, .course-body .retenir { break-inside: avoid; }
   .course-body h2 { break-after: avoid; }
 }
+.stat-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); gap: 0.75rem; margin-bottom: 1rem; }
+.stat-tile { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 0.75rem 1rem; }
+.stat-value { margin: 0; font-size: 1.6rem; font-weight: 800; color: var(--navy); }
+.stat-label { margin: 0.15rem 0 0; color: var(--muted); font-size: 0.85rem; }
+.progress-section { margin-bottom: 1rem; }
+.progress-section h2 { font-size: 1.05rem; }
+.bar-chart { display: block; width: 100%; max-width: 44rem; height: auto; }
+.bar-chart .grid { stroke: var(--line); stroke-width: 1; }
+.bar-chart .axis { fill: var(--muted); font-size: 11px; }
+.bar-chart .cat { fill: var(--ink); font-size: 13px; }
+.bar-chart .none { fill: var(--muted); font-size: 12px; font-style: italic; }
+.bar-chart .value { fill: var(--ink); font-size: 12px; font-weight: 700; }
+.bar-chart .mark { fill: var(--blue); }
+.bar-chart .hit { fill: transparent; }
+.bar-chart .bar:hover .hit, .bar-chart .bar:focus .hit { fill: #eef4ff; }
+.bar-chart .bar:focus { outline: none; }
+.progress-table { max-width: 44rem; margin-top: 0.75rem; }
+.progress-table td a { color: var(--blue); }
+.reset-box { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; margin-top: 1rem; }
+.reset-box p { margin: 0; flex-basis: 100%; }
+button.danger { background: var(--red); border-color: var(--red); color: #fff; }
+.progress-table td { font-family: inherit; }
