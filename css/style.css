@@ -1,98 +1,199 @@
 /* PacketLab — shared styles.
-   Colours from the logo: navy (background, titles), blue (actions),
-   cyan (active element, packet), violet (accents, retransmission). */
+   Identity (project description § 13): navy (backgrounds, titles), blue (actions),
+   cyan (the packet, what is active), violet (accents, retransmission).
+   Dark "lab" areas for the simulations, light areas for reading. */
 
 :root {
+  /* colours */
   --navy: #0b1d3a;
   --navy-2: #13284d;
+  --navy-3: #1c3563;
   --blue: #2563eb;          /* 5.2:1 with white text, 4.9:1 as a link on the light background */
-  --violet-strong: #7c3aed; /* violet behind white text */
-  --focus: #1d4ed8;         /* focus ring on light areas (cyan on dark areas, below) */
+  --blue-dark: #1d4ed8;
   --cyan: #22d3ee;
   --violet: #8b5cf6;
+  --violet-strong: #7c3aed; /* violet behind white text */
+  --amber: #fbbf24;
   --red: #ef4444;
-  --ink: #1b2433;
-  --muted: #5b6678;
-  --paper: #f6f8fc;
+  --green: #15803d;
+  --ink: #16213a;
+  --muted: #56627a;
+  --paper: #f5f7fb;
   --card: #ffffff;
-  --line: #d9e0ec;
-  --radius: 10px;
-  --mono: ui-monospace, "Cascadia Code", Consolas, monospace;
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --line: #dde3ee;
+  --focus: #1d4ed8;         /* focus ring on light areas (cyan on dark areas, below) */
+  /* shape */
+  --radius: 12px;
+  --radius-sm: 8px;
+  --shadow-sm: 0 1px 2px rgb(15 30 60 / 0.06), 0 1px 3px rgb(15 30 60 / 0.06);
+  --shadow: 0 2px 6px rgb(15 30 60 / 0.06), 0 10px 24px -8px rgb(15 30 60 / 0.16);
+  --shadow-lg: 0 20px 40px -12px rgb(15 30 60 / 0.28);
+  --grad: linear-gradient(135deg, #22d3ee 0%, #3b82f6 50%, #8b5cf6 100%);
+  /* type */
+  --mono: ui-monospace, "Cascadia Code", "SF Mono", Consolas, monospace;
+  --sans: "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", sans-serif;
+  --display: "Segoe UI Variable Display", "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
+  font-family: var(--sans);
+  line-height: 1.5;
   color: var(--ink);
   background: var(--paper);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 * { box-sizing: border-box; }
-body { margin: 0; min-height: 100vh; }
+body { margin: 0; min-height: 100vh; display: flex; flex-direction: column; }
+main { flex: 1; }
+img, svg { max-width: 100%; }
 
 /* ---------- Shared header ---------- */
 .site-header {
+  position: sticky;
+  top: 0;
+  z-index: 30;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.5rem 1.5rem;
-  padding: 0.75rem 1.25rem;
-  background: var(--navy);
+  gap: 0.5rem 1.25rem;
+  padding: 0.6rem clamp(1rem, 3vw, 2rem);
+  background: rgb(11 29 58 / 0.92);
+  backdrop-filter: saturate(1.4) blur(10px);
+  border-bottom: 1px solid rgb(255 255 255 / 0.06);
   color: #fff;
 }
 .brand {
-  font-weight: 800;
-  font-size: 1.25rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-height: 2.75rem;
   color: #fff;
   text-decoration: none;
 }
-.brand span { color: var(--cyan); }
+.brand-mark { width: 2rem; height: 2rem; flex: none; }
+.brand-name { font-family: var(--display); font-weight: 800; font-size: 1.25rem; letter-spacing: -0.02em; }
+.brand-name span { color: var(--cyan); }
+.brand:hover .brand-mark { transform: rotate(-12deg); transition: transform 0.3s ease; }
 .site-header ul {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.25rem;
+  gap: 0.2rem;
   margin: 0;
   padding: 0;
   list-style: none;
 }
-.site-header a:not(.brand) {
-  display: inline-block;
-  padding: 0.4rem 0.7rem;
-  border-radius: 6px;
-  color: #cfd8ea;
+.site-header nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.5rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  color: #c9d4ea;
+  font-size: 0.95rem;
+  font-weight: 500;
   text-decoration: none;
+  transition: background 0.15s, color 0.15s;
 }
-.site-header a:not(.brand):hover { background: var(--navy-2); color: #fff; }
-.site-header a[aria-current="page"] { background: var(--blue); color: #fff; }
+.site-header nav a:hover { background: rgb(255 255 255 / 0.08); color: #fff; }
+.site-header nav a[aria-current="page"] { background: var(--blue); color: #fff; box-shadow: 0 0 0 1px rgb(255 255 255 / 0.12) inset, 0 4px 14px -4px rgb(37 99 235 / 0.8); }
+.nav-toggle { display: none; }
+
+@media (max-width: 899px) {
+  .nav-toggle {
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    margin-left: auto;
+    width: 2.75rem;
+    min-height: 2.75rem;
+    padding: 0 0.7rem;
+    background: transparent;
+    border: 1px solid rgb(255 255 255 / 0.18);
+    border-radius: 10px;
+  }
+  .nav-toggle span { display: block; height: 2px; background: #fff; border-radius: 2px; transition: transform 0.2s, opacity 0.2s; }
+  .nav-open .nav-toggle span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .nav-open .nav-toggle span:nth-child(2) { opacity: 0; }
+  .nav-open .nav-toggle span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+  .site-header nav { display: none; flex-basis: 100%; padding: 0.25rem 0 0.5rem; }
+  .nav-open nav { display: block; }
+  .site-header ul { flex-direction: column; gap: 0.15rem; }
+  .site-header nav a { width: 100%; min-height: 2.9rem; border-radius: 10px; font-size: 1.02rem; }
+}
 
 /* ---------- Page body ---------- */
 .page {
-  max-width: 1200px;
+  width: 100%;
+  max-width: 1240px;
   margin: 0 auto;
-  padding: 1.5rem 1.25rem 3rem;
+  padding: 2rem clamp(1rem, 3vw, 2rem) 3.5rem;
 }
-h1 { color: var(--navy); margin: 0 0 0.5rem; }
-.intro { color: var(--muted); margin-top: 0; }
+h1, h2, h3 { font-family: var(--display); letter-spacing: -0.015em; }
+h1 {
+  color: var(--navy);
+  margin: 0 0 0.4rem;
+  font-size: clamp(1.75rem, 3.2vw, 2.35rem);
+  font-weight: 800;
+  line-height: 1.15;
+}
+.page > h1::after {
+  content: "";
+  display: block;
+  width: 3.5rem;
+  height: 4px;
+  margin-top: 0.55rem;
+  border-radius: 4px;
+  background: var(--grad);
+}
+.intro { color: var(--muted); margin-top: 0.75rem; font-size: 1.05rem; max-width: 60rem; }
 
 button, select {
   font: inherit;
-  min-height: 2.5rem;
-  padding: 0.4rem 0.8rem;
+  min-height: 2.6rem;
+  padding: 0.4rem 0.9rem;
   border: 1px solid var(--line);
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   background: var(--card);
   color: var(--ink);
 }
-button { cursor: pointer; }
+select { padding-right: 0.5rem; }
+button { cursor: pointer; font-weight: 600; transition: background 0.15s, border-color 0.15s, box-shadow 0.15s, transform 0.1s; }
 button:hover:not(:disabled) { border-color: var(--blue); }
+button:active:not(:disabled) { transform: translateY(1px); }
 button:disabled { opacity: 0.45; cursor: default; }
-button.primary { background: var(--blue); border-color: var(--blue); color: #fff; }
-button.primary:hover:not(:disabled) { background: #245bd0; }
+button.primary { background: var(--blue); border-color: var(--blue); color: #fff; box-shadow: 0 6px 16px -8px rgb(37 99 235 / 0.9); }
+button.primary:hover:not(:disabled) { background: var(--blue-dark); }
 :focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
-.site-header, .hero, .sim-stage, .lab-stage { --focus: var(--cyan); }
+.site-header, .site-footer, .hero, .sim-stage, .lab-stage { --focus: var(--cyan); }
 
 .muted { color: var(--muted); }
 .error {
   padding: 0.75rem 1rem;
   border-left: 4px solid var(--red);
   background: #fdecec;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
+}
+
+/* ---------- Shared footer ---------- */
+.site-footer {
+  margin-top: 2rem;
+  background: var(--navy);
+  color: #b7c3da;
+  font-size: 0.9rem;
+}
+.footer-inner { max-width: 1240px; margin: 0 auto; padding: 1.5rem clamp(1rem, 3vw, 2rem); display: grid; gap: 0.25rem; }
+.footer-inner p { margin: 0; }
+.footer-brand strong { color: #fff; font-family: var(--display); }
+.footer-brand span { color: var(--cyan); }
+.site-footer a { color: #7dd3fc; display: inline-flex; min-height: 1.75rem; align-items: center; }
+
+/* A dark "lab" surface with a faint grid, shared by the simulator, the lab and the home hero. */
+.lab-surface {
+  background-color: var(--navy);
+  background-image:
+    linear-gradient(rgb(255 255 255 / 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(255 255 255 / 0.035) 1px, transparent 1px);
+  background-size: 28px 28px;
 }
 
 /* ---------- Simulator ---------- */
@@ -125,20 +226,27 @@ button.primary:hover:not(:disabled) { background: #245bd0; }
 
 .sim-stage {
   position: relative;
-  background: var(--navy);
+  background-color: var(--navy);
+  background-image: radial-gradient(ellipse at 50% 0%, rgb(34 211 238 / 0.10), transparent 60%),
+    linear-gradient(rgb(255 255 255 / 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(255 255 255 / 0.035) 1px, transparent 1px);
+  background-size: 100% 100%, 28px 28px, 28px 28px;
   color: #dfe7f5;
-  border-radius: var(--radius);
-  padding: 0.75rem;
+  border: 1px solid rgb(255 255 255 / 0.06);
+  border-radius: 18px;
+  padding: 1rem;
+  box-shadow: var(--shadow-lg);
 }
 .topology { display: block; width: 100%; height: auto; max-height: 60vh; }
 .caption {
   min-height: 3.2em;
   margin: 0.5rem 0.25rem;
-  padding: 0.6rem 0.8rem;
-  background: var(--navy-2);
+  padding: 0.7rem 0.95rem;
+  background: rgb(19 40 77 / 0.92);
+  border: 1px solid rgb(34 211 238 / 0.18);
   border-left: 4px solid var(--cyan);
-  border-radius: 6px;
-  line-height: 1.4;
+  border-radius: 10px;
+  line-height: 1.45;
 }
 
 .player { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; margin: 0.5rem 0.25rem; }
@@ -186,10 +294,12 @@ button.primary:hover:not(:disabled) { background: #245bd0; }
 .panel {
   background: var(--card);
   border: 1px solid var(--line);
-  border-radius: var(--radius);
-  padding: 0.75rem 1rem;
+  border-radius: 14px;
+  padding: 0.9rem 1.1rem;
+  box-shadow: var(--shadow-sm);
 }
-.panel h2 { margin: 0 0 0.5rem; font-size: 1rem; color: var(--navy); }
+.panel h2 { display: flex; align-items: center; gap: 0.45rem; margin: 0 0 0.6rem; font-size: 0.82rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.panel h2::before { content: ""; width: 0.55rem; height: 0.55rem; border-radius: 3px; background: var(--grad); }
 .hdr-group h3 { margin: 0.5rem 0 0.25rem; font-size: 0.85rem; color: var(--muted); font-weight: 600; }
 .fields { display: grid; grid-template-columns: auto 1fr; gap: 0.2rem 0.75rem; margin: 0; }
 .fields dt { color: var(--muted); font-size: 0.85rem; }
@@ -252,7 +362,15 @@ button.primary:hover:not(:disabled) { background: #245bd0; }
 .button.primary:hover { background: #245bd0; }
 .button.ghost { background: transparent; border-color: #4a5f86; color: #fff; }
 .button.ghost:hover { border-color: var(--cyan); }
-.hero { background: linear-gradient(135deg, var(--navy) 0%, #1a2f63 60%, #3b2a7a 100%); color: #fff; }
+.hero {
+  background-color: var(--navy);
+  background-image: radial-gradient(ellipse at 85% 20%, rgb(139 92 246 / 0.35), transparent 55%),
+    radial-gradient(ellipse at 10% 90%, rgb(34 211 238 / 0.18), transparent 50%),
+    linear-gradient(rgb(255 255 255 / 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(255 255 255 / 0.035) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 28px 28px, 28px 28px;
+  color: #fff;
+}
 .hero-inner {
   max-width: 1200px;
   margin: 0 auto;
@@ -301,16 +419,20 @@ button.primary:hover:not(:disabled) { background: #245bd0; }
 .section-title { color: var(--navy); margin: 0 0 1rem; }
 .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: 1rem; }
 .card {
+  --accent: var(--grad);
+  position: relative;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
   background: var(--card);
   border: 1px solid var(--line);
-  border-top: 4px solid var(--blue);
-  border-radius: var(--radius);
-  padding: 1rem 1.25rem;
+  border-radius: 16px;
+  padding: 1.25rem 1.35rem 1.15rem;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
-.card:nth-child(2) { border-top-color: var(--violet); }
-.card:nth-child(3) { border-top-color: var(--cyan); }
+.card::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 4px; background: var(--accent); }
+.card:hover { transform: translateY(-3px); box-shadow: var(--shadow); border-color: #c9d3e6; }
 .card h3, .card .card-title { margin: 0.2rem 0 0.5rem; color: var(--navy); font-size: 1.17rem; }
 .card p { margin: 0 0 0.75rem; line-height: 1.5; color: #374151; }
 .card .card-kicker { margin: 0; color: var(--muted); }
@@ -360,7 +482,18 @@ input[type="text"] {
 .modes label { display: inline-flex; align-items: center; gap: 0.35rem; min-height: 2.5rem; }
 .modes button { margin-left: auto; }
 
-.lab-stage { background: var(--navy); color: #dfe7f5; border-radius: var(--radius); padding: 0.75rem; }
+.lab-stage {
+  background-color: var(--navy);
+  background-image: radial-gradient(ellipse at 50% 0%, rgb(139 92 246 / 0.12), transparent 60%),
+    linear-gradient(rgb(255 255 255 / 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(255 255 255 / 0.035) 1px, transparent 1px);
+  background-size: 100% 100%, 28px 28px, 28px 28px;
+  color: #dfe7f5;
+  border: 1px solid rgb(255 255 255 / 0.06);
+  border-radius: 18px;
+  padding: 1rem;
+  box-shadow: var(--shadow-lg);
+}
 .lab-empty { margin: 1rem 0.5rem; color: #9fb0cf; }
 .lanes { display: grid; gap: 0.75rem; }
 @media (min-width: 1100px) {
@@ -487,7 +620,7 @@ input[type="text"] {
 }
 
 /* ---------- Module C: quiz, fiches, cartes, cours, progression ---------- */
-.badge-review { display: inline-block; margin: 0 0 0.75rem !important; padding: 0.1rem 0.5rem; border-radius: 999px; background: #fef3c7; color: #92400e !important; font-size: 0.75rem !important; font-weight: 600; }
+.badge-review { align-self: flex-start; display: inline-block; margin: 0 0 0.75rem !important; padding: 0.1rem 0.5rem; border-radius: 999px; background: #fef3c7; color: #92400e !important; font-size: 0.75rem !important; font-weight: 600; }
 a.button { display: inline-flex; align-items: center; justify-content: center; min-height: 2.5rem; padding: 0.4rem 0.9rem; border: 1px solid var(--line); border-radius: 6px; background: var(--card); color: var(--ink); text-decoration: none; font-weight: 600; }
 a.button:hover { border-color: var(--blue); }
 a.button.primary { background: var(--blue); border-color: var(--blue); color: #fff; }
