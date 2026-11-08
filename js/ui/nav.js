@@ -1,4 +1,13 @@
-// nav.js — the menu button of the header on small screens (on wide screens the menu is always shown).
+// nav.js — loaded on every page: the menu button of the header on small screens
+// (on wide screens the menu is always shown), and the faint network in the background.
+import { startNetworkBackground } from './net-background.js';
+
+const bg = document.createElement('canvas');
+bg.className = 'net-bg';
+bg.setAttribute('aria-hidden', 'true');
+document.body.prepend(bg);
+startNetworkBackground(bg, { tone: 'light', area: null });
+
 const toggle = document.querySelector('.nav-toggle');
 const header = document.querySelector('.site-header');
 

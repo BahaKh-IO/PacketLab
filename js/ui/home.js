@@ -1,6 +1,17 @@
 // home.js — home page: the "Reprendre" box, filled from the last scenario saved by the simulator.
 
 import { load } from '../storage.js';
+import { startNetworkBackground } from './net-background.js';
+
+// The hero gets its own, brighter network.
+const hero = document.querySelector('.hero');
+if (hero) {
+  const canvas = document.createElement('canvas');
+  canvas.className = 'net-bg-hero';
+  canvas.setAttribute('aria-hidden', 'true');
+  hero.prepend(canvas);
+  startNetworkBackground(canvas, { tone: 'dark', area: hero });
+}
 
 const last = load('dernier-scenario', null);
 if (last && last.topo && (last.scenario || (last.src && last.dst))) {

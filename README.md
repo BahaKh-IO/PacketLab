@@ -7,6 +7,11 @@ Choisissez une topologie, envoyez un paquet et suivez-le saut par saut : adresse
 
 Fonctionne dans le navigateur, sur ordinateur comme sur téléphone, sans installation.
 
+| | |
+|---|---|
+| ![Accueil : un paquet traverse un mini-réseau animé](docs/captures/accueil.png) | ![Simulateur : R1 réécrit les MAC, le paquet IP reste le même](docs/captures/simulateur.png) |
+| ![Labo fiabilité : sans et avec récupération, côte à côte](docs/captures/labo-fiabilite.png) | ![Quiz : correction après chaque réponse](docs/captures/quiz.png) |
+
 ---
 
 ## Ce qu'on y trouve

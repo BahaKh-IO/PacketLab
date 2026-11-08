@@ -29,6 +29,7 @@
   --shadow: 0 2px 6px rgb(15 30 60 / 0.06), 0 10px 24px -8px rgb(15 30 60 / 0.16);
   --shadow-lg: 0 20px 40px -12px rgb(15 30 60 / 0.28);
   --grad: linear-gradient(135deg, #22d3ee 0%, #3b82f6 50%, #8b5cf6 100%);
+  --grad-strong: linear-gradient(135deg, #0e7490 0%, #1d4ed8 50%, #6d28d9 100%); /* text on light backgrounds, or white text on it: ≥ 4.5:1 */
   /* type */
   --mono: ui-monospace, "Cascadia Code", "SF Mono", Consolas, monospace;
   --sans: "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", sans-serif;
@@ -416,7 +417,7 @@ button.primary:hover:not(:disabled) { background: var(--blue-dark); }
 .hero h1 span { background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
 .hero-lead { color: #cdd7ec; font-size: 1.12rem; line-height: 1.6; max-width: 34rem; margin: 0; }
 .hero-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 1.6rem; }
-.hero-figure { margin: 0; padding: 1rem; border-radius: 20px; background: rgb(13 31 63 / 0.75); border: 1px solid rgb(255 255 255 / 0.08); box-shadow: 0 30px 60px -20px rgb(0 0 0 / 0.55); }
+.hero-figure { margin: 0; padding: 1rem; border-radius: 20px; background: rgb(13 31 63 / 0.97); border: 1px solid rgb(255 255 255 / 0.08); box-shadow: 0 30px 60px -20px rgb(0 0 0 / 0.55); }
 .hero-art { display: block; width: 100%; height: auto; }
 .hero-link { stroke: #3d5482; stroke-width: 3; stroke-linecap: round; }
 .hero-art .device-label { font-size: 12px; }
@@ -465,7 +466,7 @@ button.primary:hover:not(:disabled) { background: var(--blue-dark); }
 
 .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr)); gap: 0.75rem; margin: 0 0 2.5rem; padding: 0; list-style: none; }
 .stats li { display: flex; flex-direction: column; padding: 0.9rem 1.1rem; background: var(--card); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow-sm); color: var(--muted); font-size: 0.92rem; }
-.stats strong { font-family: var(--display); font-size: 2rem; line-height: 1.1; background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.stats strong { font-family: var(--display); font-size: 2rem; line-height: 1.1; background: var(--grad-strong); -webkit-background-clip: text; background-clip: text; color: transparent; }
 
 .section-title { color: var(--navy); margin: 0 0 1rem; font-size: 1.5rem; }
 .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: 1.1rem; }
@@ -501,7 +502,7 @@ button.primary:hover:not(:disabled) { background: var(--blue-dark); }
 
 .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: 1.1rem; margin: 0; padding: 0; list-style: none; counter-reset: none; }
 .steps li { display: flex; gap: 0.9rem; padding: 1.1rem 1.2rem; background: var(--card); border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow-sm); }
-.step-num { flex: none; display: grid; place-items: center; width: 2.4rem; height: 2.4rem; border-radius: 12px; background: var(--grad); color: #fff; font-family: var(--display); font-weight: 800; font-size: 1.15rem; }
+.step-num { flex: none; display: grid; place-items: center; width: 2.4rem; height: 2.4rem; border-radius: 12px; background: var(--grad-strong); color: #fff; font-family: var(--display); font-weight: 800; font-size: 1.15rem; }
 .steps h3 { margin: 0.1rem 0 0.3rem; color: var(--navy); font-size: 1.08rem; }
 .steps p { margin: 0; color: #3a4558; line-height: 1.55; }
 
@@ -844,10 +845,15 @@ button.danger { background: var(--red); border-color: var(--red); color: #fff; }
 @keyframes flip { 0% { transform: perspective(900px) rotateY(90deg); } 100% { transform: perspective(900px) rotateY(0); } }
 
 .strip-node { cursor: default; }
-.strip-label { font-size: 16px; }
+.strip-label { font-size: 16px; fill: #dbe4f5; }
 .lane { background: rgb(19 40 77 / 0.85); border: 1px solid rgb(255 255 255 / 0.06); border-radius: 14px; }
 .chip { border-radius: 10px; transition: transform 0.1s, border-color 0.15s, background 0.15s; }
 .chip:hover:not(:disabled) { transform: translateY(-2px); }
 .lab-setup fieldset { border-radius: 14px; box-shadow: var(--shadow-sm); }
 .stat-tile { border-radius: 14px; box-shadow: var(--shadow-sm); }
-.stat-value { background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.stat-value { background: var(--grad-strong); -webkit-background-clip: text; background-clip: text; color: transparent; }
+
+/* ---------- Living network background (js/ui/net-background.js) ---------- */
+.net-bg { position: fixed; inset: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
+.hero { position: relative; overflow: hidden; isolation: isolate; }
+.net-bg-hero { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }

@@ -152,6 +152,15 @@ Goal: Module C complete. Claude drafts all text; Nour checks it against the cour
 - [x] Local dev server on node:sqlite; `mergeProgress` + automatic sync of the « labs réalisés »; « Mon compte » page; guest mode unchanged
 - [x] Deployed on Baha's Cloudflare account (Nov 8, 2026): `https://packetlab-api.packetlab-handoff.workers.dev`, D1 `packetlab`; `DEPLOYED` set in `js/config.js`
 
+## Design pass (Nov 8, 2026)
+
+- [x] Identity and shell: logo, sticky header with a phone menu, footer, type scale, cards, dark « lab » surfaces
+- [x] Simulator: device icons, packets as labelled frames, flowing links, pulsing halo, headers as nested envelopes (Ethernet ▸ IP ▸ données)
+- [x] Home page: live mini-network hero (§ 7.1 told in a few seconds), figures, modules, how it works
+- [x] Content pages: one icon and colour per theme, quiz score ring, 3D flashcards, lab strip with device icons
+- [x] Living network background (Baha's request): drifting devices and packets with their bits, reacts to the pointer and to clicks; reduced motion = still
+- [x] Accessibility re-checked after the redesign; README screenshots in `docs/captures/`
+
 ## Session 5 — Documentation, testing, demo (≈ 3 h)
 
 Goal: graded documentation done, no network error on screen, demo rehearsed on the live link.
