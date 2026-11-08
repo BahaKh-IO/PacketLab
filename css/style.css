@@ -17,7 +17,7 @@
   --red: #ef4444;
   --green: #15803d;
   --ink: #16213a;
-  --muted: #56627a;
+  --muted: #4b5670;
   --paper: #f5f7fb;
   --card: #ffffff;
   --line: #dde3ee;
@@ -37,7 +37,17 @@
   font-family: var(--sans);
   line-height: 1.5;
   color: var(--ink);
-  background: var(--paper);
+  /* The "blueprint" backdrop of the reading pages: soft blue / lavender / cyan tints and a dotted grid.
+     The living network (js/ui/net-background.js) is drawn on top of it, behind the content. */
+  background-color: #eef2fb;
+  background-image:
+    radial-gradient(circle at 1px 1px, rgb(59 92 180 / 0.11) 1px, transparent 1.6px),
+    radial-gradient(ellipse 60% 50% at 0% 0%, rgb(219 234 254 / 0.95), transparent 70%),
+    radial-gradient(ellipse 55% 45% at 100% 35%, rgb(237 233 254 / 0.95), transparent 70%),
+    radial-gradient(ellipse 60% 50% at 20% 100%, rgb(207 250 254 / 0.8), transparent 70%),
+    linear-gradient(180deg, #eef2fb, #f2f0fc);
+  background-size: 26px 26px, 100% 100%, 100% 100%, 100% 100%, 100% 100%;
+  background-attachment: fixed;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
@@ -857,3 +867,173 @@ button.danger { background: var(--red); border-color: var(--red); color: #fff; }
 .net-bg { position: fixed; inset: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
 .hero { position: relative; overflow: hidden; isolation: isolate; }
 .net-bg-hero { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
+
+/* Frosted-glass cards on the reading pages: the living network shows through, softly. */
+.card, .stats li, .steps li, .resume, .stat-tile {
+  background: rgb(255 255 255 / 0.8);
+  -webkit-backdrop-filter: blur(10px) saturate(1.3);
+  backdrop-filter: blur(10px) saturate(1.3);
+  border-color: rgb(255 255 255 / 0.9);
+  box-shadow: 0 1px 0 rgb(255 255 255 / 0.8) inset, var(--shadow);
+}
+.sheet, .course, .quiz-card, .lab-setup fieldset, .panel, .account-form {
+  background: rgb(255 255 255 / 0.93);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+
+/* ---------- Futuristic controls (all pages): dark glass fields, cyan accents, HUD labels ---------- */
+:root { --hud-bg: rgb(11 29 58 / 0.93); --hud-line: rgb(103 232 249 / 0.38); --hud-text: #e6f0ff; --grad-btn: linear-gradient(135deg, #0e7490 0%, #1d4ed8 55%, #6d28d9 100%); }
+
+/* field names: small, uppercase, monospaced, like a control panel */
+.sim-setup label, .lab-fields label, .form-field > span, .lab-setup legend {
+  font-family: var(--mono); font-size: 0.72rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #33415c;
+}
+.lab-setup legend { font-size: 0.78rem; }
+
+select, input[type="text"], input[type="email"], input[type="password"] {
+  -webkit-appearance: none;
+  appearance: none;
+  min-height: 2.9rem;
+  padding: 0.55rem 0.95rem;
+  font-family: var(--sans); font-size: 0.95rem; font-weight: 500; letter-spacing: 0; text-transform: none;
+  color: var(--hud-text);
+  background-color: var(--hud-bg);
+  background-image: linear-gradient(180deg, rgb(255 255 255 / 0.07), transparent 60%);
+  border: 1px solid var(--hud-line);
+  border-radius: 12px;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.06), 0 8px 20px -12px rgb(11 29 58 / 0.9);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+select {
+  padding-right: 2.5rem;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3 6l5 5 5-5' fill='none' stroke='%2322d3ee' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"),
+    linear-gradient(180deg, rgb(255 255 255 / 0.07), transparent 60%);
+  background-repeat: no-repeat, no-repeat;
+  background-position: right 0.85rem center, 0 0;
+  background-size: 15px 15px, 100% 100%;
+  cursor: pointer;
+}
+select option { background: #0b1d3a; color: var(--hud-text); }
+input::placeholder { color: #8fa3c7; }
+select:hover:not(:disabled), input:hover { border-color: rgb(103 232 249 / 0.75); }
+select:focus-visible, input:focus-visible { border-color: var(--cyan); box-shadow: 0 0 0 3px rgb(34 211 238 / 0.3), 0 0 22px rgb(34 211 238 / 0.35); }
+select:disabled { opacity: 0.6; }
+.sim-setup select, .lab-fields select { color: var(--hud-text); }
+
+/* switches instead of checkboxes */
+input[type="checkbox"] {
+  -webkit-appearance: none;
+  appearance: none;
+  position: relative;
+  flex: none;
+  width: 2.7rem;
+  height: 1.5rem;
+  margin: 0;
+  border-radius: 999px;
+  background: #5b6782;
+  border: 1px solid #4b5670;
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s;
+}
+input[type="checkbox"]::after {
+  content: "";
+  position: absolute;
+  top: 2px; left: 2px;
+  width: calc(1.5rem - 6px); height: calc(1.5rem - 6px);
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.35);
+  transition: transform 0.2s;
+}
+input[type="checkbox"]:checked { background: var(--grad-btn); border-color: transparent; box-shadow: 0 0 14px rgb(34 211 238 / 0.55); }
+input[type="checkbox"]:checked::after { transform: translateX(1.2rem); }
+.sim-setup .toggle {
+  gap: 0.6rem; min-height: 2.9rem; padding: 0 0.95rem;
+  background: var(--hud-bg); border: 1px solid var(--hud-line); border-radius: 12px; color: var(--hud-text);
+  font-family: var(--sans); font-size: 0.92rem; font-weight: 600; letter-spacing: 0; text-transform: none;
+  box-shadow: 0 8px 20px -12px rgb(11 29 58 / 0.9);
+}
+.sim-setup .toggle:has(input:checked) { background: var(--hud-bg); border-color: var(--cyan); box-shadow: 0 0 0 1px rgb(34 211 238 / 0.4), 0 0 22px rgb(34 211 238 / 0.3); }
+.sim-setup .toggle .toggle-hint { color: #a9b8d6; font-weight: 500; }
+
+/* radios: glowing dots, the chosen mode lit up */
+input[type="radio"] {
+  -webkit-appearance: none; appearance: none; flex: none; width: 1.2rem; height: 1.2rem; margin: 0;
+  border-radius: 50%; border: 2px solid #5b6782; background: #fff; cursor: pointer; transition: box-shadow 0.15s, border-color 0.15s;
+}
+input[type="radio"]:checked { border-color: #0e7490; box-shadow: inset 0 0 0 3px #fff, inset 0 0 0 10px #0e7490, 0 0 10px rgb(34 211 238 / 0.6); }
+.modes label { padding: 0.35rem 0.85rem 0.35rem 0.6rem; border: 1px solid transparent; border-radius: 999px; transition: background 0.15s, border-color 0.15s; }
+.modes label:has(input:checked) { background: var(--hud-bg); border-color: var(--hud-line); color: var(--hud-text); }
+.modes label:has(input:checked) input[type="radio"] { border-color: var(--cyan); background: var(--navy); box-shadow: inset 0 0 0 3px var(--navy), inset 0 0 0 10px var(--cyan), 0 0 12px rgb(34 211 238 / 0.7); }
+
+/* main buttons: gradient with a glow (white text stays above 5:1 on every colour of the gradient) */
+button.primary, .button.primary, a.button.primary {
+  background: var(--grad-btn);
+  border-color: transparent;
+  color: #fff;
+  box-shadow: 0 0 0 1px rgb(255 255 255 / 0.08) inset, 0 10px 24px -10px rgb(37 99 235 / 0.9), 0 0 18px -6px rgb(124 58 237 / 0.6);
+}
+button.primary:hover:not(:disabled), .button.primary:hover, a.button.primary:hover { background: var(--grad-btn); filter: brightness(1.12); }
+/* secondary buttons on light pages: glass */
+.quiz-actions a.button:not(.primary), .quiz-actions button:not(.primary), .deck-actions button:not(.primary), .reset-box button:not(.danger), .course-tools button {
+  background: rgb(255 255 255 / 0.75); border: 1px solid #c7d2e8; color: var(--navy); border-radius: 10px;
+  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+}
+
+/* lab: incident chips as dark tiles that glow by state */
+.chip { background: var(--hud-bg); border: 1px solid var(--hud-line); color: var(--hud-text); box-shadow: 0 8px 18px -12px rgb(11 29 58 / 0.9); }
+.chip .chip-num { color: #8fa3c7; }
+.chip .chip-text { color: #fff; }
+.chip .chip-state { color: #a9b8d6; }
+.chip-perdre { background: var(--hud-bg); border-color: #f87171; box-shadow: 0 0 16px rgb(248 113 113 / 0.45); }
+.chip-perdre .chip-state { color: #fca5a5; }
+.chip-court { background: var(--hud-bg); border-color: #fbbf24; box-shadow: 0 0 16px rgb(251 191 36 / 0.4); }
+.chip-court .chip-state { color: #fcd34d; }
+.chip-long { background: var(--hud-bg); border-color: #fb923c; box-shadow: 0 0 16px rgb(251 146 60 / 0.4); }
+.chip-long .chip-state { color: #fdba74; }
+/* fixes: the switch keeps its size inside the toggle label; dark players keep the chevron */
+.sim-setup .toggle input[type="checkbox"] { width: 2.7rem; height: 1.5rem; accent-color: auto; }
+.player select {
+  background-color: var(--navy-2);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3 6l5 5 5-5' fill='none' stroke='%2322d3ee' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 0.7rem center; background-size: 14px 14px; padding-right: 2.2rem;
+}
+
+/* ---------- Buttons that respond: hover lift + light streak, press, ripple from the click point ---------- */
+button.primary, .button, a.button, .player button:not(:disabled) { position: relative; overflow: hidden; isolation: isolate; }
+button.primary::after, .button.primary::after, a.button.primary::after {
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background: linear-gradient(110deg, transparent 30%, rgb(255 255 255 / 0.35) 50%, transparent 70%);
+  transform: translateX(-120%);
+}
+button.primary:hover:not(:disabled)::after, .button.primary:hover::after, a.button.primary:hover::after { transform: translateX(120%); transition: transform 0.7s ease; }
+button.primary:hover:not(:disabled), .button.primary:hover, a.button.primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 0 1px rgb(255 255 255 / 0.12) inset, 0 14px 30px -10px rgb(37 99 235 / 0.95), 0 0 26px -4px rgb(34 211 238 / 0.65);
+}
+a.button:not(.primary):hover, .quiz-actions button:not(.primary):hover, .player button:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 8px 18px -10px rgb(37 99 235 / 0.7); border-color: var(--blue); }
+button:active:not(:disabled), a.button:active, .button:active, .choice:active:not(:disabled), .chip:active { transform: translateY(1px) scale(0.97); transition-duration: 0.05s; }
+button, a.button, .button { transition: transform 0.15s ease, box-shadow 0.2s ease, background 0.2s ease, border-color 0.2s ease, filter 0.2s ease; }
+
+/* text links with an arrow: the underline grows, the link slides a little */
+.card-link, .quiz-sim-link, a.link-inline {
+  text-decoration: none;
+  background-image: linear-gradient(currentColor, currentColor);
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 0% 2px;
+  transition: background-size 0.25s ease, transform 0.2s ease, color 0.2s;
+}
+.card-link:hover, .quiz-sim-link:hover, a.link-inline:hover { text-decoration: none; background-size: 100% 2px; transform: translateX(4px); color: var(--blue-dark); }
+
+/* the ripple created by js/ui/nav.js */
+.ripple {
+  position: absolute; z-index: 0; pointer-events: none; border-radius: 50%;
+  width: 12px; height: 12px; margin: -6px 0 0 -6px;
+  background: rgb(255 255 255 / 0.55);
+  animation: ripple 0.6s ease-out forwards;
+}
+.ripple.on-light { background: rgb(37 99 235 / 0.25); }
+@keyframes ripple { from { transform: scale(0); opacity: 1; } to { transform: scale(var(--ripple-size, 30)); opacity: 0; } }

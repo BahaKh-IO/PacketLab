@@ -1,27 +1,33 @@
 // net-background.js — a living network drawn behind the pages: devices drift, link up when
 // they come close, and packets hop from device to device trailing their bits.
-// Interactive: devices near the pointer link to it; a click on an empty area sends a burst
-// of packets from the nearest device. Decorative only (aria-hidden, no pointer events).
-// With prefers-reduced-motion it draws one still frame.
+// Interactive: devices near the pointer light up and link to it; a click on an empty area
+// sends a burst of packets from the nearest device. Decorative only (aria-hidden, no pointer
+// events on the canvas). With prefers-reduced-motion it draws one still frame.
 
 const TONES = {
+  // Reading pages: big, soft devices on the light "blueprint" backdrop.
   light: {
-    link: [37, 99, 235, 0.09], device: [37, 99, 235, 0.22], deviceFill: [255, 255, 255, 0.9],
-    pointer: [6, 182, 212, 0.22], packets: ['#06b6d4', '#7c3aed', '#2563eb'], bits: [37, 99, 235, 0.38],
-    packetAlpha: 0.55, density: 1 / 26000, maxNodes: 46,
+    scale: 2.7, linkDist: 290, pointerDist: 300, density: 1 / 70000, minNodes: 8, maxNodes: 22,
+    link: [79, 109, 196, 0.16], linkWidth: 1.6,
+    device: [91, 120, 205, 0.42], deviceFill: [255, 255, 255, 0.78], detail: [91, 120, 205, 0.28],
+    glow: [8, 145, 178, 0.95], glowFill: [236, 254, 255, 0.95],
+    pointer: [8, 145, 178, 0.35], packets: ['#0891b2', '#7c3aed', '#2563eb'], bits: [55, 80, 160, 0.6],
+    packetAlpha: 0.85, packetSize: 1.7, bitsFont: 12,
   },
+  // Home hero: smaller, brighter devices on the dark background.
   dark: {
-    link: [103, 232, 249, 0.13], device: [165, 180, 252, 0.42], deviceFill: [11, 29, 58, 0.9],
+    scale: 1, linkDist: 150, pointerDist: 170, density: 1 / 14000, minNodes: 10, maxNodes: 60,
+    link: [103, 232, 249, 0.13], linkWidth: 1,
+    device: [165, 180, 252, 0.42], deviceFill: [11, 29, 58, 0.9], detail: [165, 180, 252, 0.3],
+    glow: [34, 211, 238, 1], glowFill: [11, 29, 58, 0.95],
     pointer: [34, 211, 238, 0.4], packets: ['#22d3ee', '#a78bfa', '#60a5fa'], bits: [165, 243, 252, 0.55],
-    packetAlpha: 0.95, density: 1 / 14000, maxNodes: 60,
+    packetAlpha: 0.95, packetSize: 1, bitsFont: 10,
   },
 };
-const LINK_DIST = 150;
-const POINTER_DIST = 170;
-const rgba = ([r, g, b, a], k = 1) => `rgba(${r},${g},${b},${a * k})`;
-const INTERACTIVE = 'a, button, input, select, textarea, label, summary, [role=button], [role=tab], .topology, .strip, .flashcard';
+const rgba = ([r, g, b, a], k = 1) => `rgba(${r},${g},${b},${Math.min(1, a * k)})`;
+const INTERACTIVE = 'a, button, input, select, textarea, label, summary, [role=button], [role=tab], .topology, .strip, .flashcard, .card, .panel, .quiz-card, .sheet, .course';
 
-export function startNetworkBackground(canvas, { tone = 'light', area = canvas.parentElement } = {}) {
+export function startNetworkBackground(canvas, { tone = 'light', area = canvas.parentElement, avoid = null } = {}) {
   const T = TONES[tone];
   const ctx = canvas.getContext('2d');
   const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
@@ -33,6 +39,7 @@ export function startNetworkBackground(canvas, { tone = 'light', area = canvas.p
   let frame = null;
   let last = 0;
   let nextSpawn = 0;
+  let obstacles = []; // screen boxes of the texts to keep clear (titles, intros)
 
   function seed() {
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -42,18 +49,19 @@ export function startNetworkBackground(canvas, { tone = 'light', area = canvas.p
     canvas.width = Math.round(w * dpr);
     canvas.height = Math.round(h * dpr);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    const n = Math.min(T.maxNodes, Math.max(10, Math.round(w * h * T.density)));
-    const types = ['pc', 'pc', 'router', 'switch'];
+    const n = Math.min(T.maxNodes, Math.max(T.minNodes, Math.round(w * h * T.density)));
+    const types = ['pc', 'router', 'pc', 'switch'];
     nodes = Array.from({ length: n }, (_, i) => ({
       x: Math.random() * w, y: Math.random() * h,
-      vx: (Math.random() - 0.5) * 0.18, vy: (Math.random() - 0.5) * 0.18,
+      vx: (Math.random() - 0.5) * 0.16, vy: (Math.random() - 0.5) * 0.16,
       type: types[i % types.length],
+      lit: 0, // 0..1: how much the device glows (near the pointer, or when a packet arrives)
     }));
     packets = [];
   }
 
   const dist2 = (a, b) => (a.x - b.x) ** 2 + (a.y - b.y) ** 2;
-  const neighbours = (a) => nodes.filter((b) => b !== a && dist2(a, b) < LINK_DIST ** 2);
+  const neighbours = (a) => nodes.filter((b) => b !== a && dist2(a, b) < T.linkDist ** 2);
 
   function spawn(from, count = 1) {
     for (let k = 0; k < count; k++) {
@@ -61,109 +69,152 @@ export function startNetworkBackground(canvas, { tone = 'light', area = canvas.p
       if (!next.length) return;
       packets.push({
         from, to: next[Math.floor(Math.random() * next.length)], t: 0,
-        speed: 0.012 + Math.random() * 0.01, hops: 3 + Math.floor(Math.random() * 4),
+        speed: (0.009 + Math.random() * 0.008) * (150 / T.linkDist) * 1.6,
+        hops: 3 + Math.floor(Math.random() * 4),
         color: T.packets[Math.floor(Math.random() * T.packets.length)],
         bits: Array.from({ length: 4 }, () => (Math.random() < 0.5 ? '0' : '1')).join(''),
       });
     }
+    from.lit = 1;
   }
 
-  function drawDevice(n, glow) {
-    const s = glow ? 1.25 : 1;
-    ctx.lineWidth = 1.3;
-    ctx.strokeStyle = rgba(T.device, glow ? 1.8 : 1);
-    ctx.fillStyle = rgba(T.deviceFill);
+  /** One device, drawn around (0, 0) at size s, then placed at (n.x, n.y). */
+  function drawDevice(n) {
+    const s = T.scale * (1 + n.lit * 0.12);
+    const stroke = n.lit > 0.05 ? rgba(T.glow, 0.45 + n.lit * 0.55) : rgba(T.device);
+    ctx.save();
+    ctx.globalAlpha = n.fade ?? 1;
+    ctx.translate(n.x, n.y);
+    ctx.lineJoin = 'round';
+    ctx.lineCap = 'round';
+    ctx.lineWidth = 1.4 * Math.sqrt(T.scale);
+    ctx.strokeStyle = stroke;
+    ctx.fillStyle = n.lit > 0.05 ? rgba(T.glowFill) : rgba(T.deviceFill);
+    if (n.lit > 0.05) { ctx.shadowColor = rgba(T.glow, n.lit); ctx.shadowBlur = 18 * n.lit; }
     ctx.beginPath();
     if (n.type === 'router') {
-      ctx.arc(n.x, n.y, 6 * s, 0, Math.PI * 2);
+      ctx.arc(0, 0, 7 * s, 0, Math.PI * 2);
       ctx.fill(); ctx.stroke();
+      ctx.shadowBlur = 0;
+      ctx.strokeStyle = n.lit > 0.05 ? stroke : rgba(T.detail);
       ctx.beginPath();
-      ctx.moveTo(n.x - 3.5 * s, n.y); ctx.lineTo(n.x + 3.5 * s, n.y);
-      ctx.moveTo(n.x, n.y - 3.5 * s); ctx.lineTo(n.x, n.y + 3.5 * s);
+      for (const [dx, dy] of [[0, -1], [0, 1], [-1, 0], [1, 0]]) { // four arrows
+        ctx.moveTo(dx * 2 * s, dy * 2 * s);
+        ctx.lineTo(dx * 5 * s, dy * 5 * s);
+        ctx.moveTo(dx * 5 * s + dy * 1.4 * s, dy * 5 * s + dx * 1.4 * s);
+        ctx.lineTo(dx * 5 * s, dy * 5 * s);
+        ctx.lineTo(dx * 5 * s - dy * 1.4 * s, dy * 5 * s - dx * 1.4 * s);
+      }
       ctx.stroke();
     } else if (n.type === 'switch') {
-      ctx.roundRect(n.x - 8 * s, n.y - 3.5 * s, 16 * s, 7 * s, 2);
+      ctx.roundRect(-10 * s, -4.5 * s, 20 * s, 9 * s, 2.2 * s);
       ctx.fill(); ctx.stroke();
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = n.lit > 0.05 ? stroke : rgba(T.detail);
+      for (let p = 0; p < 5; p++) ctx.fillRect((-7.4 + p * 3.2) * s, 1 * s, 1.8 * s, 1.6 * s); // ports
     } else {
-      ctx.roundRect(n.x - 6.5 * s, n.y - 5 * s, 13 * s, 9 * s, 2);
+      ctx.roundRect(-8 * s, -6 * s, 16 * s, 11 * s, 2 * s); // monitor
       ctx.fill(); ctx.stroke();
+      ctx.shadowBlur = 0;
+      ctx.strokeStyle = n.lit > 0.05 ? stroke : rgba(T.detail);
       ctx.beginPath();
-      ctx.moveTo(n.x - 3 * s, n.y + 6.5 * s); ctx.lineTo(n.x + 3 * s, n.y + 6.5 * s);
+      ctx.roundRect(-6 * s, -4 * s, 12 * s, 7 * s, 1 * s); // screen
+      ctx.moveTo(-2 * s, 5 * s); ctx.lineTo(-3 * s, 8 * s); // stand
+      ctx.moveTo(2 * s, 5 * s); ctx.lineTo(3 * s, 8 * s);
+      ctx.moveTo(-4.5 * s, 8 * s); ctx.lineTo(4.5 * s, 8 * s);
       ctx.stroke();
     }
+    ctx.restore();
   }
 
   function draw() {
     ctx.clearRect(0, 0, w, h);
+    ctx.lineCap = 'round';
     // links between close devices, fading with distance
+    ctx.lineWidth = T.linkWidth;
     for (let i = 0; i < nodes.length; i++) {
       for (let j = i + 1; j < nodes.length; j++) {
         const d2 = dist2(nodes[i], nodes[j]);
-        if (d2 > LINK_DIST ** 2) continue;
-        ctx.strokeStyle = rgba(T.link, 1 - Math.sqrt(d2) / LINK_DIST);
-        ctx.lineWidth = 1;
+        if (d2 > T.linkDist ** 2) continue;
+        ctx.strokeStyle = rgba(T.link, (1 - Math.sqrt(d2) / T.linkDist) * Math.min(nodes[i].fade ?? 1, nodes[j].fade ?? 1));
         ctx.beginPath();
         ctx.moveTo(nodes[i].x, nodes[i].y);
         ctx.lineTo(nodes[j].x, nodes[j].y);
         ctx.stroke();
       }
     }
-    // links to the pointer
-    const near = new Set();
+    // dashed links to the pointer
     if (pointer) {
+      ctx.setLineDash([5, 6]);
+      ctx.lineWidth = 1.4;
       for (const n of nodes) {
         const d = Math.sqrt(dist2(n, pointer));
-        if (d > POINTER_DIST) continue;
-        near.add(n);
-        ctx.strokeStyle = rgba(T.pointer, 1 - d / POINTER_DIST);
-        ctx.lineWidth = 1.2;
-        ctx.setLineDash([4, 4]);
+        if (d > T.pointerDist) continue;
+        ctx.strokeStyle = rgba(T.pointer, 1 - d / T.pointerDist);
         ctx.beginPath();
         ctx.moveTo(n.x, n.y);
         ctx.lineTo(pointer.x, pointer.y);
         ctx.stroke();
-        ctx.setLineDash([]);
       }
+      ctx.setLineDash([]);
     }
-    for (const n of nodes) drawDevice(n, near.has(n));
+    for (const n of nodes) drawDevice(n);
     // packets and their bits
-    ctx.font = '10px ui-monospace, Consolas, monospace';
+    const ps = T.packetSize;
+    ctx.font = `600 ${T.bitsFont}px ui-monospace, Consolas, monospace`;
     for (const p of packets) {
       const x = p.from.x + (p.to.x - p.from.x) * p.t;
       const y = p.from.y + (p.to.y - p.from.y) * p.t;
-      ctx.globalAlpha = T.packetAlpha * Math.min(1, p.hops / 2 + 0.3);
+      ctx.globalAlpha = T.packetAlpha * Math.min(1, p.hops / 2 + 0.35);
       ctx.fillStyle = p.color;
       ctx.shadowColor = p.color;
-      ctx.shadowBlur = 8;
+      ctx.shadowBlur = 10;
       ctx.beginPath();
-      ctx.roundRect(x - 4, y - 3, 8, 6, 1.5);
+      ctx.roundRect(x - 5 * ps, y - 3.5 * ps, 10 * ps, 7 * ps, 2 * ps);
       ctx.fill();
       ctx.shadowBlur = 0;
       ctx.fillStyle = rgba(T.bits);
-      ctx.fillText(p.bits, x + 7, y - 5);
+      ctx.fillText(p.bits, x + 7 * ps, y - 5 * ps);
       ctx.globalAlpha = 1;
     }
   }
 
+  /** Boxes of the texts the devices must not clutter (relative to the canvas), slightly enlarged. */
+  function measureObstacles() {
+    if (!avoid) return;
+    const c = canvas.getBoundingClientRect();
+    obstacles = [...document.querySelectorAll(avoid)].map((el) => el.getBoundingClientRect())
+      .filter((r) => r.width && r.bottom > c.top && r.top < c.bottom)
+      .map((r) => ({ x1: r.left - c.left - 30, y1: r.top - c.top - 24, x2: r.right - c.left + 30, y2: r.bottom - c.top + 24 }));
+  }
+  const behindText = (n) => obstacles.some((o) => n.x > o.x1 && n.x < o.x2 && n.y > o.y1 && n.y < o.y2);
+
   function step(dt) {
     const k = dt / 16.7;
+    measureObstacles();
     for (const n of nodes) {
-      if (pointer) { // drift gently towards the pointer
+      n.fade = (n.fade ?? 1) + ((behindText(n) ? 0.15 : 1) - (n.fade ?? 1)) * Math.min(1, 0.12 * k); // fade behind text
+      const near = pointer && dist2(n, pointer) < T.pointerDist ** 2;
+      if (near) { // drift gently towards the pointer, and light up
         const dx = pointer.x - n.x;
         const dy = pointer.y - n.y;
-        const d2 = dx * dx + dy * dy;
-        if (d2 < POINTER_DIST ** 2 && d2 > 900) { n.vx += dx * 0.000025 * k; n.vy += dy * 0.000025 * k; }
+        if (dx * dx + dy * dy > (40 * T.scale) ** 2) { n.vx += dx * 0.00002 * k; n.vy += dy * 0.00002 * k; }
+        n.lit = Math.min(1, n.lit + 0.08 * k);
+      } else {
+        n.lit = Math.max(0, n.lit - 0.03 * k);
       }
-      n.vx = Math.max(-0.35, Math.min(0.35, n.vx * 0.995 + (Math.random() - 0.5) * 0.004));
-      n.vy = Math.max(-0.35, Math.min(0.35, n.vy * 0.995 + (Math.random() - 0.5) * 0.004));
+      n.vx = Math.max(-0.3, Math.min(0.3, n.vx * 0.995 + (Math.random() - 0.5) * 0.004));
+      n.vy = Math.max(-0.3, Math.min(0.3, n.vy * 0.995 + (Math.random() - 0.5) * 0.004));
       n.x += n.vx * k;
       n.y += n.vy * k;
-      if (n.x < -20) n.x = w + 20; else if (n.x > w + 20) n.x = -20;
-      if (n.y < -20) n.y = h + 20; else if (n.y > h + 20) n.y = -20;
+      const m = 30 * T.scale;
+      if (n.x < -m) n.x = w + m; else if (n.x > w + m) n.x = -m;
+      if (n.y < -m) n.y = h + m; else if (n.y > h + m) n.y = -m;
     }
     for (const p of packets) {
       p.t += p.speed * k;
-      if (p.t >= 1) { // arrived: hop to a neighbour of the device it reached
+      if (p.t >= 1) { // arrived: the device flashes, the packet hops on
+        p.to.lit = Math.max(p.to.lit, 0.7);
         p.hops -= 1;
         const next = neighbours(p.to).filter((n) => n !== p.from);
         if (p.hops <= 0 || !next.length) { p.dead = true; continue; }
@@ -183,7 +234,7 @@ export function startNetworkBackground(canvas, { tone = 'light', area = canvas.p
     step(Math.min(dt, 100));
     if (now > nextSpawn && nodes.length) {
       spawn(nodes[Math.floor(Math.random() * nodes.length)]);
-      nextSpawn = now + 700 + Math.random() * 900;
+      nextSpawn = now + 900 + Math.random() * 1100;
     }
     draw();
   }
@@ -198,7 +249,7 @@ export function startNetworkBackground(canvas, { tone = 'light', area = canvas.p
     pointer = p.inside ? p : null;
   }
   function onDown(e) {
-    if (e.target.closest?.(INTERACTIVE)) return; // never compete with a real control
+    if (e.target.closest?.(INTERACTIVE)) return; // never compete with a real control or a card
     const p = local(e);
     if (!p.inside || !nodes.length) return;
     let best = nodes[0];
@@ -207,6 +258,8 @@ export function startNetworkBackground(canvas, { tone = 'light', area = canvas.p
   }
 
   seed();
+  measureObstacles();
+  for (const n of nodes) n.fade = behindText(n) ? 0.15 : 1;
   draw();
   if (reduced) return { stop() {} };
   // A fixed full-page background follows the window (area: null); a box (the hero) follows its own size.
