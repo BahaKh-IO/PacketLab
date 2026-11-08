@@ -53,6 +53,14 @@ Protected routes need the header `Authorization: Bearer <jeton>`. Errors are `{ 
 2. Open the site with Live Server (`http://127.0.0.1:5500/...`): `js/config.js` uses the local API automatically when the page is on `localhost` / `127.0.0.1`.
 3. « Mon compte » → create an account. The data goes to `server/dev.db` (local, ignored by Git).
 
+## Current deployment (Nov 8, 2026)
+
+- API: `https://packetlab-api.packetlab-handoff.workers.dev` (set in `js/config.js`).
+- D1 database `packetlab`, region WEUR, id in `wrangler.toml`; tables created from `server/schema.sql`.
+- workers.dev subdomain `packetlab-handoff`: registered automatically by wrangler (from the folder name). It can be changed in the Cloudflare dashboard (Workers & Pages → subdomain); if it is, update `DEPLOYED` in `js/config.js`.
+- Checked live: sign-up (password hashing fits the free plan, about 0.6 s), login, wrong password, progress PUT/GET, account deletion, CORS (our site allowed, others refused). Test account deleted afterwards.
+- Update after a change in `server/`: `npx wrangler deploy`. Change of `server/schema.sql`: run it again with `npx wrangler d1 execute packetlab --remote --file server/schema.sql`.
+
 ## Deploy on Cloudflare (Baha, with his own account)
 
 Deployment uses Cloudflare's command-line tool **wrangler**, run with `npx` (a development tool, nothing is added to the site). Free plan; check Cloudflare's current limits.

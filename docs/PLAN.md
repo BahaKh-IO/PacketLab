@@ -150,7 +150,7 @@ Goal: Module C complete. Claude drafts all text; Nour checks it against the cour
 - [x] Choice with Baha: email + password, students only, Cloudflare Workers + D1 (no personal PC as host)
 - [x] `server/api.js` (inscription, connexion, déconnexion, moi, progression GET/PUT, suppression du compte), PBKDF2 passwords, hashed session tokens, login blocking, CORS — `tests/backend.test.js`
 - [x] Local dev server on node:sqlite; `mergeProgress` + automatic sync of the « labs réalisés »; « Mon compte » page; guest mode unchanged
-- [ ] Baha: create the Cloudflare account and deploy (`docs/backend.md`, steps 1–7), then set `DEPLOYED` in `js/config.js`
+- [x] Deployed on Baha's Cloudflare account (Nov 8, 2026): `https://packetlab-api.packetlab-handoff.workers.dev`, D1 `packetlab`; `DEPLOYED` set in `js/config.js`
 
 ## Session 5 — Documentation, testing, demo (≈ 3 h)
 

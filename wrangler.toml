@@ -10,5 +10,5 @@ ALLOWED_ORIGINS = "https://bahakh-io.github.io"
 [[d1_databases]]
 binding = "DB"
 database_name = "packetlab"
-# Replace with the id printed by:  npx wrangler d1 create packetlab
-database_id = "A-REMPLIR"
+# Printed by:  npx wrangler d1 create packetlab   (region WEUR, Nov 8, 2026)
+database_id = "bc68fec4-99cf-44eb-a685-5625ac743e4a"
