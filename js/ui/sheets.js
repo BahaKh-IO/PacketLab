@@ -7,6 +7,7 @@
 import { h, link, button } from './dom.js';
 import { loadThemes, loadFiches, loadCartes, loadError } from './content.js';
 import { createFlashcards } from './flashcards.js';
+import { themeIcon, themeClass } from './theme-icons.js';
 import { getProgress } from '../progress.js';
 import { startSync } from '../account.js';
 
@@ -40,7 +41,8 @@ function sheetList(themeId = null) {
   const list = themeId ? fiches.filter((f) => f.theme === themeId) : fiches;
   show(
     themeId ? h('p', 'filter-note', `Fiches du thème « ${themeOf(themeId)?.titre} » · `, button('voir toutes les fiches', 'link-inline', () => go(''))) : null,
-    h('div', 'cards', list.map((f) => h('article', 'card sheet-card',
+    h('div', 'cards', list.map((f) => h('article', `card sheet-card ${themeClass(f.theme)}`,
+      themeIcon(f.theme),
       h('p', 'card-kicker', themeOf(f.theme)?.titre ?? ''),
       h('h2', 'card-title', f.titre),
       h('p', null, f.essentiel[0]),
@@ -54,9 +56,9 @@ function sheet(f) {
   const prev = fiches[i - 1];
   const next = fiches[i + 1];
   document.title = `${f.titre} — Fiches — PacketLab`;
-  show(h('article', 'sheet',
+  show(h('article', `sheet ${themeClass(f.theme)}`,
     h('p', 'card-kicker', t?.titre ?? ''),
-    h('h2', null, f.titre),
+    h('div', 'course-head', themeIcon(f.theme), h('h2', null, f.titre)),
     t?.statut === 'a-valider' ? h('p', 'badge-review', 'Contenu à valider par l\'équipe') : null,
     h('section', 'sheet-block',
       h('h3', null, 'L\'essentiel'),
@@ -87,7 +89,8 @@ function deckList() {
   const decks = themes.map((t) => {
     const ids = cartes.filter((c) => c.theme === t.id).map((c) => c.id);
     const n = (known[t.id] ?? []).filter((id) => ids.includes(id)).length;
-    return h('article', 'card',
+    return h('article', `card ${themeClass(t.id)}`,
+      themeIcon(t.id),
       h('h2', 'card-title', t.titre),
       h('p', 'quiz-best', `${n} / ${ids.length} cartes sues`),
       button('Réviser →', 'link-inline card-link', () => go(`?cartes=${t.id}`)));

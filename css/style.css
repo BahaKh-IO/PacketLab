@@ -806,3 +806,48 @@ button.danger { background: var(--red); border-color: var(--red); color: #fff; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 }
+
+/* ---------- Design pass: themes, quiz, cards, lab ---------- */
+.theme-adressage-ip { --accent: linear-gradient(90deg, #2563eb, #60a5fa); --tint: #2563eb; }
+.theme-ethernet-mac { --accent: linear-gradient(90deg, #0e7490, #22d3ee); --tint: #0e7490; }
+.theme-arp          { --accent: linear-gradient(90deg, #b45309, #fbbf24); --tint: #b45309; }
+.theme-commutation  { --accent: linear-gradient(90deg, #0f766e, #2dd4bf); --tint: #0f766e; }
+.theme-routage      { --accent: linear-gradient(90deg, #6d28d9, #a78bfa); --tint: #6d28d9; }
+.theme-topologies   { --accent: linear-gradient(90deg, #4338ca, #818cf8); --tint: #4338ca; }
+.theme-fiabilite    { --accent: linear-gradient(90deg, #be185d, #f472b6); --tint: #be185d; }
+.theme-icon {
+  width: 2.75rem; height: 2.75rem; flex: none; margin-bottom: 0.6rem; padding: 0.5rem; border-radius: 12px;
+  background: color-mix(in srgb, var(--tint, #2563eb) 11%, white);
+  fill: none; stroke: var(--tint, #2563eb); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round;
+}
+.theme-icon .f { fill: var(--tint, #2563eb); stroke: none; }
+.course-head { display: flex; align-items: center; gap: 0.85rem; }
+.course-head .theme-icon { margin: 0; }
+.course-head h2 { margin: 0; }
+.sheet { border-top-color: var(--tint, var(--blue)); box-shadow: var(--shadow-sm); border-radius: 16px; }
+.course { border-top: 4px solid var(--tint, var(--blue)); box-shadow: var(--shadow-sm); border-radius: 16px; }
+
+.quiz-card { border-top: 4px solid var(--tint, var(--blue)); border-radius: 16px; box-shadow: var(--shadow); }
+.quiz-bar span { background: var(--accent, var(--grad)); transition: width 0.4s ease; }
+.quiz-choices .choice { border-radius: 10px; transition: background 0.15s, border-color 0.15s, transform 0.1s; }
+.quiz-choices .choice:hover:not(:disabled) { background: #f4f7ff; border-color: var(--tint, var(--blue)); }
+.quiz-end { text-align: left; }
+.score-ring { width: 7rem; height: 7rem; display: block; margin: 0.75rem 0 0.25rem; }
+.score-ring .track { fill: none; stroke: var(--line); stroke-width: 8; }
+.score-ring .arc { fill: none; stroke: var(--tint, var(--blue)); stroke-width: 8; stroke-linecap: round; transform: rotate(-90deg); transform-origin: 40px 40px; animation: ring 0.9s ease-out; }
+@keyframes ring { from { stroke-dasharray: 0 999; } }
+.score-ring text { font-family: var(--display); font-weight: 800; font-size: 17px; fill: var(--navy); }
+
+.flashcard { border-radius: 18px; box-shadow: var(--shadow); transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s; }
+.flashcard:hover:not(.flipped) { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+.flashcard.flipped { animation: flip 0.45s ease; }
+@keyframes flip { 0% { transform: perspective(900px) rotateY(90deg); } 100% { transform: perspective(900px) rotateY(0); } }
+
+.strip-node { cursor: default; }
+.strip-label { font-size: 16px; }
+.lane { background: rgb(19 40 77 / 0.85); border: 1px solid rgb(255 255 255 / 0.06); border-radius: 14px; }
+.chip { border-radius: 10px; transition: transform 0.1s, border-color 0.15s, background 0.15s; }
+.chip:hover:not(:disabled) { transform: translateY(-2px); }
+.lab-setup fieldset { border-radius: 14px; box-shadow: var(--shadow-sm); }
+.stat-tile { border-radius: 14px; box-shadow: var(--shadow-sm); }
+.stat-value { background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }

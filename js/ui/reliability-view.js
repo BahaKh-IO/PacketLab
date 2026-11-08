@@ -2,6 +2,8 @@
 // the sender cells and the receiver cells. It only reads the output of
 // simulateReliability(): events (state at each moment) and trajets (moves).
 
+import { deviceIcon } from './topology-view.js';
+
 const NS = 'http://www.w3.org/2000/svg';
 const X = { E: 70, RA: 270, RB: 470, R: 670 }; // node positions on the strip
 const LINE_Y = 70;
@@ -37,10 +39,10 @@ export function createLane(root, run, titre) {
   const svg = svgEl('svg', { viewBox: '0 0 740 150', class: 'strip', role: 'img', 'aria-label': `Réseau : ${titre}` });
   svg.append(svgEl('line', { x1: X.E, y1: LINE_Y, x2: X.R, y2: LINE_Y, class: 'strip-line' }));
   for (const [id, label] of NODES) {
-    const g = svgEl('g', { transform: `translate(${X[id]} ${LINE_Y})`, class: `strip-node strip-${id}` });
-    if (id === 'RA' || id === 'RB') g.append(svgEl('circle', { r: 20, class: 'shape' }));
-    else g.append(svgEl('rect', { x: -24, y: -18, width: 48, height: 36, rx: 6, class: 'shape' }));
-    g.append(svgEl('text', { y: 44, 'text-anchor': 'middle', class: 'strip-label' }, label));
+    const router = id === 'RA' || id === 'RB';
+    const g = svgEl('g', { transform: `translate(${X[id]} ${LINE_Y}) scale(0.78)`, class: `strip-node strip-${id} device device-${router ? 'router' : 'pc'}` });
+    g.append(...deviceIcon(router ? 'router' : 'pc'));
+    g.append(svgEl('text', { y: 54, 'text-anchor': 'middle', class: 'strip-label' }, label));
     svg.append(g);
   }
   const lossLayer = svgEl('g');

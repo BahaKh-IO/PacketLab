@@ -4,6 +4,7 @@
 
 import { h, link, button } from './dom.js';
 import { loadThemes, loadError } from './content.js';
+import { themeIcon, themeClass } from './theme-icons.js';
 
 const app = document.getElementById('courses-app');
 let data = null;
@@ -15,7 +16,8 @@ function show(...nodes) {
 
 function list() {
   document.title = 'Cours — PacketLab';
-  show(h('div', 'cards', data.themes.map((t, k) => h('article', 'card',
+  show(h('div', 'cards', data.themes.map((t, k) => h('article', `card ${themeClass(t.id)}`,
+    themeIcon(t.id),
     h('p', 'card-kicker', `Cours ${k + 1}`),
     h('h2', 'card-title', t.titre),
     h('p', null, t.resume),
@@ -38,12 +40,12 @@ async function course(theme) {
   const next = data.themes[i + 1];
   const body = h('div', 'course-body');
   body.innerHTML = html; // our own course file (see the comment at the top)
-  show(h('article', 'course',
+  show(h('article', `course ${themeClass(theme.id)}`,
     h('div', 'course-tools no-print',
       link('./cours.html', '← Tous les cours', 'link-inline'),
       button('Imprimer / PDF', null, () => window.print())),
     h('p', 'card-kicker', `Cours ${i + 1} sur ${data.themes.length}`),
-    h('h2', 'course-title', theme.titre),
+    h('div', 'course-head', themeIcon(theme.id), h('h2', 'course-title', theme.titre)),
     theme.statut === 'a-valider' ? h('p', 'badge-review', 'Contenu à valider par l\'équipe') : null,
     h('p', 'course-sources', data.sources),
     body,

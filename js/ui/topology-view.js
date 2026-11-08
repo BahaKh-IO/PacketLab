@@ -12,7 +12,7 @@ function svgEl(tag, attrs = {}, text = null) {
 }
 
 /** The drawn icon of a device, centred on (0, 0). The main outline has the class "shape". */
-function deviceIcon(type) {
+export function deviceIcon(type) {
   if (type === 'router') {
     // The usual router symbol: a disc with four arrows.
     const arrows = [
