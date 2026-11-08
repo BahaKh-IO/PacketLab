@@ -28,7 +28,12 @@ function fieldList(rows, prev) {
   return dl;
 }
 
-/** Ethernet + IP (or ARP) headers of the frame of step i. */
+/**
+ * Headers of the frame of step i, drawn as nested envelopes (encapsulation):
+ * the Ethernet frame (layer 2) contains the IP packet (layer 3, or an ARP message),
+ * which contains the data. When a router builds a new frame, the outer envelope
+ * is marked « nouvelle trame » while the IP packet inside stays the same.
+ */
 export function renderHeaders(el, events, i) {
   const f = events[i].frame;
   if (!f) {
@@ -37,28 +42,39 @@ export function renderHeaders(el, events, i) {
   }
   const prev = previousFrame(events, i, f.kind);
   const v = (raw, text = raw) => ({ raw, text: String(text) });
-  const eth = h('div', 'hdr-group', h('h3', null, 'Trame Ethernet (couche 2)'), fieldList([
-    ['MAC source', 'macSrc', v(f.macSrc, macText(f.macSrc))],
-    ['MAC destination', 'macDst', v(f.macDst, macText(f.macDst))],
-  ], prev));
-  let body;
+  const newFrame = f.kind === 'data' && prev && prev.macSrc && f.macSrc !== prev.macSrc && f.macDst !== prev.macDst
+    && f.ipSrc === prev.ipSrc && f.ipDst === prev.ipDst;
+
+  let inner;
   if (f.kind === 'arp') {
     const a = f.arp;
-    const pa = prev?.arp;
-    body = h('div', 'hdr-group arp', h('h3', null, `Message ARP : ${a.op === 'request' ? 'requête' : 'réponse'}`), fieldList([
-      ['IP émetteur', 'senderIp', v(a.senderIp)],
-      ['MAC émetteur', 'senderMac', v(a.senderMac)],
-      ['IP cherchée', 'targetIp', v(a.targetIp)],
-      ['MAC cible', 'targetMac', v(a.targetMac, a.targetMac === '00:00:00:00:00:00' ? '00:00:00:00:00:00 (inconnue)' : a.targetMac)],
-    ], pa));
+    inner = h('div', 'layer layer-arp',
+      h('h3', 'layer-title', h('span', 'layer-tag', 'ARP'), `Message ARP : ${a.op === 'request' ? 'requête' : 'réponse'}`),
+      fieldList([
+        ['IP émetteur', 'senderIp', v(a.senderIp)],
+        ['MAC émetteur', 'senderMac', v(a.senderMac)],
+        ['IP cherchée', 'targetIp', v(a.targetIp)],
+        ['MAC cible', 'targetMac', v(a.targetMac, a.targetMac === '00:00:00:00:00:00' ? '00:00:00:00:00:00 (inconnue)' : a.targetMac)],
+      ], prev?.arp));
   } else {
-    body = h('div', 'hdr-group', h('h3', null, 'Paquet IP (couche 3)'), fieldList([
-      ['IP source', 'ipSrc', v(f.ipSrc)],
-      ['IP destination', 'ipDst', v(f.ipDst)],
-      ['TTL', 'ttl', v(f.ttl)],
-    ], prev));
+    inner = h('div', 'layer layer-ip',
+      h('h3', 'layer-title', h('span', 'layer-tag', 'L3'), 'Paquet IP (couche 3)'),
+      fieldList([
+        ['IP source', 'ipSrc', v(f.ipSrc)],
+        ['IP destination', 'ipDst', v(f.ipDst)],
+        ['TTL', 'ttl', v(f.ttl)],
+      ], prev),
+      h('div', 'layer layer-data', h('span', null, 'Données'), h('span', 'muted', ' — le contenu ne change jamais en route')));
   }
-  el.replaceChildren(eth, body);
+  const frame = h('div', `layer layer-eth${newFrame ? ' renewed' : ''}`,
+    h('h3', 'layer-title', h('span', 'layer-tag', 'L2'), 'Trame Ethernet (couche 2)',
+      newFrame ? h('span', 'layer-badge', 'Nouvelle trame') : null),
+    fieldList([
+      ['MAC source', 'macSrc', v(f.macSrc, macText(f.macSrc))],
+      ['MAC destination', 'macDst', v(f.macDst, macText(f.macDst))],
+    ], prev),
+    inner);
+  el.replaceChildren(frame);
 }
 
 function table(caption, head, rows, prevRows) {
