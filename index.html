@@ -39,23 +39,51 @@
   <section class="hero">
     <div class="hero-inner">
       <div class="hero-text">
-        <h1>Voir voyager les paquets</h1>
-        <p>Choisissez une topologie, envoyez un paquet et suivez-le saut par saut : adresses MAC et IP, TTL, tables ARP, MAC et de routage. Tout est déjà configuré.</p>
+        <p class="hero-kicker">Laboratoire réseau interactif</p>
+        <h1>Voir voyager <span>les paquets</span></h1>
+        <p class="hero-lead">Choisissez une topologie, envoyez un paquet et suivez-le saut par saut : adresses MAC et IP, TTL, tables ARP, MAC et de routage. Tout est déjà configuré.</p>
         <div class="hero-actions">
-          <a class="button primary" href="./simulateur.html?topo=mixte&amp;src=PC-A&amp;dst=PC-B">Lancer l'exemple PC-A → PC-B</a>
+          <a class="button primary" href="./simulateur.html?topo=mixte&amp;src=PC-A&amp;dst=PC-B">▶ Lancer l'exemple PC-A → PC-B</a>
           <a class="button ghost" href="./simulateur.html">Choisir une topologie</a>
         </div>
       </div>
-      <svg class="hero-art" viewBox="0 0 360 150" role="img" aria-label="Un paquet passe de PC-A à PC-B par un switch et deux routeurs">
-        <polyline class="hero-link" points="30,75 105,75 180,75 255,75 330,75" />
-        <rect class="hero-node" x="6" y="57" width="48" height="36" rx="6" /><text x="30" y="80">PC-A</text>
-        <rect class="hero-node" x="79" y="60" width="52" height="30" rx="4" /><text x="105" y="80">SW1</text>
-        <circle class="hero-node" cx="180" cy="75" r="22" /><text x="180" y="80">R1</text>
-        <circle class="hero-node" cx="255" cy="75" r="22" /><text x="255" y="80">R2</text>
-        <rect class="hero-node" x="306" y="57" width="48" height="36" rx="6" /><text x="330" y="80">PC-B</text>
-        <circle class="hero-packet" cx="30" cy="40" r="8" />
-        <text class="hero-caption" x="180" y="128">MAC réécrites à chaque routeur · IP inchangées · TTL 64 → 62</text>
-      </svg>
+      <figure class="hero-figure">
+        <svg class="hero-art" viewBox="0 0 600 230" role="img" aria-label="Un paquet IP va de PC-A à PC-B en passant par un commutateur et deux routeurs : les adresses MAC changent à chaque routeur, les adresses IP restent les mêmes, le TTL passe de 64 à 62.">
+          <line class="hero-link" x1="50" y1="120" x2="550" y2="120" />
+          <g class="device device-pc" transform="translate(50 120)">
+            <path d="M-7,16 L7,16 L10,23 L-10,23 Z" class="stand" /><rect x="-31" y="-24" width="62" height="41" rx="6" class="shape" /><rect x="-26" y="-19" width="52" height="30" rx="3" class="screen" />
+            <text y="-1" text-anchor="middle" class="device-label">PC-A</text>
+          </g>
+          <g class="device device-switch" transform="translate(170 120)">
+            <rect x="-40" y="-18" width="80" height="36" rx="8" class="shape" />
+            <rect x="-27" y="8" width="6" height="4" rx="1" class="port" /><rect x="-17" y="8" width="6" height="4" rx="1" class="port" /><rect x="-7" y="8" width="6" height="4" rx="1" class="port" /><rect x="3" y="8" width="6" height="4" rx="1" class="port" /><rect x="13" y="8" width="6" height="4" rx="1" class="port" /><rect x="23" y="8" width="6" height="4" rx="1" class="port" />
+            <text y="2" text-anchor="middle" class="device-label">SW1</text>
+          </g>
+          <g class="device device-router" transform="translate(300 120)">
+            <circle r="28" class="shape" /><circle r="21.5" class="ring" />
+            <path d="M0,-15 L0,-23 M-3.5,-19.5 L0,-23 L3.5,-19.5" class="arrow" /><path d="M0,15 L0,23 M-3.5,19.5 L0,23 L3.5,19.5" class="arrow" />
+            <text y="5" text-anchor="middle" class="device-label">R1</text>
+          </g>
+          <g class="device device-router" transform="translate(430 120)">
+            <circle r="28" class="shape" /><circle r="21.5" class="ring" />
+            <path d="M0,-15 L0,-23 M-3.5,-19.5 L0,-23 L3.5,-19.5" class="arrow" /><path d="M0,15 L0,23 M-3.5,19.5 L0,23 L3.5,19.5" class="arrow" />
+            <text y="5" text-anchor="middle" class="device-label">R2</text>
+          </g>
+          <g class="device device-pc" transform="translate(550 120)">
+            <path d="M-7,16 L7,16 L10,23 L-10,23 Z" class="stand" /><rect x="-31" y="-24" width="62" height="41" rx="6" class="shape" /><rect x="-26" y="-19" width="52" height="30" rx="3" class="screen" />
+            <text y="-1" text-anchor="middle" class="device-label">PC-B</text>
+          </g>
+          <g class="hero-caps" aria-hidden="true">
+            <text class="cap cap-1" x="300" y="34">MAC AA…0A → 11…01 · IP .1.10 → .2.20 · TTL 64</text>
+            <text class="cap cap-2" x="300" y="34">MAC 11…02 → 22…01 · IP .1.10 → .2.20 · TTL 63</text>
+            <text class="cap cap-3" x="300" y="34">MAC 22…02 → BB…0B · IP .1.10 → .2.20 · TTL 62</text>
+          </g>
+          <g class="hero-packet" aria-hidden="true">
+            <rect x="33" y="62" width="34" height="20" rx="6" /><text x="50" y="76" text-anchor="middle">IP</text>
+          </g>
+          <text class="hero-caption" x="300" y="200">Les MAC changent à chaque routeur · les IP restent · le TTL baisse</text>
+        </svg>
+      </figure>
     </div>
   </section>
 
@@ -68,27 +96,45 @@
       <a class="button primary" id="resume-link" href="./simulateur.html">Continuer</a>
     </section>
 
+    <ul class="stats" aria-label="PacketLab en chiffres">
+      <li><strong>5</strong> topologies</li>
+      <li><strong>19</strong> exemples prêts</li>
+      <li><strong>57</strong> questions de quiz</li>
+      <li><strong>56</strong> cartes mémoire</li>
+      <li><strong>7</strong> cours</li>
+    </ul>
+
     <h2 class="section-title">Trois modules</h2>
-    <div class="cards">
-      <article class="card">
+    <div class="cards modules">
+      <article class="card module module-a">
+        <svg class="module-icon" viewBox="0 0 48 48" aria-hidden="true"><circle cx="10" cy="24" r="6" /><circle cx="38" cy="12" r="6" /><circle cx="38" cy="36" r="6" /><path d="M15 21.5 L33 14.5 M15 26.5 L33 33.5" /><rect x="19" y="13" width="10" height="7" rx="2" class="fill" /></svg>
         <p class="card-kicker">Module A</p>
         <h3>Voyage d'un paquet</h3>
-        <p>Cinq topologies prêtes (étoile, bus, anneau, maillée, mixte). Le paquet avance étape par étape ; à chaque saut on voit les en-têtes et les tables, avec des questions en cours de route.</p>
+        <p>Cinq topologies et dix-neuf exemples, pannes comprises. Le paquet avance étape par étape ; à chaque saut on voit les en-têtes et les tables, avec des questions en cours de route.</p>
         <a class="card-link" href="./simulateur.html">Ouvrir le simulateur →</a>
       </article>
-      <article class="card">
+      <article class="card module module-b">
+        <svg class="module-icon" viewBox="0 0 48 48" aria-hidden="true"><rect x="5" y="17" width="9" height="14" rx="2" class="fill" /><rect x="19.5" y="17" width="9" height="14" rx="2" /><path d="M21 21 L27 27 M27 21 L21 27" /><rect x="34" y="17" width="9" height="14" rx="2" class="fill" /><path d="M24 10 C 32 4, 40 8, 38.5 15 M36 12 L38.5 15 L41 12" /></svg>
         <p class="card-kicker">Module B</p>
         <h3>Labo fiabilité</h3>
-        <p>Un message découpé en morceaux traverse le réseau. Perdez-en un, retardez-en un autre, puis comparez la livraison sans et avec acquittements et retransmissions.</p>
+        <p>Un message découpé en morceaux traverse le réseau. Perdez-en un, retardez-en un autre, puis comparez la livraison sans et avec acquittements et réémission.</p>
         <a class="card-link" href="./fiabilite.html">Ouvrir le labo →</a>
       </article>
-      <article class="card">
+      <article class="card module module-c">
+        <svg class="module-icon" viewBox="0 0 48 48" aria-hidden="true"><path d="M8 10 H22 C24 10 24 12 24 12 V38 C24 36 22 36 22 36 H8 Z" /><path d="M40 10 H26 C24 10 24 12 24 12 V38 C24 36 26 36 26 36 H40 Z" /><path d="M29 20 L32 23 L37 17" class="tick" /></svg>
         <p class="card-kicker">Module C</p>
         <h3>Apprendre et s'évaluer</h3>
-        <p>Sept thèmes (adressage, Ethernet, ARP, commutation, routage, topologies, fiabilité), chacun avec un cours, une fiche, des cartes mémoire et un quiz corrigé.</p>
+        <p>Sept thèmes, chacun avec un cours, une fiche, des cartes mémoire et un quiz corrigé. La progression est gardée, et suivie sur un compte si vous le souhaitez.</p>
         <p class="card-links"><a href="./cours.html">Cours</a> · <a href="./fiches.html">Fiches et cartes</a> · <a href="./quiz.html">Quiz</a> · <a href="./progression.html">Progression</a></p>
       </article>
     </div>
+
+    <h2 class="section-title">Comment ça marche</h2>
+    <ol class="steps">
+      <li><span class="step-num">1</span><div><h3>Choisir</h3><p>Une topologie et deux machines, ou un exemple prêt : deuxième envoi, réponse, panne de passerelle, boucle de routage…</p></div></li>
+      <li><span class="step-num">2</span><div><h3>Suivre</h3><p>Le paquet avance saut par saut. Les enveloppes Ethernet et IP, les tables ARP, MAC et de routage se mettent à jour sous vos yeux.</p></div></li>
+      <li><span class="step-num">3</span><div><h3>Vérifier</h3><p>Activez « Prédire d'abord », répondez aux questions, puis passez le quiz du thème pour voir ce qui est acquis.</p></div></li>
+    </ol>
   </main>
   <script type="module" src="./js/ui/home.js"></script>
   <footer class="site-footer">
