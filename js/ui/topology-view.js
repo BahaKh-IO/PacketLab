@@ -78,6 +78,7 @@ export function createTopologyView(svg, topo, { onDeviceClick = () => {} } = {})
   for (const d of topo.devices) {
     if (d.type === 'bus') continue;
     const g = svgEl('g', { class: `device device-${d.type}`, transform: `translate(${d.position.x} ${d.position.y})` });
+    g.append(svgEl('rect', { x: -44, y: -34, width: 88, height: 68, class: 'hit' })); // easier to tap on a phone
     if (d.type === 'router') g.append(svgEl('circle', { r: 27, class: 'shape' }));
     else if (d.type === 'switch') g.append(svgEl('rect', { x: -38, y: -18, width: 76, height: 36, rx: 5, class: 'shape' }));
     else g.append(svgEl('rect', { x: -30, y: -20, width: 60, height: 40, rx: 7, class: 'shape' }));

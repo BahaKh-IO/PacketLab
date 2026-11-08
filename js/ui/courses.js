@@ -17,7 +17,7 @@ function list() {
   document.title = 'Cours — PacketLab';
   show(h('div', 'cards', data.themes.map((t, k) => h('article', 'card',
     h('p', 'card-kicker', `Cours ${k + 1}`),
-    h('h3', null, t.titre),
+    h('h2', 'card-title', t.titre),
     h('p', null, t.resume),
     link(`./cours.html?theme=${t.id}`, 'Lire le cours →', 'card-link')))));
 }

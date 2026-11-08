@@ -158,7 +158,7 @@ Goal: graded documentation done, no network error on screen, demo rehearsed on t
 
 - [ ] For each of the 5 topologies, write the expected trace by hand (like § 7.1) and compare it with the app
 - [ ] Browsers: Chrome, Firefox, Edge on desktop; Chrome on Android
-- [ ] Accessibility basics: real `<button>`s with labels, contrast check, `prefers-reduced-motion`
+- [x] Accessibility basics (Nov 8, 2026): audit of 8 pages × states × desktop/phone (contrast AA, names and labels, headings, landmarks, targets ≥ 24 px, focus ring 3:1, reduced motion, tab order); 81 issues found and fixed, 0 left
 - [ ] UML: use-case diagram (draw.io); class diagram, sequence PC-A → PC-B (now with R1's and R2's ARP), Module B sequence and state diagrams (Mermaid), all matching the real code
 - [ ] README: what it is, live link, screenshots, run locally, run tests, simplifications, credits
 - [ ] `a-propos.html`: model and simplifications, team, credits

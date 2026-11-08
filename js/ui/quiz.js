@@ -24,7 +24,7 @@ function themeList() {
   const cards = themes.map((t) => {
     const best = progress[t.id];
     return h('article', 'card quiz-theme',
-      h('h3', null, t.titre),
+      h('h2', 'card-title', t.titre),
       h('p', null, t.resume),
       h('p', 'quiz-best', best ? `Meilleur score : ${best.meilleur} / ${best.total} (${best.tentatives} essai${best.tentatives > 1 ? 's' : ''})` : 'Pas encore tenté'),
       t.statut === 'a-valider' ? h('p', 'badge-review', 'Contenu à valider par l\'équipe') : null,

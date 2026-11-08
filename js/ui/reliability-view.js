@@ -52,7 +52,7 @@ export function createLane(root, run, titre) {
   const notes = h('ul', 'lane-notes');
   notes.setAttribute('aria-live', 'polite');
   root.replaceChildren(
-    h('h3', 'lane-title', titre),
+    h('h2', 'lane-title', titre),
     h('div', 'strip-wrap', svg),
     h('div', 'cells-row', h('span', 'row-label', 'Émetteur'), senderRow),
     h('div', 'cells-row', h('span', 'row-label', 'Récepteur'), receiverRow),

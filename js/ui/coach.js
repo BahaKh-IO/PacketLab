@@ -33,7 +33,7 @@ export function createCoach(box) {
     ok.addEventListener('click', () => { b.onClose?.(); next(); });
     return h('div', 'coach-card coach-bubble',
       h('p', 'coach-kicker', 'À retenir'),
-      h('h3', null, b.titre),
+      h('h2', null, b.titre),
       h('p', null, b.texte),
       h('div', 'coach-actions', ok));
   }
@@ -64,7 +64,7 @@ export function createCoach(box) {
     });
     return h('div', `coach-card coach-question${q.kicker ? ' coach-predict' : ''}`,
       h('p', 'coach-kicker', q.kicker ?? 'Question'),
-      h('h3', null, q.enonce),
+      h('h2', null, q.enonce),
       choices,
       feedback);
   }

@@ -42,7 +42,7 @@ function sheetList(themeId = null) {
     themeId ? h('p', 'filter-note', `Fiches du thème « ${themeOf(themeId)?.titre} » · `, button('voir toutes les fiches', 'link-inline', () => go(''))) : null,
     h('div', 'cards', list.map((f) => h('article', 'card sheet-card',
       h('p', 'card-kicker', themeOf(f.theme)?.titre ?? ''),
-      h('h3', null, f.titre),
+      h('h2', 'card-title', f.titre),
       h('p', null, f.essentiel[0]),
       button('Ouvrir la fiche →', 'link-inline card-link', () => go(`?fiche=${f.id}`))))));
 }
@@ -88,7 +88,7 @@ function deckList() {
     const ids = cartes.filter((c) => c.theme === t.id).map((c) => c.id);
     const n = (known[t.id] ?? []).filter((id) => ids.includes(id)).length;
     return h('article', 'card',
-      h('h3', null, t.titre),
+      h('h2', 'card-title', t.titre),
       h('p', 'quiz-best', `${n} / ${ids.length} cartes sues`),
       button('Réviser →', 'link-inline card-link', () => go(`?cartes=${t.id}`)));
   });
