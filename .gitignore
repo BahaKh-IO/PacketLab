@@ -4,3 +4,6 @@
 
 # Local development database of the backend (server/dev-server.js).
 /server/dev.db
+
+# Wrangler (Cloudflare CLI) local cache: contains the account id and name.
+/.wrangler/
