@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Page introuvable — PacketLab</title>
+  <script>
+    // GitHub Pages shows this page for any missing address, at any depth (/PacketLab/a/b/c).
+    // The <base> points every relative link of the page back to the site folder.
+    (function () {
+      var parts = location.pathname.split('/');
+      var base = /github\.io$/.test(location.hostname) && parts.length > 2 ? '/' + parts[1] + '/' : '/';
+      var el = document.createElement('base');
+      el.href = base;
+      document.head.appendChild(el);
+    })();
+  </script>
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#0b1d3a">
+  <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml">
+  <script src="./js/theme-init.js"></script>
+  <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="./index.html" aria-label="PacketLab, accueil">
+      <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+        <circle cx="16" cy="16" r="12" fill="none" stroke="#5b7cb3" stroke-width="1.6" stroke-dasharray="3 2.2"/>
+        <circle cx="16" cy="4" r="2.7" fill="#22d3ee"/><circle cx="28" cy="16" r="2.7" fill="#a78bfa"/>
+        <circle cx="16" cy="28" r="2.7" fill="#22d3ee"/><circle cx="4" cy="16" r="2.7" fill="#a78bfa"/>
+        <path d="M16 9.6 L21.6 12.8 L16 16 L10.4 12.8 Z" fill="#67e8f9"/>
+        <path d="M10.4 12.8 L16 16 L16 22.4 L10.4 19.2 Z" fill="#3b82f6"/>
+        <path d="M16 16 L21.6 12.8 L21.6 19.2 L16 22.4 Z" fill="#8b5cf6"/>
+      </svg>
+      <span class="brand-name">Packet<span>Lab</span></span>
+    </a>
+    <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="site-nav" aria-label="Ouvrir le menu">
+      <span></span><span></span><span></span>
+    </button>
+    <nav id="site-nav" aria-label="Navigation principale">
+      <ul>
+        <li><a href="./index.html">Accueil</a></li>
+        <li><a href="./simulateur.html">Simulateur</a></li>
+        <li><a href="./fiabilite.html">Labo fiabilité</a></li>
+        <li><a href="./quiz.html">Quiz</a></li>
+        <li><a href="./fiches.html">Fiches</a></li>
+        <li><a href="./cours.html">Cours</a></li>
+        <li><a href="./progression.html">Progression</a></li>
+        <li><a href="./connexion.html">Mon compte</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="page lost">
+    <div class="lost-stage lab-surface" aria-hidden="true">
+      <svg class="lost-art" viewBox="0 0 560 170">
+        <line class="link" x1="60" y1="85" x2="500" y2="85" />
+        <g class="device device-pc" transform="translate(60 85)">
+          <path d="M-7,16 L7,16 L10,23 L-10,23 Z" class="stand" />
+          <rect x="-31" y="-24" width="62" height="41" rx="6" class="shape" />
+          <rect x="-26" y="-19" width="52" height="30" rx="3" class="screen" />
+          <text y="-1" text-anchor="middle" class="device-label">Vous</text>
+        </g>
+        <g class="device device-router" transform="translate(200 85)"><circle r="24" class="shape" /><text y="5" text-anchor="middle" class="device-label">R1</text></g>
+        <g class="device device-router" transform="translate(330 85)"><circle r="24" class="shape" /><text y="5" text-anchor="middle" class="device-label">R2</text></g>
+        <g class="lost-target" transform="translate(500 85)">
+          <rect x="-31" y="-24" width="62" height="41" rx="6" />
+          <text y="5" text-anchor="middle">?</text>
+        </g>
+        <g class="lost-packet">
+          <rect x="-26" y="-13" width="52" height="26" rx="7" />
+          <text y="4" text-anchor="middle" class="ttl ttl-2">TTL 2</text>
+          <text y="4" text-anchor="middle" class="ttl ttl-1">TTL 1</text>
+          <text y="4" text-anchor="middle" class="ttl ttl-0">TTL 0</text>
+        </g>
+        <g transform="translate(330 40)"><g class="lost-cross"><circle r="16" /><path d="M-6,-6 L6,6 M6,-6 L-6,6" /></g></g>
+      </svg>
+    </div>
+    <p class="lost-code">Erreur 404</p>
+    <h1>Paquet perdu : TTL expiré</h1>
+    <p class="intro">La page demandée n'existe pas. Comme un paquet dont le TTL tombe à 0 avant d'arriver, votre requête a été abandonnée en route.</p>
+    <p class="intro">Vérifiez l'adresse, ou repartez d'un endroit connu :</p>
+    <div class="hero-actions">
+      <a class="button primary" href="./index.html">Revenir à l'accueil</a>
+      <a class="button" href="./simulateur.html?topo=mixte&amp;scenario=boucle">Voir un TTL expirer pour de vrai</a>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <p class="footer-brand"><strong>Packet<span>Lab</span></strong> — apprendre les réseaux en voyant voyager les paquets.</p>
+      <p>Projet Web SUP'COM 2026/2027 · Baha Eddine Khantouch et Nour El Houda Fodha · encadré par Mme Nesrine Zaghdoud</p>
+      <p><a href="https://github.com/BahaKh-IO/PacketLab">Code source sur GitHub</a></p>
+    </div>
+  </footer>
+  <script type="module" src="./js/ui/nav.js"></script>
+</body>
+</html>

@@ -73,7 +73,8 @@ function sheet(f) {
       link(f.simulateur, f.simulateur.includes('fiabilite') ? 'Voir dans le labo →' : 'Voir dans le simulateur →', 'button primary'),
       link(`./cours.html?theme=${f.theme}`, 'Lire le cours', 'button'),
       link(`./quiz.html?theme=${f.theme}`, 'Faire le quiz', 'button'),
-      button('Cartes mémoire du thème', null, () => go(`?cartes=${f.theme}`))),
+      button('Cartes mémoire du thème', null, () => go(`?cartes=${f.theme}`)),
+      button('Imprimer la fiche', null, () => window.print())),
     h('nav', 'sheet-nav',
       prev ? button(`← ${prev.titre}`, 'link-inline', () => go(`?fiche=${prev.id}`)) : h('span'),
       button('Toutes les fiches', 'link-inline', () => go('')),
@@ -107,7 +108,13 @@ function deck(themeId) {
   const title = themeId === 'tout' ? 'Toutes les cartes' : themeOf(themeId)?.titre;
   document.title = `Cartes : ${title} — PacketLab`;
   const box = h('div', null);
-  show(h('p', 'filter-note', `Cartes mémoire · ${title} · `, button('autres paquets', 'link-inline', () => go('?cartes='))), box);
+  // Printed version of the deck: every card, question and answer side by side, to cut out.
+  const printable = h('section', 'print-deck',
+    h('h2', null, `PacketLab · cartes mémoire · ${title}`),
+    h('div', 'print-cards', list.map((c) => h('div', 'print-card',
+      h('p', 'print-q', c.recto), h('p', 'print-a', c.verso)))));
+  show(h('p', 'filter-note', `Cartes mémoire · ${title} · `, button('autres paquets', 'link-inline', () => go('?cartes=')),
+    ' · ', button('Imprimer les cartes', 'link-inline', () => window.print())), box, printable);
   createFlashcards(box, list);
 }
 

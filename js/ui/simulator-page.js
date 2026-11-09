@@ -98,12 +98,30 @@ function showTables(i) {
     : selectionHeader(`Tables de ${id} (choisi sur le schéma) à l'étape ${i + 1}.`, `Revenir à l'équipement actif (${active})`));
 }
 
-/** Phone layout: show one panel at a time (the tabs are hidden on wide screens). */
-function showTab(name) {
-  $('panels').dataset.tab = name;
-  for (const b of document.querySelectorAll('.tabs [role=tab]')) b.setAttribute('aria-selected', String(b.dataset.tab === name));
+/**
+ * Phone layout: the panels live in a sheet at the bottom of the screen, above the player.
+ * A tab opens the sheet on that panel; the tab of the open panel folds it back.
+ * (On wide screens the tabs are hidden and every panel is shown.)
+ */
+const panelsEl = $('panels');
+function showTab(name, open = true) {
+  panelsEl.dataset.tab = name;
+  panelsEl.classList.toggle('open', open);
+  for (const b of document.querySelectorAll('.tabs [role=tab]')) {
+    b.setAttribute('aria-selected', String(b.dataset.tab === name));
+    b.setAttribute('aria-expanded', String(open && b.dataset.tab === name));
+  }
 }
-for (const b of document.querySelectorAll('.tabs [role=tab]')) b.addEventListener('click', () => showTab(b.dataset.tab));
+for (const b of document.querySelectorAll('.tabs [role=tab]')) {
+  b.addEventListener('click', () => {
+    const same = panelsEl.dataset.tab === b.dataset.tab;
+    showTab(b.dataset.tab, !(same && panelsEl.classList.contains('open')));
+  });
+}
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && panelsEl.classList.contains('open')) showTab(panelsEl.dataset.tab, false);
+});
+showTab('headers', false);
 
 /** Click on a device in the drawing (null: back to the active device). */
 function pickDevice(id) {
@@ -277,6 +295,17 @@ async function init() {
   predictBox.addEventListener('change', () => {
     save('mode-prediction', predictBox.checked);
     updatePredictions();
+  });
+  // The address of a run already describes it (topology, source, destination, step): copy it.
+  const share = $('share-run');
+  share.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(location.href);
+      share.textContent = 'Lien copié ✓';
+    } catch {
+      share.textContent = 'Copie impossible : utilisez la barre d\'adresse';
+    }
+    setTimeout(() => { share.textContent = 'Copier le lien de ce trajet'; }, 2500);
   });
   $('reset-bubbles').addEventListener('click', () => {
     resetSeen();

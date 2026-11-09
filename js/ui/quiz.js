@@ -48,6 +48,7 @@ async function runQuiz(theme) {
   }
   const questions = shuffled(data.questions);
   const missed = [];
+  const results = []; // true / false per answered question, for the segments
   let score = 0;
   let index = 0;
 
@@ -71,6 +72,9 @@ async function runQuiz(theme) {
         buttons[k].classList.add('wrong');
         missed.push(q);
       }
+      results.push(choice.right);
+      steps.children[index].className = choice.right ? 'step-right' : 'step-wrong';
+      meta.textContent = metaText();
       const last = index === questions.length - 1;
       const next = button(last ? 'Voir mon score' : 'Question suivante', 'primary', () => {
         if (last) end();
@@ -85,11 +89,16 @@ async function runQuiz(theme) {
       next.focus();
     }
 
-    const bar = h('div', 'quiz-bar', h('span', null));
-    bar.firstChild.style.width = `${(index / questions.length) * 100}%`;
+    // One segment per question: right / wrong for the answered ones, the current one lit.
+    // Decorative: the same facts are written in the line above.
+    const steps = h('div', 'quiz-steps', questions.map((_, k) => h('span',
+      k < index ? (results[k] ? 'step-right' : 'step-wrong') : k === index ? 'step-current' : null)));
+    steps.setAttribute('aria-hidden', 'true');
+    const metaText = () => `${theme.titre} · question ${index + 1} / ${questions.length} · ${score} bonne${score > 1 ? 's' : ''} réponse${score > 1 ? 's' : ''}`;
+    const meta = h('p', 'quiz-meta', metaText());
     show(h('section', `quiz-card ${themeClass(theme.id)}`,
-      h('p', 'quiz-meta', `${theme.titre} · question ${index + 1} / ${questions.length}`),
-      bar,
+      meta,
+      steps,
       h('h2', null, q.enonce),
       list,
       feedback,
@@ -114,6 +123,7 @@ async function runQuiz(theme) {
       : ratio >= 0.75 ? 'Très bien : relisez les quelques points ci-dessous.'
         : ratio >= 0.5 ? 'C\'est un début : la fiche et le cours de ce thème vous aideront.'
           : 'Reprenez la fiche et le cours de ce thème, puis réessayez.';
+    if (ratio === 1) celebrate();
     show(h('section', `quiz-card quiz-end ${themeClass(theme.id)}`,
       h('p', 'quiz-meta', theme.titre),
       scoreRing(score, questions.length),
@@ -154,9 +164,40 @@ function scoreRing(score, total) {
   arc.setAttribute('stroke-dasharray', `${(score / total) * c} ${c}`);
   const text = document.createElementNS(NS, 'text');
   text.setAttribute('x', 40); text.setAttribute('y', 46); text.setAttribute('text-anchor', 'middle');
-  text.textContent = `${Math.round((score / total) * 100)} %`;
+  const pct = Math.round((score / total) * 100);
+  text.textContent = `${pct} %`;
   svg.append(track, arc, text);
+  // The number counts up with the ring (the final value is there from the start for reduced motion).
+  if (!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) {
+    const start = performance.now();
+    const tick = (now) => {
+      const k = Math.min(1, (now - start) / 900);
+      text.textContent = `${Math.round(pct * (1 - (1 - k) ** 3))} %`;
+      if (k < 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  }
   return svg;
+}
+
+/** A perfect score: a short burst of confetti (decorative; skipped with reduced motion). */
+function celebrate() {
+  if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
+  const colors = ['#22d3ee', '#3b82f6', '#8b5cf6', '#f472b6', '#fbbf24', '#4ade80'];
+  const layer = h('div', 'confetti');
+  layer.setAttribute('aria-hidden', 'true');
+  for (let i = 0; i < 70; i++) {
+    const p = h('i', null);
+    p.style.setProperty('--x', `${Math.random() * 100}vw`);
+    p.style.setProperty('--drift', `${(Math.random() - 0.5) * 30}vw`);
+    p.style.setProperty('--spin', `${(Math.random() - 0.5) * 1440}deg`);
+    p.style.setProperty('--delay', `${Math.random() * 0.5}s`);
+    p.style.setProperty('--time', `${1.8 + Math.random() * 1.4}s`);
+    p.style.background = colors[i % colors.length];
+    layer.append(p);
+  }
+  document.body.append(layer);
+  setTimeout(() => layer.remove(), 4000);
 }
 
 async function init() {

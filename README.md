@@ -22,6 +22,7 @@ Fonctionne dans le navigateur, sur ordinateur comme sur téléphone, sans instal
 | **Labo fiabilité** | Un message découpé en morceaux : on en perd un, on en retarde un autre, puis on compare la livraison sans et avec acquittements et réémission. |
 | **Apprendre et s'évaluer** | 7 cours, 8 fiches, 56 cartes mémoire, 57 questions de quiz corrigées, et une page de progression. |
 | **Comptes étudiants** | Facultatifs : la progression (« labs réalisés ») est gardée sur le compte et retrouvée sur chaque appareil. |
+| **Confort** | Thème clair ou sombre, badges de progression, fiches et cartes imprimables, lien à partager pour chaque trajet. |
 
 ## Sous le capot
 
@@ -50,7 +51,7 @@ index.html  simulateur.html  fiabilite.html  quiz.html  fiches.html  cours.html 
 js/engine/   le moteur (aucun accès à la page)      data/topologies/  les 5 topologies et leurs exemples
 js/ui/       l'affichage de chaque page             data/quiz, data/fiches, cours/   les contenus
 server/      l'API des comptes                       tests/            les tests
-docs/        plan, formats des données, backend
+docs/        plan, formats des données, backend      assets/           icônes et image d'aperçu
 ```
 
 ## Ce qui est simplifié

@@ -14,6 +14,15 @@ const TONES = {
     pointer: [8, 145, 178, 0.35], packets: ['#0891b2', '#7c3aed', '#2563eb'], bits: [55, 80, 160, 0.6],
     packetAlpha: 0.85, packetSize: 1.7, bitsFont: 12,
   },
+  // Reading pages in the dark theme: the same big devices, drawn in light lines on the night backdrop.
+  night: {
+    scale: 2.7, linkDist: 290, pointerDist: 300, density: 1 / 70000, minNodes: 8, maxNodes: 22,
+    link: [103, 232, 249, 0.1], linkWidth: 1.6,
+    device: [129, 140, 248, 0.4], deviceFill: [10, 22, 46, 0.85], detail: [129, 140, 248, 0.26],
+    glow: [34, 211, 238, 1], glowFill: [8, 30, 52, 0.95],
+    pointer: [34, 211, 238, 0.35], packets: ['#22d3ee', '#a78bfa', '#60a5fa'], bits: [165, 243, 252, 0.5],
+    packetAlpha: 0.9, packetSize: 1.7, bitsFont: 12,
+  },
   // Home hero: smaller, brighter devices on the dark background.
   dark: {
     scale: 1, linkDist: 150, pointerDist: 170, density: 1 / 14000, minNodes: 10, maxNodes: 60,
@@ -28,7 +37,7 @@ const rgba = ([r, g, b, a], k = 1) => `rgba(${r},${g},${b},${Math.min(1, a * k)}
 const INTERACTIVE = 'a, button, input, select, textarea, label, summary, [role=button], [role=tab], .topology, .strip, .flashcard, .card, .panel, .quiz-card, .sheet, .course';
 
 export function startNetworkBackground(canvas, { tone = 'light', area = canvas.parentElement, avoid = null } = {}) {
-  const T = TONES[tone];
+  let T = TONES[tone];
   const ctx = canvas.getContext('2d');
   const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
   let w = 0;
@@ -261,7 +270,12 @@ export function startNetworkBackground(canvas, { tone = 'light', area = canvas.p
   measureObstacles();
   for (const n of nodes) n.fade = behindText(n) ? 0.15 : 1;
   draw();
-  if (reduced) return { stop() {} };
+  /** Same network, other colours (light / dark theme). */
+  const setTone = (name) => {
+    T = TONES[name] ?? T;
+    draw();
+  };
+  if (reduced) return { stop() {}, setTone };
   // A fixed full-page background follows the window (area: null); a box (the hero) follows its own size.
   let timer = null;
   const onResize = () => { clearTimeout(timer); timer = setTimeout(() => { seed(); draw(); }, 150); };
@@ -277,6 +291,7 @@ export function startNetworkBackground(canvas, { tone = 'light', area = canvas.p
   });
   frame = requestAnimationFrame(loop);
   return {
+    setTone,
     stop() {
       cancelAnimationFrame(frame);
       resize?.disconnect();

@@ -4,6 +4,20 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Accueil — PacketLab</title>
+  <meta name="description" content="Apprendre les réseaux en voyant voyager les paquets : simulateur pas à pas (ARP, MAC, routage), labo fiabilité, cours, fiches et quiz.">
+  <meta name="theme-color" content="#0b1d3a">
+  <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="./assets/icon-180.png">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="fr_FR">
+  <meta property="og:site_name" content="PacketLab">
+  <meta property="og:title" content="Accueil — PacketLab">
+  <meta property="og:description" content="Apprendre les réseaux en voyant voyager les paquets : simulateur pas à pas (ARP, MAC, routage), labo fiabilité, cours, fiches et quiz.">
+  <meta property="og:image" content="https://bahakh-io.github.io/PacketLab/assets/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <script src="./js/theme-init.js"></script>
   <link rel="stylesheet" href="./css/style.css">
 </head>
 <body>
@@ -127,6 +141,22 @@
         <p>Sept thèmes, chacun avec un cours, une fiche, des cartes mémoire et un quiz corrigé. La progression est gardée, et suivie sur un compte si vous le souhaitez.</p>
         <p class="card-links"><a href="./cours.html">Cours</a> · <a href="./fiches.html">Fiches et cartes</a> · <a href="./quiz.html">Quiz</a> · <a href="./progression.html">Progression</a></p>
       </article>
+    </div>
+
+    <h2 class="section-title">Ce que votre ordinateur vous dit… et ce qu'il vous cache</h2>
+    <div class="terminal-row">
+      <figure class="terminal">
+        <div class="terminal-bar" aria-hidden="true"><span></span><span></span><span></span><em>PC-A — terminal</em>
+          <button type="button" class="terminal-replay" id="terminal-replay" tabindex="-1">Rejouer</button></div>
+        <pre class="terminal-screen" id="terminal" aria-hidden="true"></pre>
+        <figcaption class="sr-only" id="terminal-text"></figcaption>
+      </figure>
+      <div class="terminal-side">
+        <p>Sur un vrai PC, un <code>ping</code> vers PC-B ne répond qu'une ligne, et <code>traceroute</code> n'en affiche que trois.</p>
+        <p>Entre ces lignes, il s'est pourtant passé beaucoup de choses : des requêtes ARP diffusées, des tables MAC remplies, deux routeurs qui ont réécrit les adresses MAC et fait passer le TTL de 64 à 62.</p>
+        <p><strong>PacketLab vous montre tout ce qui se passe entre ces lignes, étape par étape.</strong></p>
+        <a class="button primary" href="./simulateur.html?topo=mixte&amp;src=PC-A&amp;dst=PC-B">Voir ce trajet dans le simulateur</a>
+      </div>
     </div>
 
     <h2 class="section-title">Comment ça marche</h2>

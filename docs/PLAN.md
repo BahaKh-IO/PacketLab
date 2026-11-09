@@ -161,6 +161,19 @@ Goal: Module C complete. Claude drafts all text; Nour checks it against the cour
 - [x] Living network background (Baha's request): drifting devices and packets with their bits, reacts to the pointer and to clicks; reduced motion = still
 - [x] Accessibility re-checked after the redesign; README screenshots in `docs/captures/`
 
+## Design pass 2 (Nov 8–9, 2026)
+
+- [x] Backdrop and controls: blueprint background, bigger interactive network, glass cards, dark « HUD » fields, switches, gradient buttons that react (hover lift, light streak, press, ripple)
+- [x] Simulator: the old Ethernet header peels off when a router builds a new frame (`panels.js`); learned ARP/MAC rows slide in with an « appris » tag; device card on hover/focus (IP, MAC, gateway); fading trail behind the frame and a flash on the receiving device (`topology-view.js`); phone: panels in a bottom sheet; « Copier le lien de ce trajet »
+- [x] Quiz: one segment per question, running count of right answers, wrong answer shakes, right one pulses, score counts up, confetti on 100 %
+- [x] Progression: one tile per theme (best quiz score as a ring, flashcards known as a bar) and 8 badges computed from the progress data
+- [x] Home: a typed terminal (ping + traceroute PC-A → PC-B, ttl=62) next to « ce que PacketLab montre entre ces lignes »
+- [x] Dark theme: button in the header, saved choice or system setting (`js/theme-init.js` runs in `<head>`, no white flash); screen only, printing stays light
+- [x] Themed 404 page (a packet whose TTL runs out), favicon, touch icon and link-preview image (`assets/`), page descriptions
+- [x] Printing: « Imprimer la fiche », and a deck of flashcards prints as question / answer strips to cut out
+- [x] Extras: skip link « Aller au contenu », reading-progress bar on courses and fiches, back-to-top button, cards revealed on scroll (CSS only, off with reduced motion)
+- [x] Checked: 97 tests; accessibility audit in light and dark, desktop and phone (only the known gradient-text false positives left); header on one row from 900 px
+
 ## Session 5 — Documentation, testing, demo (≈ 3 h)
 
 Goal: graded documentation done, no network error on screen, demo rehearsed on the live link.

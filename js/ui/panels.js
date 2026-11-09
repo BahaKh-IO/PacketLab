@@ -66,14 +66,22 @@ export function renderHeaders(el, events, i) {
       ], prev),
       h('div', 'layer layer-data', h('span', null, 'Données'), h('span', 'muted', ' — le contenu ne change jamais en route')));
   }
-  const frame = h('div', `layer layer-eth${newFrame ? ' renewed' : ''}`,
-    h('h3', 'layer-title', h('span', 'layer-tag', 'L2'), 'Trame Ethernet (couche 2)',
-      newFrame ? h('span', 'layer-badge', 'Nouvelle trame') : null),
+  const ethHead = (frameValues, compareWith, badge) => h('div', 'eth-head',
+    h('h3', 'layer-title', h('span', 'layer-tag', 'L2'), 'Trame Ethernet (couche 2)', badge),
     fieldList([
-      ['MAC source', 'macSrc', v(f.macSrc, macText(f.macSrc))],
-      ['MAC destination', 'macDst', v(f.macDst, macText(f.macDst))],
-    ], prev),
-    inner);
+      ['MAC source', 'macSrc', v(frameValues.macSrc, macText(frameValues.macSrc))],
+      ['MAC destination', 'macDst', v(frameValues.macDst, macText(frameValues.macDst))],
+    ], compareWith));
+  const head = ethHead(f, prev, newFrame ? h('span', 'layer-badge', 'Nouvelle trame') : null);
+  if (newFrame) {
+    // The old Ethernet header, laid over the new one, peels off: the router threw it away
+    // and wrapped the same IP packet in a new frame. Decorative (the badge says it in words).
+    const old = ethHead(prev, null, h('span', 'layer-badge layer-badge-old', 'Ancienne trame'));
+    old.classList.add('eth-old');
+    old.setAttribute('aria-hidden', 'true');
+    head.append(old);
+  }
+  const frame = h('div', `layer layer-eth${newFrame ? ' renewed' : ''}`, head, inner);
   el.replaceChildren(frame);
 }
 
@@ -85,7 +93,9 @@ function table(caption, head, rows, prevRows) {
   if (rows.length === 0) tb.append(h('tr', null, Object.assign(h('td', 'muted', '(vide)'), { colSpan: head.length })));
   for (const r of rows) {
     const isNew = prevRows && !prevKeys.has(JSON.stringify(r.raw));
-    tb.append(h('tr', r.chosen ? 'chosen' : isNew ? 'new' : null, ...r.cells.map((c) => h('td', null, c))));
+    const cells = r.cells.map((c) => h('td', null, c));
+    if (isNew) cells.at(-1).append(' ', h('span', 'row-tag', 'appris')); // in words, not only in colour
+    tb.append(h('tr', r.chosen ? 'chosen' : isNew ? 'new' : null, ...cells));
   }
   t.append(tb);
   return t;

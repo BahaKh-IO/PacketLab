@@ -104,6 +104,62 @@ export function createTopologyView(svg, topo, { onDeviceClick = () => {} } = {})
     }
   }
 
+  // ---------- device card (shown on hover / focus) ----------
+  const host = svg.closest('.sim-stage') ?? svg.parentElement;
+  let tip = host.querySelector('.device-tip'); // kept when another topology is drawn
+  if (!tip) {
+    tip = document.createElement('div');
+    tip.className = 'device-tip';
+    tip.id = 'device-tip';
+    tip.setAttribute('role', 'tooltip');
+    tip.hidden = true;
+    host.append(tip);
+  }
+  const KIND = { pc: 'Ordinateur', router: 'Routeur', switch: 'Commutateur' };
+
+  function tipLine(label, value) {
+    const p = document.createElement('p');
+    const b = document.createElement('span');
+    b.className = 'tip-key';
+    b.textContent = label;
+    const code = document.createElement('code');
+    code.textContent = value;
+    p.append(b, code);
+    return p;
+  }
+
+  function showTip(d, g) {
+    const head = document.createElement('p');
+    head.className = 'tip-head';
+    head.append(Object.assign(document.createElement('strong'), { textContent: d.id }), ` · ${KIND[d.type] ?? d.type}`);
+    const parts = [head];
+    if (d.type === 'switch') {
+      parts.push(Object.assign(document.createElement('p'), { className: 'tip-note',
+        textContent: `${d.interfaces.length} ports (${d.interfaces.map((i) => i.nom).join(', ')}). Pas d'adresse IP : il lit seulement les MAC.` }));
+    } else {
+      for (const i of d.interfaces) {
+        if (d.type === 'router') parts.push(Object.assign(document.createElement('p'), { className: 'tip-iface', textContent: `Interface ${i.nom}` }));
+        parts.push(tipLine('IP', `${i.ip}/${i.masque}`), tipLine('MAC', i.mac));
+      }
+      if (d.gateway) parts.push(tipLine('Passerelle', d.gateway));
+    }
+    parts.push(Object.assign(document.createElement('p'), { className: 'tip-hint', textContent: 'Cliquer pour voir ses tables' }));
+    tip.replaceChildren(...parts);
+    tip.hidden = false;
+    // Above the device, or below it when there is no room; kept inside the stage.
+    const hr = host.getBoundingClientRect();
+    const r = g.getBoundingClientRect();
+    const x = Math.min(Math.max(r.left + r.width / 2 - hr.left, 120), hr.width - 120);
+    const below = r.top - hr.top < tip.offsetHeight + 16;
+    tip.classList.toggle('below', below);
+    tip.style.left = `${x}px`;
+    tip.style.top = `${below ? r.bottom - hr.top : r.top - hr.top}px`;
+  }
+
+  function hideTip() {
+    tip.hidden = true;
+  }
+
   // ---------- devices ----------
   const nodes = new Map();
   for (const d of topo.devices) {
@@ -116,15 +172,17 @@ export function createTopologyView(svg, topo, { onDeviceClick = () => {} } = {})
     if (d.type === 'pc') {
       g.append(svgEl('text', { y: 40, 'text-anchor': 'middle', class: 'device-ip' }, d.interfaces[0].ip));
     }
-    const title = svgEl('title', {}, d.type === 'router'
-      ? `${d.id} : ${d.interfaces.map((i) => `${i.nom} ${i.ip}/${i.masque}`).join(', ')}`
-      : d.interfaces[0].ip ? `${d.id} : ${d.interfaces[0].ip}/${d.interfaces[0].masque}, MAC ${d.interfaces[0].mac}` : d.id);
-    g.append(title);
     // Click (or Tab + Entrée) on a device: show its tables.
     g.setAttribute('tabindex', '0');
     g.setAttribute('role', 'button');
     g.setAttribute('aria-label', `Voir les tables de ${d.id}`);
+    g.setAttribute('aria-describedby', tip.id);
     g.addEventListener('click', () => onDeviceClick(d.id));
+    // Pointing at (or tabbing to) a device: a card with its addresses.
+    g.addEventListener('pointerenter', () => showTip(d, g));
+    g.addEventListener('pointerleave', hideTip);
+    g.addEventListener('focus', () => showTip(d, g));
+    g.addEventListener('blur', hideTip);
     g.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
@@ -144,8 +202,11 @@ export function createTopologyView(svg, topo, { onDeviceClick = () => {} } = {})
   // ---------- highlight one event ----------
   let frameRequest = null; // current requestAnimationFrame id
 
+  let trailCount = 0;
+
   function clear() {
     cancelAnimationFrame(frameRequest);
+    defs.querySelectorAll('linearGradient').forEach((x) => x.remove());
     for (const g of nodes.values()) g.classList.remove('active');
     for (const { el } of links.values()) el.classList.remove('active', 'reverse');
     layerPackets.replaceChildren();
@@ -156,14 +217,36 @@ export function createTopologyView(svg, topo, { onDeviceClick = () => {} } = {})
    * Each dot is { el, from, to }. With duration 0 the dots are put at the end directly.
    */
   function animate(dots, duration) {
+    const at = (d, e) => ({ x: d.from.x + (d.to.x - d.from.x) * e, y: d.from.y + (d.to.y - d.from.y) * e });
     const place = (k) => {
       const e = k * k * (3 - 2 * k); // smooth start and stop
       for (const d of dots) {
-        d.el.setAttribute('transform', `translate(${d.from.x + (d.to.x - d.from.x) * e} ${d.from.y + (d.to.y - d.from.y) * e})`);
+        const p = at(d, e);
+        d.el.setAttribute('transform', `translate(${p.x} ${p.y})`);
+        if (d.trail) {
+          // The trail: a short streak behind the frame, fading towards its tail.
+          const q = at(d, Math.max(0, e - 0.22));
+          for (const [el, a, b] of [[d.trail, q, p], [d.grad, q, p]]) {
+            el.setAttribute('x1', a.x); el.setAttribute('y1', a.y);
+            el.setAttribute('x2', b.x); el.setAttribute('y2', b.y);
+          }
+        }
+      }
+    };
+    const arrive = () => {
+      for (const d of dots) {
+        d.trail?.remove();
+        d.grad?.remove();
+        const g = nodes.get(d.target);
+        if (!g) continue;
+        g.classList.remove('receiving');
+        void g.getBoundingClientRect(); // restart the flash if it is still running
+        g.classList.add('receiving');
       }
     };
     if (duration <= 0) {
       place(1);
+      for (const d of dots) { d.trail?.remove(); d.grad?.remove(); }
       return;
     }
     const start = performance.now();
@@ -171,6 +254,7 @@ export function createTopologyView(svg, topo, { onDeviceClick = () => {} } = {})
       const k = Math.min(1, (now - start) / duration);
       place(k);
       if (k < 1) frameRequest = requestAnimationFrame(tick);
+      else arrive();
     };
     place(0);
     frameRequest = requestAnimationFrame(tick);
@@ -193,8 +277,13 @@ export function createTopologyView(svg, topo, { onDeviceClick = () => {} } = {})
       const [from, to] = backwards ? [l.p2, l.p1] : [l.p1, l.p2];
       const end = { x: from.x + (to.x - from.x) * 0.72, y: from.y + (to.y - from.y) * 0.72 }; // stop before the icon
       const el = packetGlyph(kind);
-      layerPackets.append(el);
-      dots.push({ el, from, to: end });
+      const gid = `trail-${trailCount++}`;
+      const grad = svgEl('linearGradient', { id: gid, gradientUnits: 'userSpaceOnUse' });
+      grad.append(svgEl('stop', { offset: '0', class: 'trail-tail' }), svgEl('stop', { offset: '1', class: `trail-head trail-${kind}` }));
+      defs.append(grad);
+      const trail = svgEl('line', { class: 'trail', stroke: `url(#${gid})` });
+      layerPackets.append(trail, el);
+      dots.push({ el, from, to: end, trail, grad, target: backwards ? l.aId : l.bId });
     }
     const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
     animate(dots, reduced ? 0 : duration);
