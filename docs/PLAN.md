@@ -179,7 +179,7 @@ Goal: Module C complete. Claude drafts all text; Nour checks it against the cour
 Goal: graded documentation done, no network error on screen, demo rehearsed on the live link.
 
 - [x] For each of the 5 topologies, write the expected trace by hand (like § 7.1) and compare it with the app (Nov 9, 2026): `docs/traces.md`, all 5 match (mesh: /24 beats the default route; return path R4 → R3 → R1); kept as tests in `tests/traces.test.js`
-- [x] Browsers (Nov 9, 2026): Chrome 157, Edge 156, Firefox 158 on desktop and at phone width — every page, one real interaction each, no JavaScript error. Fixed on the way: Firefox showed the page through the phone bottom sheet. **Left to the team: a real Android phone** (open the link, run PC-A → PC-B, open the Tables panel, do a quiz)
+- [x] Browsers (Nov 9, 2026): Chrome 157, Edge 156, Firefox 158 on desktop and at phone width — every page, one real interaction each, no JavaScript error. Fixed on the way: Firefox showed the page through the phone bottom sheet. Android phones tested by Baha (Nov 9, 2026)
 - [x] Accessibility basics (Nov 8, 2026): audit of 8 pages × states × desktop/phone (contrast AA, names and labels, headings, landmarks, targets ≥ 24 px, focus ring 3:1, reduced motion, tab order); 81 issues found and fixed, 0 left
 - [ ] UML: use-case diagram (draw.io); class diagram, sequence PC-A → PC-B (now with R1's and R2's ARP), Module B sequence and state diagrams (Mermaid), all matching the real code
 - [x] README: what it is, live link, screenshots, run locally, run tests, simplifications, credits (Nov 8, 2026)
@@ -187,32 +187,7 @@ Goal: graded documentation done, no network error on screen, demo rehearsed on t
 - [x] Shareable scenario link (the address of a run + « Copier le lien de ce trajet »)
 - [-] PWA (works offline): dropped (Baha, Nov 9, 2026)
 - [x] Tag `v1.0` (Nov 9, 2026); demo script `docs/demo.md` (clicks, words, timings, likely questions); rehearsed automatically on the live site in a fresh browser, plan-B images in `docs/demo/`. The rehearsal found GitHub Pages answering 503 for a few seconds after a deploy: data files are now retried (`fetchWithRetry`, tested)
-- [ ] **Team:** rehearse the demo twice out loud; record it once (Win + Alt + R) as plan B
-
-## Nour — what to collect (before session 4)
-
-Nothing here blocks today. She drops everything in `docs/reference/` and uploads the course slides to this Claude project.
-
-- [ ] Networking course slides: IP addressing, MAC, ARP, switching, routing, topologies, reliability (ACK, timeout)
-- [ ] Course vocabulary to reuse word for word in the quizzes (e.g. “trame” vs “paquet”, “commutateur” vs “switch”)
-- [ ] Any exercise from the course that could become a quiz question or a simulation question
-- [ ] Review of Claude's quiz and fiche drafts (session 4)
-- [ ] Optional: logo source file and exact hex codes; until then the colours from the slides are used
-
-## Claude Code prompts for today
-
-Run Claude Code in the repo folder. For each prompt: ask for a plan first, read the diff, run the tests, commit. These 8 prompts cover steps 2–6.
-
-1. “Read docs/. Write a CLAUDE.md of about 15 lines: what PacketLab is; plain HTML/CSS/JS with ES modules, no framework, no dependency, no build step; the engine never touches the DOM and the UI only reads the event list; UI text in French, code in English; ARP and MAC tables start empty, routing tables pre-filled; run tests with `node --test`; ask before adding a library or changing a JSON format.”
-2. “Create the folder structure from the plan and the 7 pages with a shared header and navigation. No logic yet.”
-3. “Propose a JSON format for topologies, then write `etoile.json` and `mixte.json` with exactly the addresses of § 7.1 in docs, plus one extra PC per LAN. Show me the format before writing the files.”
-4. “Write `scheduler.js`: a queue of events sorted by simulated time, ties by insertion order. Explain the data structure first. Add a test.”
-5. “Write the PC, ARP and switch rules in `network.js` and `simulate(topology, src, dst)`. Each event carries a French `note` and a copy of the tables. Add tests on étoile.”
-6. “Add the router rule. Add a test that checks § 7.1: MACs per segment, IPs unchanged, TTL 64, 63, 62. Then write `tests/print-log.js`.”
-7. “Add bus, anneau and maillée: JSON files, rules, one test each.”
-8. “Build `simulateur.html`: SVG view, player (précédent, suivant, lecture/pause, rejouer, speed 0.5/1/2, keys ← → space R), headers, table and log panels. The UI only reads the event list.”
-
-After prompt 6, ask “explain `network.js` to me line by line”: this is the file the jury will question most.
+- [ ] **Nour:** slides, report, UML, demo rehearsal and video (Win + Alt + R) — see `docs/demo.md`
 
 ## Learning checklist
 
@@ -240,12 +215,3 @@ The project is done when you can answer every line below without notes. Tick the
 - [ ] How GitHub Pages serves the repo, and why relative paths and exact file names matter there
 - [ ] How to run the tests and what each one proves
 - [ ] What Claude Code wrote and what you decided, checked or fixed yourselves
-
-## Open questions
-
-None of these blocks today; ask them at the next class.
-
-1. **Teacher:** is plain JavaScript accepted? Objectif 1 slide 4 announced React or Vue.js, so say it explicitly if you drop it.
-2. **Teacher:** what are the dates and expected content of Objectif 2, the final delivery, and the soutenance?
-3. **Teacher:** is an AI coding assistant allowed, and should its use be declared in the report?
-4. **Teacher:** does “complexité technique” expect a backend (login, database)? This plan has none, on purpose.

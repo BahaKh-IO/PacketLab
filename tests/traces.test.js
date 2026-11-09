@@ -1,4 +1,4 @@
-// Hand-written traces (docs/traces.md): for each topology, what the rules of CLAUDE.md say must
+// Hand-written traces (docs/traces.md): for each topology, what the network rules (§ 10.3 of the description) say must
 // happen, written from the topology file before looking at the engine — then compared with it.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

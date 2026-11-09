@@ -1,6 +1,6 @@
 # Traces attendues, écrites à la main
 
-Pour chaque topologie, le trajet PC-A → PC-B est déduit **à la main** du fichier de la topologie et des règles réseau (CLAUDE.md, § 10.3 de la description), sans regarder le moteur. Il est ensuite comparé à ce qu'affiche PacketLab (`node tests/print-log.js <topologie> PC-A PC-B`).
+Pour chaque topologie, le trajet PC-A → PC-B est déduit **à la main** du fichier de la topologie et des règles réseau (§ 10.3 de la description détaillée), sans regarder le moteur. Il est ensuite comparé à ce qu'affiche PacketLab (`node tests/print-log.js <topologie> PC-A PC-B`).
 
 Résultat (9 novembre 2026) : **les 5 topologies sont conformes**. Ces traces sont devenues des tests automatiques : `tests/traces.test.js` (et `tests/engine.test.js` pour l'exemple mixte du § 7.1).
 

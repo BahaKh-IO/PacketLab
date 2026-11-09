@@ -1,6 +1,6 @@
 # PacketLab — data formats
 
-Frozen at step 3. Any change to these formats must be agreed first (see CLAUDE.md).
+Frozen at step 3. Any change to these formats must be agreed first.
 
 ## Topology file (`data/topologies/<id>.json`)
 
