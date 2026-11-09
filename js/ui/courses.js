@@ -3,7 +3,7 @@
 // as HTML because it is our own file, from our own site (never user input).
 
 import { h, link, button } from './dom.js';
-import { loadThemes, loadError } from './content.js';
+import { loadThemes, loadError, fetchWithRetry } from './content.js';
 import { themeIcon, themeClass } from './theme-icons.js';
 
 const app = document.getElementById('courses-app');
@@ -27,7 +27,7 @@ function list() {
 async function course(theme) {
   let html;
   try {
-    const res = await fetch(`./cours/${theme.id}.html`);
+    const res = await fetchWithRetry(`./cours/${theme.id}.html`);
     if (!res.ok) throw new Error(`cours/${theme.id}.html : HTTP ${res.status}`);
     html = await res.text();
   } catch (err) {

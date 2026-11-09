@@ -12,6 +12,7 @@ import { save, load } from '../storage.js';
 import { predictions } from './predict.js';
 import { recordSimulation } from '../progress.js';
 import { startSync } from '../account.js';
+import { loadTopology } from './content.js';
 
 startSync(); // logged-in students: progress kept in sync with their account
 
@@ -270,11 +271,7 @@ function run({ askAtStart = true } = {}) {
 
 async function init() {
   try {
-    for (const id of TOPOLOGY_IDS) {
-      const res = await fetch(`./data/topologies/${id}.json`);
-      if (!res.ok) throw new Error(`${id}.json : HTTP ${res.status}`);
-      topologies.set(id, await res.json());
-    }
+    for (const id of TOPOLOGY_IDS) topologies.set(id, await loadTopology(id));
   } catch (err) {
     const box = $('error');
     box.hidden = false;

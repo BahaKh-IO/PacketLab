@@ -4,7 +4,7 @@
 
 import { h, link, button } from './dom.js';
 import { themeIcon, themeClass } from './theme-icons.js';
-import { loadThemes, loadCartes, loadError } from './content.js';
+import { loadThemes, loadCartes, loadTopology, loadError } from './content.js';
 import { getProgress, resetProgress } from '../progress.js';
 import { startSync, accountsEnabled, currentSession, pushReset } from '../account.js';
 
@@ -102,7 +102,7 @@ async function render() {
   try {
     themes = (await loadThemes()).themes;
     cartes = (await loadCartes()).cartes;
-    topos = await Promise.all(TOPOLOGIES.map(([id]) => fetch(`./data/topologies/${id}.json`).then((r) => r.json())));
+    topos = await Promise.all(TOPOLOGIES.map(([id]) => loadTopology(id)));
   } catch (err) {
     app.replaceChildren(h('p', 'error', loadError(err)));
     return;
