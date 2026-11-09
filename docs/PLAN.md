@@ -182,9 +182,10 @@ Goal: graded documentation done, no network error on screen, demo rehearsed on t
 - [ ] Browsers: Chrome, Firefox, Edge on desktop; Chrome on Android
 - [x] Accessibility basics (Nov 8, 2026): audit of 8 pages × states × desktop/phone (contrast AA, names and labels, headings, landmarks, targets ≥ 24 px, focus ring 3:1, reduced motion, tab order); 81 issues found and fixed, 0 left
 - [ ] UML: use-case diagram (draw.io); class diagram, sequence PC-A → PC-B (now with R1's and R2's ARP), Module B sequence and state diagrams (Mermaid), all matching the real code
-- [ ] README: what it is, live link, screenshots, run locally, run tests, simplifications, credits
+- [x] README: what it is, live link, screenshots, run locally, run tests, simplifications, credits (Nov 8, 2026)
 - [ ] `a-propos.html`: model and simplifications, team, credits
-- [ ] Bonus if time: PWA (works offline in the exam room), shareable scenario link
+- [x] Shareable scenario link (the address of a run + « Copier le lien de ce trajet »)
+- [ ] Bonus if time: PWA (works offline in the exam room)
 - [ ] Tag `v1.0`; rehearse the 5-minute demo of § 18 twice; keep a local copy and a screen recording as plan B
 
 ## Nour — what to collect (before session 4)
