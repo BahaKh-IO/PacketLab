@@ -46,7 +46,7 @@ async function course(theme) {
       button('Imprimer / PDF', null, () => window.print())),
     h('p', 'card-kicker', `Cours ${i + 1} sur ${data.themes.length}`),
     h('div', 'course-head', themeIcon(theme.id), h('h2', 'course-title', theme.titre)),
-    theme.statut === 'a-valider' ? h('p', 'badge-review', 'Contenu à valider par l\'équipe') : null,
+    theme.statut === 'a-valider' ? h('p', 'badge-review', 'Des erreurs restent possibles : en cas de doute, vérifiez auprès de votre enseignante.') : null,
     h('p', 'course-sources', data.sources),
     body,
     h('div', 'quiz-actions no-print',

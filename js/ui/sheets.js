@@ -59,7 +59,7 @@ function sheet(f) {
   show(h('article', `sheet ${themeClass(f.theme)}`,
     h('p', 'card-kicker', t?.titre ?? ''),
     h('div', 'course-head', themeIcon(f.theme), h('h2', null, f.titre)),
-    t?.statut === 'a-valider' ? h('p', 'badge-review', 'Contenu à valider par l\'équipe') : null,
+    t?.statut === 'a-valider' ? h('p', 'badge-review', 'Des erreurs restent possibles : en cas de doute, vérifiez auprès de votre enseignante.') : null,
     h('section', 'sheet-block',
       h('h3', null, 'L\'essentiel'),
       h('ul', null, f.essentiel.map((e) => h('li', null, e)))),

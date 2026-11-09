@@ -29,7 +29,7 @@ function themeList() {
       h('h2', 'card-title', t.titre),
       h('p', null, t.resume),
       h('p', 'quiz-best', best ? `Meilleur score : ${best.meilleur} / ${best.total} (${best.tentatives} essai${best.tentatives > 1 ? 's' : ''})` : 'Pas encore tenté'),
-      t.statut === 'a-valider' ? h('p', 'badge-review', 'Contenu à valider par l\'équipe') : null,
+      t.statut === 'a-valider' ? h('p', 'badge-review', 'Des erreurs restent possibles : en cas de doute, vérifiez auprès de votre enseignante.') : null,
       link(`./quiz.html?theme=${t.id}`, 'Commencer →', 'button primary'));
   });
   show(h('div', 'cards', cards));

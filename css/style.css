@@ -1426,3 +1426,14 @@ main:focus { outline: none; }
   .site-header nav a { padding-inline: 0.55rem; font-size: 0.9rem; }
   .brand-name { font-size: 1.15rem; }
 }
+/* the "check with your teacher" note on quizzes, fiches and courses: a small note that can wrap */
+.badge-review { display: flex !important; align-items: flex-start; gap: 0.4rem; max-width: 34rem; padding: 0.35rem 0.7rem !important; border-radius: 10px; line-height: 1.4; font-size: 0.78rem !important; }
+.badge-review::before { content: "!" / ""; flex: none; display: grid; place-items: center; width: 1.05rem; height: 1.05rem; margin-top: 0.05rem; border-radius: 50%; background: #b45309; color: #fff; font-size: 0.7rem; font-weight: 800; }
+/* phone sheet: fully opaque, no blur (Firefox let the page show through the blurred sheet) */
+@media (max-width: 767px) {
+  .sim-panels { background: #fff; -webkit-backdrop-filter: none; backdrop-filter: none; }
+}
+@media screen and (max-width: 767px) {
+  :root[data-theme="dark"] .sim-panels { background: #0c1730; }
+}
+.sheet .badge-review, .course .badge-review { margin-top: 0.7rem !important; }
