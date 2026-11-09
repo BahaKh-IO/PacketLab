@@ -29,7 +29,7 @@ Fonctionne dans le navigateur, sur ordinateur comme sur téléphone, sans instal
 - **HTML, CSS et JavaScript** (modules ES) : aucun framework, aucune dépendance, aucune étape de compilation.
 - **Un moteur à événements discrets** (`js/engine/`) calcule toute la simulation ; l'interface ne fait que rejouer la liste d'événements. Pause, retour en arrière et rejeu restent donc toujours cohérents.
 - **Un backend léger** (`server/`) pour les comptes : le même code tourne sur Cloudflare Workers + D1 en ligne, et avec le SQLite intégré à Node en local. Mots de passe hachés (PBKDF2), sessions à jetons. Détails : [`docs/backend.md`](docs/backend.md).
-- **97 tests** (`node --test`) : règles réseau, exemple travaillé, scénarios, contenus pédagogiques, backend.
+- **106 tests** (`node --test`) : règles réseau, exemple travaillé, traces des 5 topologies vérifiées à la main ([`docs/traces.md`](docs/traces.md)), scénarios, contenus pédagogiques, backend. Testé dans Chrome, Edge et Firefox.
 
 ## Lancer en local
 

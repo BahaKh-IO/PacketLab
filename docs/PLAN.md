@@ -178,15 +178,16 @@ Goal: Module C complete. Claude drafts all text; Nour checks it against the cour
 
 Goal: graded documentation done, no network error on screen, demo rehearsed on the live link.
 
-- [ ] For each of the 5 topologies, write the expected trace by hand (like § 7.1) and compare it with the app
-- [ ] Browsers: Chrome, Firefox, Edge on desktop; Chrome on Android
+- [x] For each of the 5 topologies, write the expected trace by hand (like § 7.1) and compare it with the app (Nov 9, 2026): `docs/traces.md`, all 5 match (mesh: /24 beats the default route; return path R4 → R3 → R1); kept as tests in `tests/traces.test.js`
+- [x] Browsers (Nov 9, 2026): Chrome 157, Edge 156, Firefox 158 on desktop and at phone width — every page, one real interaction each, no JavaScript error. Fixed on the way: Firefox showed the page through the phone bottom sheet. **Left to the team: a real Android phone** (open the link, run PC-A → PC-B, open the Tables panel, do a quiz)
 - [x] Accessibility basics (Nov 8, 2026): audit of 8 pages × states × desktop/phone (contrast AA, names and labels, headings, landmarks, targets ≥ 24 px, focus ring 3:1, reduced motion, tab order); 81 issues found and fixed, 0 left
 - [ ] UML: use-case diagram (draw.io); class diagram, sequence PC-A → PC-B (now with R1's and R2's ARP), Module B sequence and state diagrams (Mermaid), all matching the real code
 - [x] README: what it is, live link, screenshots, run locally, run tests, simplifications, credits (Nov 8, 2026)
 - [ ] `a-propos.html`: model and simplifications, team, credits
 - [x] Shareable scenario link (the address of a run + « Copier le lien de ce trajet »)
-- [ ] Bonus if time: PWA (works offline in the exam room)
-- [ ] Tag `v1.0`; rehearse the 5-minute demo of § 18 twice; keep a local copy and a screen recording as plan B
+- [-] PWA (works offline): dropped (Baha, Nov 9, 2026)
+- [x] Tag `v1.0` (Nov 9, 2026); demo script `docs/demo.md` (clicks, words, timings, likely questions); rehearsed automatically on the live site in a fresh browser, plan-B images in `docs/demo/`. The rehearsal found GitHub Pages answering 503 for a few seconds after a deploy: data files are now retried (`fetchWithRetry`, tested)
+- [ ] **Team:** rehearse the demo twice out loud; record it once (Win + Alt + R) as plan B
 
 ## Nour — what to collect (before session 4)
 
